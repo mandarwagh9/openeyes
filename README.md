@@ -1,4 +1,4 @@
-# 🤖 AI + Embedded Systems
+# PROJECT0 - Robot Vision System
 
 <p align="center">
   <pre style="font-family: monospace; font-size: 14px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 20px; border-radius: 8px;">
@@ -9,257 +9,190 @@
 | .__/|_|  \___// |\___|\___|\__|\___/ 
 |_|           |__/                     
   
-                AI + Embedded Systems
+                PROJECT0
+              Vision System for Humanoid Robots
   </pre>
 </p>
 
 <p align="center">
-  <a href="#what-is-this">
-    <img src="https://img.shields.io/badge/AI-Embedded%20Systems-1a1a2e?style=for-the-badge&logo=hardware&logoColor=white" alt="AI + Embedded Systems" />
+  <a href="#about">
+    <img src="https://img.shields.io/badge/Version-v0.0.1-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
   </a>
-  <a href="#license">
-    <img src="https://img.shields.io/badge/License-MIT-1a1a2e?style=for-the-badge" alt="License" />
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/License-Apache_2.0-1a1a2e?style=for-the-badge" alt="License" />
   </a>
-  <a href="#contributing">
+  <a href="#tech-stack">
+    <img src="https://img.shields.io/badge/Tech-NVIDIA_Jetson-1a1a2e?style=for-the-badge&logo=nvidia&logoColor=white" alt="Tech Stack" />
+  </a>
+  <a href="CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/Welcome-Contributions-1a1a2e?style=for-the-badge" alt="Contributing" />
   </a>
 </p>
 
 ---
 
-## ✨ What is Embedded AI?
+## About
 
-> **AI + Embedded Systems = intelligence running directly inside physical devices.**
+**PROJECT0** is a vision system for humanoid robots - the "eyes" that enable robots to perceive and understand the physical world. Built on NVIDIA Jetson Orin Nano, it provides real-time AI-powered computer vision capabilities running entirely on-device (Edge AI).
 
-Instead of AI running only in large cloud servers, **AI models are embedded inside hardware devices that interact with the real world**. The device itself can:
+### Key Features
 
-- 👁️ **Perceive** its environment
-- 🧠 **Interpret** data locally  
-- ⚡ **Make decisions** in real-time
-- 🎯 **Trigger actions** without internet
-
-This paradigm is also known as **Edge AI** or **On-device AI** — AI inference happening locally on devices rather than centralized infrastructure.
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        AI + EMBEDDED SYSTEMS                                │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   ┌─────────────┐       ┌─────────────┐       ┌─────────────┐              │
-│   │  Physical  │       │   Edge      │       │     AI      │              │
-│   │   Layer    │ ────▶ │ Processing  │ ────▶ │    Model    │              │
-│   └─────────────┘       └─────────────┘       └─────────────┘              │
-│   • Sensors              • NPU                   • Object Detection         │
-│   • Actuators            • GPU                   • Speech Recognition       │
-│   • Microcontrollers     • TPU                   • Anomaly Detection       │
-│   • AI Accelerators     • FPGA                                            │
-│                           └─────────────┬───────────┘                      │
-│                                         │                                   │
-│                                         ▼                                   │
-│                              ┌─────────────────────┐                        │
-│                              │   Control Logic     │                        │
-│                              │   (Actions/Output) │                        │
-│                              └─────────────────────┘                        │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Traditional vs Embedded AI
-
-| Traditional AI | Embedded AI |
-|----------------|-------------|
-| `Sensors → Internet → Cloud AI → Decision → Device` | `Sensors → Device AI → Decision → Actuator` |
-| ❌ Latency | ✅ Real-time |
-| ❌ Internet required | ✅ Offline capable |
-| ❌ Privacy concerns | ✅ Local data processing |
-| ❌ Bandwidth costs | ✅ Lower network load |
+- 👁️ **Object Detection** - Recognize everyday objects in real-time
+- 📊 **Depth Estimation** - Understand 3D environment from 2D camera
+- 👤 **Face Recognition** - Identify and track people
+- 🖐️ **Gesture Recognition** - Understand human hand signals
+- 🦵 **Pose Estimation** - Detect human body poses
+- ⚡ **Real-time Performance** - 20-30 FPS on embedded hardware
+- 🔒 **Privacy-first** - All processing done locally, no cloud required
 
 ---
 
-## 🔑 The Three Pillars
+## Why PROJECT0?
 
-```
-┌─────────────────────┐
-│  Embedded Systems   │  Specialized computing for specific tasks
-│  ─────────────────  │  Limited power & memory
-│  • Car ECUs         │
-│  • Washing machines │  Examples: ECUs, drones, medical devices
-│  • Drones           │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐     ┌─────────────────────┐
-│ Artificial          │     │   Edge Computing    │
-│ Intelligence        │ +   │  ─────────────────  │
-│  ─────────────────  │     │  Processing data    │
-│  Pattern recognition│     │  close to where     │
-│  Decision making    │     │  it's generated     │
-│  • Computer vision │     │                     │
-│  • Speech rec.     │     │                     │
-└──────────┬──────────┘     └──────────┬──────────┘
-           │                           │
-           └───────────┬───────────────┘
-                       ▼
-            ┌─────────────────────┐
-            │    Embedded AI      │
-            │  (The Convergence)  │
-            └─────────────────────┘
-```
+A humanoid robot needs vision like humans need eyes. PROJECT0 provides:
+
+| Capability | Human Equivalent | Use Case |
+|:-----------|:----------------|:---------|
+| Object Detection | "That's a cup" | Find objects to grasp |
+| Depth Estimation | "The table is 50cm away" | Navigation & avoidance |
+| Face Recognition | "That's my owner" | Personal identification |
+| Gesture Recognition | "Stop sign" | Understand commands |
+| Pose Estimation | "Person sitting" | Activity recognition |
 
 ---
 
-## 🚀 Application Domains
+## Hardware
 
-<div align="center">
+| Component | Specification |
+|:----------|:-------------|
+| **Platform** | NVIDIA Jetson Orin Nano (4GB/8GB) |
+| **Camera** | USB Webcam 1080p |
+| **OS** | JetPack (Ubuntu 22.04) |
+| **Power** | 5V/4A barrel jack |
+| **Storage** | MicroSD 64GB+ |
 
-| 🏎️ Autonomous Vehicles | 📱 Smart Devices | 🤖 Robotics |
-|:---:|:---:|:---:|
-| Cars interpret sensor data locally | Phones, cameras, wearables | Navigation, manipulation |
-| Real-time processing is critical | Face recognition, voice assistants | Environment mapping |
+### Performance Targets
 
-| 🏭 Industrial Automation | 🏥 Healthcare | 🏠 Smart Environments |
-|:---:|:---:|:---:|
-| Anomaly detection | AI ultrasound | Smart homes |
-| Predictive maintenance | Wearable monitors | Intelligent appliances |
-
-</div>
-
----
-
-## ⚙️ The Pipeline
-
-```
-┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
-│    Data      │    │    Model     │    │    Model     │    │    Edge      │    │   Real-time  │
-│  Collection  │ ─▶ │   Training   │ ─▶ │  Compression │ ─▶ │  Deployment  │ ─▶ │  Inference   │
-└──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘
-   Sensors         Cloud GPUs         Quantization       TensorFlow Lite      Local AI
-   Camera frames   Neural networks    Pruning            ONNX                Decision
-   Vibration       Training           Distillation       TinyML               Action
-```
-
-### Model Optimization Techniques
-
-- **Quantization** — Reduce precision (32-bit → 8-bit)
-- **Pruning** — Remove unnecessary neural connections
-- **Knowledge Distillation** — Train smaller "student" models
-
-### Deployment Frameworks
-
-| Framework | Description |
-|-----------|-------------|
-| TensorFlow Lite | Google's edge inference |
-| ONNX | Interoperable model format |
-| TinyML | Ultra-low power ML |
+| Metric | Target |
+|:-------|:-------|
+| FPS | 20-30 FPS |
+| Latency | <50ms |
+| Detection Range | 0.5m - 5m |
+| Model Size | <50MB |
 
 ---
 
-## 💡 The Vision
-
-> **"Every device can sense. Every device can reason. Every device can act."**
-
-```
-Cloud AI (training)
-        ↓
-Edge AI (coordination)
-        ↓
-Embedded AI (real-time decisions)
-```
-
-### Historical Computing Paradigms
-
-| Era | Computing Model |
-|:---:|:---:|
-| 1960s | Mainframes |
-| 1990s | Personal Computers |
-| 2010s | Cloud Computing |
-| 2020s | AI Assistants |
-| **2030s** | **Embedded AI Everywhere** |
-
----
-
-## 🔬 Core Concept: Embodied Intelligence
-
-Intelligence exists **inside physical systems** interacting with the world:
-
-```
-Perception + Decision + Action
-```
-
-| Example | Flow |
-|:---:|:---|
-| 🚗 Car | `camera + radar → detect obstacle → brake` |
-| 📱 Phone | `microphone → speech recognition → assistant response` |
-| 🤖 Robot | `camera → detect object → pick object` |
-
----
-
-## ⚠️ Technical Challenges
-
-<div align="center">
-
-| Challenge | Description |
-|:---:|:---|
-| 🧠 Model Size | LLMs = GBs, devices = MBs of RAM |
-| 🔋 Power | Battery devices need efficient computation |
-| ⚡ Latency | Robots/vehicles must respond instantly |
-| 🔒 Security | Physical attack vectors on edge devices |
-
-</div>
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 <p align="center">
-  <img src="https://skillicons.dev/icons?i=python,tensorflow,pytorch,c++,rust,arduino,raspberrypi,nvidia,aws,docker" />
+  <img src="https://skillicons.dev/icons?i=python,tensorflow,pytorch,opencv,docker" />
 </p>
 
-<div align="center">
-
-**Hardware** — NVIDIA Jetson, Raspberry Pi, ARM Cortex-M, Google Coral  
-**ML Frameworks** — TensorFlow, PyTorch, ONNX  
-**Edge Runtime** — TensorFlow Lite, ONNX Runtime, TinyML  
-**Protocols** — MQTT, gRPC, WebSocket
-
-</div>
-
----
-
-## 📖 Documentation
-
-For a deep dive into AI + Embedded Systems, see:
-
-- [Manifesto](./manifesto.md) — Full technical explanation
-- [IBM — What Is Edge AI?](https://www.ibm.com/think/topics/edge-ai)
-- [Synopsys — What is Edge AI?](https://www.synopsys.com/glossary/what-is-edge-ai.html)
-- [Milvus — Edge AI Architecture](https://milvus.io/ai-quick-reference/what-is-a-typical-architecture-for-an-edge-ai-system)
+| Layer | Technology |
+|:------|:-----------|
+| **AI Framework** | TensorFlow Lite, PyTorch, ONNX |
+| **Vision** | OpenCV, CUDA |
+| **Models** | YOLOv8, MediaPipe, MiDaS |
+| **Deployment** | TensorRT optimization |
+| **Communication** | JSON, UDP, ROS2-ready |
 
 ---
 
-## 🤝 Contributing
+## Quick Start
 
-Contributions are welcome! Whether you're:
+```bash
+# Clone the repository
+git clone https://github.com/mandarwagh9/project0.git
+cd project0
 
-- 🐛 Fixing bugs
-- ✨ Adding features
-- 📝 Improving documentation
-- 💡 Proposing new ideas
+# Install dependencies
+pip install -r requirements.txt
 
-Please read our [contributing guidelines](CONTRIBUTING.md) first.
+# Run the vision system
+python src/main.py
+```
+
+See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
 
 ---
 
-## 📄 License
+## Project Structure
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+```
+project0/
+├── src/
+│   ├── camera/           # Camera input handling
+│   ├── models/           # AI model wrappers
+│   ├── inference/        # TensorRT optimization
+│   └── output/          # Output handlers
+├── models/              # AI model weights
+├── docs/                # Documentation
+│   ├── TECHNICAL_SPEC.md
+│   ├── ARCHITECTURE.md
+│   ├── HARDWARE.md
+│   └── API_SPEC.md
+├── tests/               # Test suites
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
+```
+
+---
+
+## Documentation
+
+### Getting Started
+- [QUICKSTART.md](QUICKSTART.md) - 5-minute setup guide
+- [INSTALL.md](INSTALL.md) - Detailed installation
+- [USER_GUIDE.md](USER_GUIDE.md) - How to use the system
+
+### Technical
+- [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) - Full technical specification
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
+- [HARDWARE.md](docs/HARDWARE.md) - Hardware specifications
+- [API_SPEC.md](docs/API_SPEC.md) - API documentation
+
+### Developer
+- [AGENTS.md](AGENTS.md) - Developer guidelines
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
+- [ROADMAP.md](ROADMAP.md) - Project roadmap
+- [CHANGELOG.md](CHANGELOG.md) - Version history
+
+---
+
+## Capabilities Roadmap
+
+| Phase | Capabilities | Status |
+|:------|:------------|:-------|
+| v0.0.1 | Object Detection | Planned |
+| v0.0.2 | Depth Estimation | Planned |
+| v0.0.3 | Face Recognition | Planned |
+| v0.0.4 | Gesture Recognition | Planned |
+| v0.0.5 | Pose Estimation | Planned |
+| v1.0.0 | Full Integration | Planned |
+
+---
+
+## Contributing
+
+Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) before getting started.
+
+---
+
+## License
+
+This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## References
+
+- [NVIDIA Jetson](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/)
+- [YOLOv8 Documentation](https://docs.ultralytics.com/)
+- [MediaPipe](https://mediapipe.dev/)
+- [TensorFlow Lite](https://www.tensorflow.org/lite)
 
 ---
 
 <p align="center">
-  <sub>Built with ⚡ for the future of computing</sub>
+  <sub>Built with ⚡ for the future of humanoid robotics</sub>
 </p>
