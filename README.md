@@ -1,12 +1,15 @@
 # 🤖 AI + Embedded Systems
 
 <p align="center">
-  <pre style="font-family: 'Fira Code', monospace; font-size: 18px; font-weight: bold; color: #1a1a2e; background: linear-gradient(90deg, #0f3460, #16213e, #1a1a2e); padding: 20px; border-radius: 8px;">
-╔═══════════════════════════════════════════════════════════╗
-║      INTELLIGENCE IN THE PHYSICAL WORLD                   ║
-║      ─────────────────────────────────────                ║
-║      AI running directly on hardware devices              ║
-╚═══════════════════════════════════════════════════════════╝
+  <pre style="font-family: monospace; font-size: 14px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 20px; border-radius: 8px;">
+                  _           _    ___  
+ _ __  _ __ ___ (_) ___  ___| |_ / _ \ 
+| '_ \| '__/ _ \| |/ _ \/ __| __| | | |
+| |_) | | | (_) | |  __/ (__| |_| |_| |
+| .__/|_|  \___// |\___|\___|\__|\___/ 
+|_|           |__/                     
+  
+                AI + Embedded Systems
   </pre>
 </p>
 
