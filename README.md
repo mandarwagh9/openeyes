@@ -1,18 +1,24 @@
 # 🤖 AI + Embedded Systems
 
 <p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&weight=700&size=32&color=00D9FF&center=true&vCenter=true&width=500&lines=Intelligence+in+the+Physical+World" alt="Typing SVG" />
+  <pre style="font-family: 'Fira Code', monospace; font-size: 18px; font-weight: bold; color: #1a1a2e; background: linear-gradient(90deg, #0f3460, #16213e, #1a1a2e); padding: 20px; border-radius: 8px;">
+╔═══════════════════════════════════════════════════════════╗
+║      INTELLIGENCE IN THE PHYSICAL WORLD                   ║
+║      ─────────────────────────────────────                ║
+║      AI running directly on hardware devices              ║
+╚═══════════════════════════════════════════════════════════╝
+  </pre>
 </p>
 
 <p align="center">
   <a href="#what-is-this">
-    <img src="https://img.shields.io/badge/AI-Embedded%20Systems-00D9FF?style=for-the-badge&logo=hardware&logoColor=white" alt="AI + Embedded Systems" />
+    <img src="https://img.shields.io/badge/AI-Embedded%20Systems-1a1a2e?style=for-the-badge&logo=hardware&logoColor=white" alt="AI + Embedded Systems" />
   </a>
   <a href="#license">
-    <img src="https://img.shields.io/badge/License-MIT-00D9FF?style=for-the-badge" alt="License" />
+    <img src="https://img.shields.io/badge/License-MIT-1a1a2e?style=for-the-badge" alt="License" />
   </a>
   <a href="#contributing">
-    <img src="https://img.shields.io/badge/Welcome-Contributions-00D9FF?style=for-the-badge" alt="Contributing" />
+    <img src="https://img.shields.io/badge/Welcome-Contributions-1a1a2e?style=for-the-badge" alt="Contributing" />
   </a>
 </p>
 
