@@ -150,6 +150,7 @@ project0/
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
 - [HARDWARE.md](docs/HARDWARE.md) - Hardware specifications
 - [API_SPEC.md](docs/API_SPEC.md) - API documentation
+- [HOW_HUMANOID_ROBOTS_SEE.md](docs/HOW_HUMANOID_ROBOTS_SEE.md) - How robot vision works
 
 ### Developer
 - [AGENTS.md](AGENTS.md) - Developer guidelines

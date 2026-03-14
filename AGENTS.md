@@ -427,4 +427,5 @@ python src/main.py
 
 - [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) - Full technical spec
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
+- [HOW_HUMANOID_ROBOTS_SEE.md](docs/HOW_HUMANOID_ROBOTS_SEE.md) - How robot vision works
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
