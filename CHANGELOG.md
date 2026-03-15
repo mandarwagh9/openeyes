@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v0.0.1] - 2026-03-13
+## [v0.0.1] - 2026-03-15
 
 ### Added
 
@@ -36,13 +36,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - requirements.txt with dependencies
   - LICENSE (Apache 2.0)
 
-- **Source Code Templates**
-  - camera/ module (placeholder)
-  - models/ module (placeholder)
-  - inference/ module (placeholder)
-  - output/ module (placeholder)
-  - pipeline/ module (placeholder)
-  - utils/ module (placeholder)
+- **Source Code**
+  - config.yaml with default configuration
+  - camera/ module with CameraHandler
+  - models/ module with ObjectDetector (YOLOv8)
+  - output/ module with JSON formatter and UDP sender
+  - utils/ module with config loader and logger
   - main.py entry point
 
 ### Changed
@@ -53,8 +52,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known Issues
 
-- No AI models integrated yet
-- No working source code (templates only)
 - No tests implemented yet
 
 ---
@@ -63,10 +60,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned for v0.0.2
 
-- [ ] YOLOv8n object detection model integration
-- [ ] Camera handler implementation
-- [ ] Basic output (JSON/UDP)
+- [x] YOLOv8n object detection model integration
+- [x] Camera handler implementation
+- [x] Basic output (JSON/UDP)
 - [ ] Working object detection demo
+- [ ] Unit tests
 
 ### Planned for v0.0.3
 
