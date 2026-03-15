@@ -1,0 +1,28 @@
+camera:
+  source: 0
+  width: 640
+  height: 480
+  fps: 30
+
+models:
+  yolo:
+    path: models/yolov8n.pt
+    confidence: 0.5
+    iou_threshold: 0.45
+  depth:
+    enabled: true
+    path: models/depth_midas.pt
+
+output:
+  format: json
+  protocol: udp
+  host: 127.0.0.1
+  port: 5000
+  fps: 30
+
+performance:
+  target_fps: 30
+  max_latency_ms: 50
+  use_tensorrt: false
+
+debug: false
