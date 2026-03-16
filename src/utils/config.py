@@ -42,13 +42,20 @@ class Config:
         import os
         return os.environ.get(key)
 
-    def _set_nested(self, path: tuple, value: Any) -> None:
+    def _set_nested(self, path: tuple, value: str) -> None:
         d = self._config
         for key in path[:-1]:
             if key not in d:
                 d[key] = {}
             d = d[key]
-        d[path[-1]] = value
+        
+        final_key = path[-1]
+        if final_key in ("source", "port", "width", "height", "fps", "target_fps"):
+            d[final_key] = int(value)
+        elif final_key in ("confidence", "iou_threshold"):
+            d[final_key] = float(value)
+        else:
+            d[final_key] = value
 
     def get(self, *keys: str, default: Any = None) -> Any:
         d = self._config
