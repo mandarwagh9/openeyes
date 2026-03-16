@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for PROJECT0
 
 > **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Last Updated**: 2026-03-16
 
 ---
 
@@ -44,6 +44,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - utils/ module with config loader and logger
   - main.py entry point
 
+- **Testing**
+  - Unit tests for config, camera, models, output (36 tests)
+
 ### Changed
 
 - Initial repository setup
@@ -52,7 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known Issues
 
-- No tests implemented yet
+- None
 
 ---
 
@@ -60,17 +63,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned for v0.0.2
 
-- [x] YOLOv8n object detection model integration
-- [x] Camera handler implementation
-- [x] Basic output (JSON/UDP)
-- [ ] Working object detection demo
-- [ ] Unit tests
-
-### Planned for v0.0.3
-
 - [ ] MiDaS depth estimation integration
 - [ ] Depth visualization
 - [ ] Distance calculation utilities
+
+### Planned for v0.0.3
+
+- [ ] MediaPipe Face detection
+- [ ] Face tracking
 
 ---
 
