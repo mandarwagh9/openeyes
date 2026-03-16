@@ -15,7 +15,8 @@ This roadmap outlines the development plan for PROJECT0 - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.0.1 | Current | 2026-03-13 | Initial release - Object Detection |
+| v0.0.1 | Current | 2026-03-16 | Object Detection - Complete |
+| v0.0.1 | Released | 2026-03-13 | Initial release - Object Detection |
 
 ---
 
@@ -24,16 +25,16 @@ This roadmap outlines the development plan for PROJECT0 - a vision system for hu
 ### v0.0.x - Foundation Phase
 
 #### v0.0.1 - Object Detection ✓
-**Status:** Planned (current)
+**Status:** Complete
 
 - [x] Project setup
 - [x] Basic architecture
-- [ ] YOLOv8n integration
-- [ ] Camera handler
-- [ ] Basic output (JSON/UDP)
-- [ ] Documentation
+- [x] YOLOv8n integration
+- [x] Camera handler
+- [x] Basic output (JSON/UDP)
+- [x] Unit tests
 
-**Target:** March 2026
+**Released:** March 2026
 
 #### v0.0.2 - Depth Estimation
 **Status:** Planned
@@ -149,7 +150,7 @@ This roadmap outlines the development plan for PROJECT0 - a vision system for hu
 
 ### M1: First Detection ✓
 **Goal:** Get object detection working
-**Status:** In Progress
+**Status:** Complete
 
 ### M2: Depth Perception
 **Goal:** Add 3D understanding
