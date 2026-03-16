@@ -164,7 +164,7 @@ project0/
 
 | Phase | Capabilities | Status |
 |:------|:------------|:-------|
-| v0.0.1 | Object Detection | Planned |
+| v0.0.1 | Object Detection | Complete |
 | v0.0.2 | Depth Estimation | Planned |
 | v0.0.3 | Face Recognition | Planned |
 | v0.0.4 | Gesture Recognition | Planned |
