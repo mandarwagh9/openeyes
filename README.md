@@ -1,16 +1,15 @@
-# PROJECT0 - Robot Vision System
+# OpenEyes - Robot Vision System
 
 <p align="center">
   <pre style="font-family: monospace; font-size: 14px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 20px; border-radius: 8px;">
-                  _           _    ___  
- _ __  _ __ ___ (_) ___  ___| |_ / _ \ 
-| '_ \| '__/ _ \| |/ _ \/ __| __| | | |
-| |_) | | | (_) | |  __/ (__| |_| |_| |
-| .__/|_|  \___// |\___|\___|\__|\___/ 
-|_|           |__/                     
-  
-                PROJECT0
-              Vision System for Humanoid Robots
+  ___      _             _   
+ / _ \_ __(_)_ __ ___ (_)_| |
+/ /_\/ '__| | '_ ` _ \| |_  |
+/ /_\\ |  | | | | | | | |_| |
+\_\__/|_|  |_|_| |_| |_| (_) |
+
+              OpenEyes
+          Vision System for Humanoid Robots
   </pre>
 </p>
 
@@ -33,7 +32,7 @@
 
 ## About
 
-**PROJECT0** is a vision system for humanoid robots - the "eyes" that enable robots to perceive and understand the physical world. Built on NVIDIA Jetson Orin Nano, it provides real-time AI-powered computer vision capabilities running entirely on-device (Edge AI).
+**OpenEyes** is a vision system for humanoid robots - the "eyes" that enable robots to perceive and understand the physical world. Built on NVIDIA Jetson Orin Nano, it provides real-time AI-powered computer vision capabilities running entirely on-device (Edge AI).
 
 ### Key Features
 
@@ -47,9 +46,9 @@
 
 ---
 
-## Why PROJECT0?
+## Why OpenEyes?
 
-A humanoid robot needs vision like humans need eyes. PROJECT0 provides:
+A humanoid robot needs vision like humans need eyes. OpenEyes provides:
 
 | Capability | Human Equivalent | Use Case |
 |:-----------|:----------------|:---------|
@@ -102,8 +101,8 @@ A humanoid robot needs vision like humans need eyes. PROJECT0 provides:
 
 ```bash
 # Clone the repository
-git clone https://github.com/mandarwagh9/project0.git
-cd project0
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
 
 # Install dependencies
 pip install -r requirements.txt
@@ -119,7 +118,7 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
 ## Project Structure
 
 ```
-project0/
+openeyes/
 ├── src/
 │   ├── camera/           # Camera input handling
 │   ├── models/           # AI model wrappers

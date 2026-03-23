@@ -1,4 +1,4 @@
-# ROADMAP.md - Project Roadmap for PROJECT0
+# ROADMAP.md - Project Roadmap for OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
@@ -7,7 +7,7 @@
 
 ## Overview
 
-This roadmap outlines the development plan for PROJECT0 - a vision system for humanoid robots.
+This roadmap outlines the development plan for OpenEyes - a vision system for humanoid robots.
 
 ---
 
@@ -180,7 +180,7 @@ This roadmap outlines the development plan for PROJECT0 - a vision system for hu
 
 ## Contributing to Roadmap
 
-Want to suggest features? Please [open an issue](https://github.com/mandarwagh9/project0/issues) with:
+Want to suggest features? Please [open an issue](https://github.com/mandarwagh9/openeyes/issues) with:
 - Feature description
 - Use case
 - Priority suggestion

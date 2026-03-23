@@ -1,4 +1,4 @@
-# CONTRIBUTING.md - Contributing to PROJECT0
+# CONTRIBUTING.md - Contributing to OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
@@ -7,7 +7,7 @@
 
 ## Welcome!
 
-Thank you for your interest in contributing to PROJECT0! This document will help you get started.
+Thank you for your interest in contributing to OpenEyes! This document will help you get started.
 
 ---
 
@@ -26,7 +26,7 @@ By participating in this project, you agree to abide by our [Code of Conduct](CO
 
 ### 1. Report Bugs
 
-Found a bug? Please [open an issue](https://github.com/mandarwagh9/project0/issues) with:
+Found a bug? Please [open an issue](https://github.com/mandarwagh9/openeyes/issues) with:
 
 - Clear title and description
 - Steps to reproduce
@@ -35,7 +35,7 @@ Found a bug? Please [open an issue](https://github.com/mandarwagh9/project0/issu
 
 ### 2. Suggest Features
 
-Have an idea? [Open a feature request](https://github.com/mandarwagh9/project0/issues) with:
+Have an idea? [Open a feature request](https://github.com/mandarwagh9/openeyes/issues) with:
 
 - Clear description of the feature
 - Use cases
@@ -48,7 +48,7 @@ Want to contribute code? Follow these steps:
 #### Step 1: Fork the Repository
 
 ```
-1. Go to https://github.com/mandarwagh9/project0
+1. Go to https://github.com/mandarwagh9/openeyes
 2. Click "Fork" button
 3. Clone your fork
 ```
@@ -115,8 +115,8 @@ git push origin feature/your-feature-name
 
 ```bash
 # Clone repository
-git clone https://github.com/mandarwagh9/project0.git
-cd project0
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
 
 # Create virtual environment
 python -m venv venv
@@ -286,11 +286,11 @@ Contributors will be recognized in:
 
 | Channel | Link |
 |:--------|:-----|
-| GitHub Issues | https://github.com/mandarwagh9/project0/issues |
-| Discussions | https://github.com/mandarwagh9/project0/discussions |
+| GitHub Issues | https://github.com/mandarwagh9/openeyes/issues |
+| Discussions | https://github.com/mandarwagh9/openeyes/discussions |
 
 ---
 
 ## Thank You!
 
-Your contributions make PROJECT0 better for everyone.
+Your contributions make OpenEyes better for everyone.

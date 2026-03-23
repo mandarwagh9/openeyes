@@ -1,4 +1,4 @@
-# QUICKSTART.md - Quick Start Guide for PROJECT0
+# QUICKSTART.md - Quick Start Guide for OpenEyes
 
 > **Version**: v0.0.1  
 > **Estimated Time**: 5 minutes
@@ -19,8 +19,8 @@
 ## Step 1: Clone the Project
 
 ```bash
-git clone https://github.com/mandarwagh9/project0.git
-cd project0
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
 ```
 
 ---

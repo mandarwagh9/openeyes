@@ -1,4 +1,4 @@
-# CHANGELOG.md - Version History for PROJECT0
+# CHANGELOG.md - Version History for OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-16
@@ -50,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Initial repository setup
-- Project named "PROJECT0"
+- Project named "OpenEyes"
 - License set to Apache 2.0
 
 ### Known Issues

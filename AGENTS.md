@@ -1,6 +1,6 @@
-# AGENTS.md - Developer Guidelines for PROJECT0
+# AGENTS.md - Developer Guidelines for OpenEyes
 
-> AI agent guidelines for PROJECT0 - vision system for humanoid robots.
+> AI agent guidelines for OpenEyes - vision system for humanoid robots.
 
 ---
 
