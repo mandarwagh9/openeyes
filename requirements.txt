@@ -1,4 +1,4 @@
-# PROJECT0 Requirements
+# OpenEyes Requirements
 # Robot Vision System for Humanoid Robots
 
 # Core

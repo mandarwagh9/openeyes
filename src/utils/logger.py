@@ -5,7 +5,7 @@ from typing import Optional
 
 
 def setup_logger(
-    name: str = "project0",
+    name: str = "openeyes",
     level: int = logging.INFO,
     log_file: Optional[Path] = None,
 ) -> logging.Logger:
@@ -35,5 +35,5 @@ def setup_logger(
     return logger
 
 
-def get_logger(name: str = "project0") -> logging.Logger:
+def get_logger(name: str = "openeyes") -> logging.Logger:
     return logging.getLogger(name)

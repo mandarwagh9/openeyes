@@ -21,7 +21,7 @@ class VisionSystem:
     def __init__(self, config: Config):
         self._config = config
         self._logger = setup_logger(
-            "project0",
+            "openeyes",
             level=logging.DEBUG if config.debug else logging.INFO
         )
         self._camera: Optional[CameraHandler] = None
@@ -38,7 +38,7 @@ class VisionSystem:
         sys.exit(0)
 
     def start(self) -> None:
-        self._logger.info("Starting PROJECT0 Vision System")
+        self._logger.info("Starting OpenEyes Vision System")
 
         self._init_camera()
         self._init_detector()
@@ -159,12 +159,12 @@ class VisionSystem:
                 2,
             )
 
-        cv2.imshow("PROJECT0 Debug", frame)
+        cv2.imshow("OpenEyes Debug", frame)
         cv2.waitKey(1)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="PROJECT0 Vision System")
+    parser = argparse.ArgumentParser(description="OpenEyes Vision System")
     parser.add_argument(
         "--camera",
         type=int,
