@@ -1,4 +1,4 @@
-# INSTALL.md - Detailed Installation Guide for PROJECT0
+# INSTALL.md - Detailed Installation Guide for OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
@@ -77,7 +77,7 @@ sudo apt install -y git python3-pip python3-venv
 
 ```bash
 # Navigate to project
-cd /path/to/project0
+cd /path/to/openeyes
 
 # Create virtual environment
 python3 -m venv venv
@@ -118,8 +118,8 @@ python-dotenv>=1.0.0
 ### 4.1 Clone Repository
 
 ```bash
-git clone https://github.com/mandarwagh9/project0.git
-cd project0
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
 ```
 
 ### 4.2 Create Directories
@@ -286,7 +286,7 @@ deactivate
 
 # Remove directory
 cd ..
-rm -rf project0
+rm -rf openeyes
 ```
 
 ---

@@ -1,4 +1,4 @@
-# TROUBLESHOOTING.md - Common Issues and Solutions for PROJECT0
+# TROUBLESHOOTING.md - Common Issues and Solutions for OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
@@ -439,7 +439,7 @@ free -h
 
 | Resource | Link |
 |:---------|:-----|
-| GitHub Issues | https://github.com/mandarwagh9/project0/issues |
+| GitHub Issues | https://github.com/mandarwagh9/openeyes/issues |
 | NVIDIA Forums | https://forums.developer.nvidia.com/ |
 | OpenCV Q&A | https://answers.opencv.org/ |
 

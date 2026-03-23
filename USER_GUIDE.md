@@ -1,4 +1,4 @@
-# USER_GUIDE.md - User Guide for PROJECT0
+# USER_GUIDE.md - User Guide for OpenEyes
 
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
@@ -18,7 +18,7 @@
 
 ## 1. Overview
 
-PROJECT0 provides vision capabilities for humanoid robots:
+OpenEyes provides vision capabilities for humanoid robots:
 
 | Capability | Description |
 |:-----------|:------------|
@@ -246,7 +246,7 @@ htop
 tegrastats
 
 # View logs
-tail -f logs/project0.log
+tail -f logs/openeyes.log
 ```
 
 ---
@@ -261,7 +261,7 @@ See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
 
 | Resource | Link |
 |:---------|:-----|
-| GitHub Issues | https://github.com/mandarwagh9/project0/issues |
+| GitHub Issues | https://github.com/mandarwagh9/openeyes/issues |
 | Documentation | See `docs/` folder |
 | Discussions | GitHub Discussions |
 
