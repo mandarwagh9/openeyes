@@ -1,6 +1,6 @@
-# HARDWARE.md - Hardware Specifications for PROJECT0
+# HARDWARE.md - Hardware Specifications for OpenEyes
 
-> **Project**: PROJECT0 - Robot Vision System  
+> **Project**: OpenEyes - Robot Vision System  
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
 
@@ -12,7 +12,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         PROJECT0 Hardware                                │
+│                         OpenEyes Hardware                                │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │    ┌──────────────┐         ┌──────────────┐                          │
@@ -244,9 +244,9 @@ For humanoid robot integration:
 ### 6.2 Network Topology
 
 ```
-PROJECT0                    Robot Controller
-    │                              │
-    │  UDP:5000                   │
+OpenEyes                    Robot Controller
+     │                              │
+     │  UDP:5000                   │
     │◄─────────────────────────────│
     │  (JSON output)               │
     │                              │

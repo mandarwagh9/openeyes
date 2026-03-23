@@ -1,6 +1,6 @@
-# ARCHITECTURE.md - System Architecture for PROJECT0
+# ARCHITECTURE.md - System Architecture for OpenEyes
 
-> **Project**: PROJECT0 - Robot Vision System  
+> **Project**: OpenEyes - Robot Vision System  
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
 
@@ -10,11 +10,11 @@
 
 ### 1.1 System Overview
 
-PROJECT0 follows a layered architecture designed for real-time edge AI processing:
+OpenEyes follows a layered architecture designed for real-time edge AI processing:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                           PROJECT0                                       │
+│                           OpenEyes                                       │
 ├─────────────────────────────────────────────────────────────────────────┤
 │                                                                          │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐               │
@@ -327,10 +327,10 @@ src/
 ### 4.1 External Control System
 
 ```
-PROJECT0                          External System
-    │                                     │
-    │  ◄──── UDP JSON (5000) ──────────  │
-    │                                     │
+OpenEyes                          External System
+     │                                     │
+     │  ◄──── UDP JSON (5000) ──────────  │
+     │                                     │
     │                                     │
 ```
 

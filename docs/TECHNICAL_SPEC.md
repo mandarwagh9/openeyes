@@ -1,6 +1,6 @@
-# TECHNICAL_SPEC.md - Technical Specification for PROJECT0
+# TECHNICAL_SPEC.md - Technical Specification for OpenEyes
 
-> **Project**: PROJECT0 - Robot Vision System  
+> **Project**: OpenEyes - Robot Vision System  
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
 
@@ -10,7 +10,7 @@
 
 ### 1.1 Project Overview
 
-PROJECT0 is a vision system designed to provide "eyes" for humanoid robots. It enables robots to perceive, interpret, and understand the physical world through computer vision and AI, running entirely on-device (Edge AI) using NVIDIA Jetson Orin Nano.
+OpenEyes is a vision system designed to provide "eyes" for humanoid robots. It enables robots to perceive, interpret, and understand the physical world through computer vision and AI, running entirely on-device (Edge AI) using NVIDIA Jetson Orin Nano.
 
 ### 1.2 Goals & Objectives
 

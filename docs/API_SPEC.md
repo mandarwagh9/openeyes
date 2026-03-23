@@ -1,6 +1,6 @@
-# API_SPEC.md - API Documentation for PROJECT0
+# API_SPEC.md - API Documentation for OpenEyes
 
-> **Project**: PROJECT0 - Robot Vision System  
+> **Project**: OpenEyes - Robot Vision System  
 > **Version**: v0.0.1  
 > **Last Updated**: 2026-03-13
 

@@ -40,7 +40,7 @@ The research shows that RGB-D cameras (combining RGB and depth) like the Intel R
 
 While not a "vision" sensor in the traditional optical sense, LiDAR has become indispensable for outdoor and long-range robotic applications. LiDAR emits laser pulses and measures their reflection time to create precise 3D point clouds of the environment.
 
-The choice between LiDAR and depth cameras involves fundamental tradeoffs. LiDAR provides exceptional range and precision, especially outdoors, but comes with higher cost, larger physical size, and relatively sparse point clouds. Depth cameras provide dense, color-aligned depth maps ideal for close-range manipulation but typically limited to indoor distances of 5-10 meters. Most budget-conscious humanoid projects—like your PROJECT0 setup—rely primarily on depth cameras or monocular depth estimation rather than LiDAR, reserving the latter for more advanced outdoor deployments.
+The choice between LiDAR and depth cameras involves fundamental tradeoffs. LiDAR provides exceptional range and precision, especially outdoors, but comes with higher cost, larger physical size, and relatively sparse point clouds. Depth cameras provide dense, color-aligned depth maps ideal for close-range manipulation but typically limited to indoor distances of 5-10 meters. Most budget-conscious humanoid projects—like your OpenEyes setup—rely primarily on depth cameras or monocular depth estimation rather than LiDAR, reserving the latter for more advanced outdoor deployments.
 
 ---
 
@@ -62,7 +62,7 @@ YOLO revolutionized robot vision by treating object detection as a single regres
 
 Research from 2025 demonstrates that YOLOv9 and YOLOv10 achieve mean Average Precision (mAP) scores exceeding 82% on standard benchmarks while maintaining the real-time performance necessary for robotic applications. The latest models incorporate innovations like Programmable Gradient Information (PGI) and Generalized Efficient Layer Aggregation Networks (GELAN) to maximize both accuracy and efficiency.
 
-For your PROJECT0, integrating YOLOv8 or YOLOv9 through the Ultralytics library provides an excellent balance of accuracy, speed, and ease of use on the Jetson Orin Nano. The nano and small variants are specifically designed for edge deployment, running comfortably on embedded hardware while maintaining detection quality.
+For your OpenEyes, integrating YOLOv8 or YOLOv9 through the Ultralytics library provides an excellent balance of accuracy, speed, and ease of use on the Jetson Orin Nano. The nano and small variants are specifically designed for edge deployment, running comfortably on embedded hardware while maintaining detection quality.
 
 ### 3.3 Depth Estimation: Knowing How Far
 
@@ -206,12 +206,12 @@ Humanoid robots must carry their computing hardware, batteries, and sensors—ev
 
 ---
 
-## 9. Your PROJECT0 in Context
+## 9. Your OpenEyes in Context
 
-Your PROJECT0 vision system aligns precisely with contemporary approaches to humanoid robot vision. Using the Jetson Orin Nano with a USB webcam, you are implementing the core capabilities that drive modern robot perception:
+Your OpenEyes vision system aligns precisely with contemporary approaches to humanoid robot vision. Using the Jetson Orin Nano with a USB webcam, you are implementing the core capabilities that drive modern robot perception:
 
 The YOLOv8 integration you plan provides object detection—the foundational capability that enables the robot to identify relevant elements in its environment. Adding depth estimation through MiDaS or similar models will transform 2D detections into 3D understanding. Face recognition and gesture recognition extend the system to human interaction. MediaPipe offers efficient implementations of body pose estimation suitable for edge deployment.
 
-As you build out PROJECT0, you will confront the same tradeoffs that professional robotics engineers face: balancing speed against accuracy, managing computational resources, handling edge cases in perception, and integrating multiple processing pipelines into a coherent system. The documentation you created provides the architectural blueprint; implementation will require iterative refinement as you discover what works best for your specific use cases.
+As you build out OpenEyes, you will confront the same tradeoffs that professional robotics engineers face: balancing speed against accuracy, managing computational resources, handling edge cases in perception, and integrating multiple processing pipelines into a coherent system. The documentation you created provides the architectural blueprint; implementation will require iterative refinement as you discover what works best for your specific use cases.
 
 The path from simple object detection to fully autonomous humanoid perception is long, but each capability you add builds toward a system that begins to approach the remarkable perceptual abilities that humans take for granted.
