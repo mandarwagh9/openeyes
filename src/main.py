@@ -1,16 +1,24 @@
 import argparse
 import logging
+import os
 import signal
 import sys
 import time
+from pathlib import Path
 from typing import Optional
 
 import cv2
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.camera.camera_handler import CameraHandler
 from src.camera.types import DepthData, FaceDetection, Gesture, PoseData, VisionResult
 from src.exceptions import CameraError, ModelError
 from src.models.object_detector import ObjectDetector
+from src.models.depth_estimator import DepthEstimator
+from src.models.face_detector import FaceDetector
+from src.models.gesture_recognizer import GestureRecognizer
+from src.models.pose_estimator import PoseEstimator
 from src.output.json_formatter import format_vision_result
 from src.output.udp_sender import UDPSender
 from src.utils.config import Config
@@ -26,9 +34,15 @@ class VisionSystem:
         )
         self._camera: Optional[CameraHandler] = None
         self._detector: Optional[ObjectDetector] = None
+        self._depth_estimator: Optional[DepthEstimator] = None
+        self._face_detector: Optional[FaceDetector] = None
+        self._gesture_recognizer: Optional[GestureRecognizer] = None
+        self._pose_estimator: Optional[PoseEstimator] = None
         self._udp_sender: Optional[UDPSender] = None
         self._running = False
         self._frame_id = 0
+        self._fps_counter = 0
+        self._fps_start_time = time.time()
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
@@ -41,7 +55,7 @@ class VisionSystem:
         self._logger.info("Starting OpenEyes Vision System")
 
         self._init_camera()
-        self._init_detector()
+        self._init_detectors()
         self._init_output()
 
         self._running = True
@@ -73,7 +87,7 @@ class VisionSystem:
             self._logger.error(f"Camera initialization failed: {e}")
             raise
 
-    def _init_detector(self) -> None:
+    def _init_detectors(self) -> None:
         self._detector = ObjectDetector(
             model_path=self._config.yolo_path,
             confidence=self._config.yolo_confidence,
@@ -81,9 +95,38 @@ class VisionSystem:
         )
         try:
             self._detector.load()
+            self._logger.info("Object Detector loaded")
         except ModelError as e:
             self._logger.error(f"Detector initialization failed: {e}")
             raise
+
+        try:
+            self._depth_estimator = DepthEstimator()
+            self._depth_estimator.load()
+            self._logger.info("Depth Estimator loaded")
+        except ModelError as e:
+            self._logger.warning(f"Depth Estimator not available: {e}")
+
+        try:
+            self._face_detector = FaceDetector()
+            self._face_detector.load()
+            self._logger.info("Face Detector loaded")
+        except ModelError as e:
+            self._logger.warning(f"Face Detector not available: {e}")
+
+        try:
+            self._gesture_recognizer = GestureRecognizer()
+            self._gesture_recognizer.load()
+            self._logger.info("Gesture Recognizer loaded")
+        except ModelError as e:
+            self._logger.warning(f"Gesture Recognizer not available: {e}")
+
+        try:
+            self._pose_estimator = PoseEstimator()
+            self._pose_estimator.load()
+            self._logger.info("Pose Estimator loaded")
+        except ModelError as e:
+            self._logger.warning(f"Pose Estimator not available: {e}")
 
     def _init_output(self) -> None:
         self._udp_sender = UDPSender(
@@ -112,6 +155,17 @@ class VisionSystem:
             if self._config.debug:
                 self._debug_display(frame, result)
 
+            self._fps_counter += 1
+            elapsed_total = time.time() - self._fps_start_time
+            if elapsed_total >= 1.0:
+                fps = self._fps_counter / elapsed_total
+                self._logger.info(
+                    f"FPS: {fps:.1f} | Objects: {len(result.objects)} | "
+                    f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)}"
+                )
+                self._fps_counter = 0
+                self._fps_start_time = time.time()
+
             elapsed = time.time() - loop_start
             sleep_time = frame_time - elapsed
             if sleep_time > 0:
@@ -126,14 +180,28 @@ class VisionSystem:
         if self._detector:
             detections = self._detector.detect(frame)
 
+        depth = DepthData(enabled=False)
+
+        faces: list[FaceDetection] = []
+        if self._face_detector:
+            faces = self._face_detector.detect(frame)
+
+        gestures: list[Gesture] = []
+        if self._gesture_recognizer:
+            gestures = self._gesture_recognizer.recognize(frame)
+
+        pose = PoseData(detected=False)
+        if self._pose_estimator:
+            pose = self._pose_estimator.estimate(frame)
+
         result = VisionResult(
             timestamp=timestamp,
             frame_id=self._frame_id,
             objects=detections,
-            depth=DepthData(enabled=False),
-            faces=[],
-            gestures=[],
-            pose=PoseData(detected=False),
+            depth=depth,
+            faces=faces,
+            gestures=gestures,
+            pose=pose,
         )
 
         return result
@@ -156,6 +224,16 @@ class VisionSystem:
                 cv2.FONT_HERSHEY_SIMPLEX,
                 0.5,
                 (0, 255, 0),
+                2,
+            )
+
+        for face in result.faces:
+            bbox = face.bbox
+            cv2.rectangle(
+                frame,
+                (int(bbox.x1), int(bbox.y1)),
+                (int(bbox.x2), int(bbox.y2)),
+                (255, 0, 0),
                 2,
             )
 
@@ -182,6 +260,51 @@ def main() -> None:
         action="store_true",
         help="Enable debug output",
     )
+    parser.add_argument(
+        "--width",
+        type=int,
+        default=640,
+        help="Frame width",
+    )
+    parser.add_argument(
+        "--height",
+        type=int,
+        default=480,
+        help="Frame height",
+    )
+    parser.add_argument(
+        "--fps",
+        type=int,
+        default=30,
+        help="Target FPS",
+    )
+    parser.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Output host IP",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=5000,
+        help="Output port",
+    )
+    parser.add_argument(
+        "--no-face",
+        action="store_true",
+        help="Disable face detection",
+    )
+    parser.add_argument(
+        "--no-gesture",
+        action="store_true",
+        help="Disable gesture recognition",
+    )
+    parser.add_argument(
+        "--no-pose",
+        action="store_true",
+        help="Disable pose estimation",
+    )
 
     args = parser.parse_args()
 
@@ -192,6 +315,12 @@ def main() -> None:
         config._config["debug"] = True
     if args.config:
         config._config_path = args.config
+    if args.width:
+        config._config["camera"]["width"] = args.width
+    if args.height:
+        config._config["camera"]["height"] = args.height
+    if args.fps:
+        config._config["camera"]["fps"] = args.fps
 
     try:
         system = VisionSystem(config)
