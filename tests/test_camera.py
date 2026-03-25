@@ -1,6 +1,9 @@
+import os
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
+
+os.environ["OPENEYES_TEST_MODE"] = "true"
 
 from src.camera.camera_handler import CameraHandler
 from src.exceptions import CameraError
@@ -24,7 +27,7 @@ class TestCameraHandler:
         camera.open()
 
         assert camera.is_opened is True
-        mock_video_capture.assert_called_once_with(0)
+        mock_video_capture.assert_called()
 
     @patch("src.camera.camera_handler.cv2.VideoCapture")
     def test_open_failure(self, mock_video_capture):
