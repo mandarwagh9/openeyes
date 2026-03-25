@@ -46,6 +46,8 @@ class ObjectDetector:
             conf=self._confidence,
             iou=self._iou_threshold,
             verbose=False,
+            device='0',  # Use GPU (CUDA)
+            half=False,  # Use FP32 for compatibility
         )
 
         detections = []
