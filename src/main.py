@@ -27,6 +27,7 @@ from src.output.json_formatter import format_vision_result
 from src.output.udp_sender import UDPSender
 from src.utils.config import Config
 from src.utils.logger import setup_logger
+from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
 
 
 class VisionSystem:
@@ -57,6 +58,9 @@ class VisionSystem:
         self._use_parallel = True
         self._pose_skip_frames = 1
 
+        self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
+        self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
+
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
@@ -65,11 +69,29 @@ class VisionSystem:
         self.stop()
         sys.exit(0)
 
+    def _init_frame_scheduler(self) -> None:
+        skip_intervals = {
+            'detector': 1,
+            'depth': 2,
+            'face': 2,
+            'gesture': 2,
+            'pose': 2
+        }
+        self._frame_scheduler = MultiModelFrameScheduler(skip_intervals)
+        self._adaptive_skipper = AdaptiveFrameSkipper(
+            base_skip=2,
+            motion_threshold=5000.0,
+            min_skip=1,
+            max_skip=3
+        )
+        self._logger.info(f"Frame scheduler initialized: {skip_intervals}")
+
     def start(self) -> None:
         self._logger.info("Starting OpenEyes Vision System (Optimized)")
         self._logger.info(f"Parallel processing: {self._use_parallel}")
         self._logger.info(f"Pose skip frames: {self._pose_skip_frames + 1}")
 
+        self._init_frame_scheduler()
         self._init_camera()
         self._init_detectors()
         self._init_output()
@@ -195,9 +217,29 @@ class VisionSystem:
     def _process_frame(self, frame) -> VisionResult:
         timestamp = time.time()
 
+        if self._frame_scheduler and self._adaptive_skipper:
+            should_process = self._adaptive_skipper.should_process(frame)
+            if not should_process:
+                last_objects = self._frame_scheduler.get_last('detector')
+                last_faces = self._frame_scheduler.get_last('face')
+                last_gestures = self._frame_scheduler.get_last('gesture')
+                last_pose = self._frame_scheduler.get_last('pose')
+
+                return VisionResult(
+                    timestamp=timestamp,
+                    frame_id=self._frame_id,
+                    objects=last_objects if last_objects else [],
+                    depth=DepthData(enabled=False),
+                    faces=last_faces if last_faces else [],
+                    gestures=last_gestures if last_gestures else [],
+                    pose=last_pose if last_pose else PoseData(detected=False),
+                )
+
         detections = []
         if self._detector:
             detections = self._detector.detect(frame)
+            if self._frame_scheduler:
+                self._frame_scheduler.update('detector', detections)
 
         depth = DepthData(enabled=False)
 
@@ -205,6 +247,12 @@ class VisionSystem:
             faces, gestures, pose = self._process_models_parallel(frame)
         else:
             faces, gestures, pose = self._process_models_sequential(frame)
+
+        if self._frame_scheduler:
+            self._frame_scheduler.update('face', faces)
+            self._frame_scheduler.update('gesture', gestures)
+            self._frame_scheduler.update('pose', pose)
+            self._frame_scheduler.next_frame()
 
         result = VisionResult(
             timestamp=timestamp,
