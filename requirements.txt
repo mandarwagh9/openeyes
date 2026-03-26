@@ -12,7 +12,9 @@ torch>=2.0.0
 torchvision>=0.15.0
 ultralytics>=8.0.0
 onnxruntime>=1.15.0
+onnxruntime-gpu>=1.15.0
 mediapipe>=0.10.0
+timm>=1.0.0
 
 # Communication
 pyserial>=3.5
