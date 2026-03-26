@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.0.2  
-> **Last Updated**: 2026-03-25
+> **Version**: v0.0.3  
+> **Last Updated**: 2026-03-26
 
 ---
 
@@ -9,6 +9,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.0.3] - 2026-03-26
+
+### Added
+
+- **YOLO11n Model**
+  - YOLO11n model with better performance than YOLOv10n
+  - ONNX export for TensorRT deployment
+  - Expected FPS: 139 (FP16), 180 (INT8)
+
+- **Adaptive Frame Skipping**
+  - Universal frame skipper for all models
+  - Adaptive skipping based on motion detection
+  - Multi-model frame scheduler
+  - Configurable skip intervals per model
+
+- **ROS2 Integration**
+  - VisionPublisher node for publishing detections
+  - VisionControlNode for robot control
+  - VisionWrapperNode for OpenEyes integration
+  - Support for vision_msgs (Detection2DArray)
+
+- **DeepStream SDK Integration**
+  - DeepStream-Yolo custom parser library
+  - GStreamer pipeline for CSI camera
+  - Configuration files for YOLOv10
+
+- **Performance Optimizations**
+  - Motion-based adaptive processing
+  - Result caching across all models
+  - Frame interpolation for skipped frames
+
+### Changed
+
+- Updated version to v0.0.3
+- Model path configuration supports YOLO11n
+- Default frame scheduler intervals: detector(1), depth(2), face(2), gesture(2), pose(2)
+
+### Dependencies Added
+
+- pyds (DeepStream Python bindings)
 
 ---
 
