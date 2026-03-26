@@ -21,18 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ONNX export for TensorRT deployment
   - Expected FPS: 139 (FP16), 180 (INT8)
 
-- **TensorRT Engine Integration**
-  - Native TensorRT FP16 inference (~51 FPS on Jetson Orin Nano)
-  - Export script: `scripts/export_tensorrt.py`
-  - Pre-built engine: `models/yolo11n.engine` (8.2 MB)
-  - Uses Ultralytics YOLO with TensorRT backend
-
 - **Adaptive Frame Skipping**
   - Universal frame skipper for all models
   - Adaptive skipping based on motion detection
   - Multi-model frame scheduler
   - Configurable skip intervals per model
-  - Default skip increased to 4 frames for CPU models
 
 - **ROS2 Integration**
   - VisionPublisher node for publishing detections
@@ -53,10 +46,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Updated version to v0.0.3
-- Model path configuration supports YOLO11n + TensorRT engine
-- Default frame scheduler intervals: detector(1), depth(4), face(4), gesture(4), pose(4)
-- Depth estimation disabled by default (CPU bottleneck)
-- Config file now supports per-model skip_frames setting
+- Model path configuration supports YOLO11n
+- Default frame scheduler intervals: detector(1), depth(2), face(2), gesture(2), pose(2)
 
 ### Dependencies Added
 

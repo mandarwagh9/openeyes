@@ -177,44 +177,23 @@ output:
 
 ## 5. Model Download
 
-### 5.1 Download YOLO11n
+### 5.1 Download YOLOv8
 
 ```bash
-# Using ultralytics (downloads to models/ folder)
-python -c "from ultralytics import YOLO; YOLO('yolov11n.pt')"
+# Using ultralytics
+python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx')"
 
 # Or download directly
-wget https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov11n.pt
-mv yolov11n.pt models/
+wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt
+mv yolov8n.pt models/
 ```
 
-### 5.2 Export to TensorRT (Recommended)
-
-For maximum GPU performance on Jetson Orin Nano:
+### 5.2 Download MiDaS
 
 ```bash
-# Export to TensorRT engine (~51 FPS inference)
-python3 scripts/export_tensorrt.py --model models/yolo11n.pt
-
-# Or use Ultralytics CLI
-yolo export model=yolo11n.pt format=engine half=True
-```
-
-This creates `models/yolo11n.engine` (8.2 MB) - a native TensorRT engine.
-
-### 5.3 Download MiDaS (Optional - Disabled by Default)
-
-```bash
-# Download MiDaS v2.1 (disabled by default due to CPU overhead)
+# Download MiDaS v2.1
 wget https://github.com/intel-isd/MiDaS/releases/download/v2.1/midas_v21_onnx.pt
 mv midas_v21_onnx.pt models/depth_midas.pt
-```
-
-To enable depth estimation, update config.yaml:
-```yaml
-models:
-  depth:
-    enabled: true
 ```
 
 ---

@@ -52,24 +52,7 @@ sudo jetson_clocks
 
 ---
 
-## Step 4: TensorRT Engine (Optional - Already Included)
-
-The project includes a pre-built TensorRT engine for maximum GPU performance:
-
-```bash
-# The engine is already at: models/yolo11n.engine (8.2 MB)
-# To verify it exists:
-ls -la models/yolo11n.engine
-
-# To export a new engine (e.g., after retraining):
-python3 scripts/export_tensorrt.py --model models/yolo11n.pt
-```
-
-> **Why TensorRT?** Provides ~51 FPS YOLO inference vs ~5 FPS on CPU - a 10x speedup!
-
----
-
-## Step 5: Verify Camera
+## Step 4: Verify Camera
 
 ### For CSI Camera (IMX219)
 ```bash
@@ -91,25 +74,25 @@ python3 -c "import cv2; cap = cv2.VideoCapture(0); print('Camera OK' if cap.isOp
 
 ---
 
-## Step 6: Run the Vision System
+## Step 5: Run the Vision System
 
 ```bash
 # Run with debug/display output
-python src/main.py --camera 0 --debug
+python src/main.py --debug
 
 # Or run headless (no display)
-python src/main.py --camera 0
+python src/main.py
 ```
 
 You should see:
 - Camera feed window (with --debug)
 - Object detection boxes (green)
 - Face detection boxes (blue)
-- Console output with FPS (10-20 FPS with all models)
+- Console output with FPS (15-25 FPS with all models)
 
 ---
 
-## Step 7: Customize (Optional)
+## Step 6: Customize (Optional)
 
 ### Change Camera
 

@@ -29,8 +29,6 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 **Status:** Complete
 
 - [x] YOLO11n integration (better than YOLOv10n)
-- [x] TensorRT FP16 engine integration (~51 FPS YOLO inference)
-- [x] Export script for TensorRT (scripts/export_tensorrt.py)
 - [x] MiDaS depth estimation
 - [x] MediaPipe Face detection
 - [x] MediaPipe Gesture recognition
@@ -38,15 +36,13 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 - [x] Parallel processing optimization
 - [x] CSI camera support (IMX219)
 - [x] Auto-display detection
-- [x] Adaptive frame skipping (4-frame default)
-- [x] ROS2 integration (vision nodes, services)
-- [x] DeepStream SDK integration
+- [x] TensorRT/ONNX optimization
 
 **Released:** March 2026
 
 **Performance:**
-- 10-15 FPS with all models (TensorRT + MediaPipe)
-- 30-50 FPS with object detection only
+- 7-10 FPS with all models
+- 30+ FPS with object detection only
 
 ---
 

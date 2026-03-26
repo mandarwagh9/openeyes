@@ -32,53 +32,6 @@ yolo export model=yolo11n.pt format=engine half=True
 yolo export model=yolo11n.pt format=engine int8=True
 ```
 
-## TensorRT Engine Export
-
-Using the pre-built TensorRT engine is recommended for maximum performance on Jetson.
-
-### Why TensorRT?
-
-| Mode | Inference FPS | Overall FPS Impact |
-|------|---------------|-------------------|
-| ONNX Runtime (CPU) | ~5 FPS | 4-5 FPS overall |
-| PyTorch + CUDA | ~20 FPS | 10-15 FPS overall |
-| **TensorRT FP16** | **~51 FPS** | **10-15 FPS overall** |
-
-The YOLO inference is now 10x faster with TensorRT. The overall FPS is limited by MediaPipe CPU models.
-
-### Pre-built Engine
-
-The project includes a pre-built TensorRT engine:
-- **File**: `models/yolo11n.engine`
-- **Size**: 8.2 MB
-- **Precision**: FP16
-- **Performance**: ~51 FPS inference
-
-### Export New Engine
-
-To export a new engine (e.g., after retraining):
-
-```bash
-# Using the export script (recommended)
-python3 scripts/export_tensorrt.py --model models/yolo11n.pt
-
-# Or using Ultralytics CLI
-yolo export model=models/yolo11n.pt format=engine half=True imgsz=640
-```
-
-### Using the Engine
-
-Update `config.yaml` to use the engine:
-
-```yaml
-models:
-  yolo:
-    path: models/yolo11n.engine  # TensorRT engine
-    confidence: 0.5
-```
-
-The system automatically detects `.engine` files and uses Ultralytics' TensorRT backend.
-
 ## Frame Skipping
 
 The system includes adaptive frame skipping that automatically adjusts based on motion:
@@ -87,21 +40,19 @@ The system includes adaptive frame skipping that automatically adjusts based on 
 
 ```python
 skip_intervals = {
-    'detector': 1,   # Process every frame (TensorRT - very fast)
-    'depth': 4,      # Process every 4th frame (CPU - heaviest)
-    'face': 4,       # Process every 4th frame (CPU)
-    'gesture': 4,    # Process every 4th frame (CPU)
-    'pose': 4        # Process every 4th frame (CPU)
+    'detector': 1,   # Process every frame
+    'depth': 2,      # Process every 2nd frame
+    'face': 2,       # Process every 2nd frame
+    'gesture': 2,    # Process every 2nd frame
+    'pose': 2        # Process every 2nd frame
 }
 ```
-
-> **Note:** Skip intervals increased from 2 to 4 to reduce CPU load. MediaPipe models run on CPU and are the main bottleneck.
 
 ### Adaptive Skipping
 
 The `AdaptiveFrameSkipper` automatically adjusts skip interval based on motion:
-- Low motion (static scene): skip more frames (up to 5)
-- High motion (active scene): process more frames
+- Low motion (static scene): skip more frames (up to 4)
+- High motion (active scene): process every frame
 
 ### Manual Configuration
 
@@ -109,10 +60,10 @@ Edit `src/main.py` to customize:
 
 ```python
 self._adaptive_skipper = AdaptiveFrameSkipper(
-    base_skip=3,           # Default skip interval
+    base_skip=2,           # Default skip interval
     motion_threshold=5000, # Motion detection threshold
-    min_skip=2,            # Minimum skip (2 = every other frame)
-    max_skip=5             # Maximum skip
+    min_skip=1,            # Minimum skip (1 = every frame)
+    max_skip=4             # Maximum skip
 )
 ```
 
@@ -160,12 +111,9 @@ camera:
 
 | Configuration | All Models FPS | Object Only FPS |
 |--------------|----------------|-----------------|
-| YOLO11n ONNX (CPU) | 4-5 | 10-15 |
-| YOLO11n PyTorch + CUDA | 7-10 | 20-30 |
-| **YOLO11n TensorRT FP16** | **10-15** | **30-50** |
-| YOLO11n TensorRT + All Skip | 15-20 | 50+ |
-
-> **Actual Results on Jetson Orin Nano**: With all models (face, gesture, pose) running, we achieve **10-15 FPS** with TensorRT. With aggressive frame skipping (skip=4), we achieve **15-20 FPS**.
+| YOLOv10n + No skipping | 7-10 | 25-35 |
+| YOLO11n + Adaptive skip | 15-25 | 50-70 |
+| YOLO11n + INT8 + Skip | 25-35 | 80-100 |
 
 ## Troubleshooting
 

@@ -74,8 +74,7 @@ A humanoid robot needs vision like humans need eyes. OpenEyes provides:
 
 | Metric | Target |
 |:-------|:-------|
-| FPS | 15-20 FPS (all models), 30-50 FPS (object only) |
-| YOLO Inference | ~51 FPS (TensorRT FP16) |
+| FPS | 15-25 FPS (all models), 50+ FPS (object only) |
 | Latency | <50ms |
 | Detection Range | 0.5m - 5m |
 | Model Size | <10MB |
@@ -92,8 +91,8 @@ A humanoid robot needs vision like humans need eyes. OpenEyes provides:
 |:------|:-----------|
 | **AI Framework** | PyTorch, ONNX Runtime, TensorRT |
 | **Vision** | OpenCV, CUDA, GStreamer, DeepStream |
-| **Models** | YOLO11n (TensorRT), MediaPipe, MiDaS |
-| **Deployment** | TensorRT FP16 engine (~51 FPS inference) |
+| **Models** | YOLO11n, MediaPipe, MiDaS |
+| **Deployment** | TensorRT optimization (FP16/INT8) |
 | **Communication** | JSON, UDP, ROS2 |
 
 > **Note:** YOLO11n uses AGPL-3.0 license. For commercial use, consider RTMDet (Apache 2.0).
@@ -114,8 +113,8 @@ pip install -r requirements.txt
 sudo nvpmodel -m 0
 sudo jetson_clocks
 
-# Run the vision system (uses TensorRT engine by default)
-python src/main.py --camera 0 --debug
+# Run the vision system
+python src/main.py --debug
 ```
 
 See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
