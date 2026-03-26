@@ -1,15 +1,20 @@
 # OpenEyes - Robot Vision System
 
 <p align="center">
-  <pre style="font-family: monospace; font-size: 14px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 20px; border-radius: 8px;">
-   ___      _             _   
-  / _ \_ __(_)_ __ ___ (_)_| |
- / /_\/ '__| | '_ ` _ \| |_  |
-/ /_\\ |  | | | | | | | |_| |
-\_\__/|_|  |_|_| |_| |_| (_) |
-
-              OpenEyes
-          Vision System for Humanoid Robots
+  <pre style="font-family: monospace; font-size: 11px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 20px; border-radius: 8px;">
+      ___/___\ 
+     / o  o \ 
+    ( =  =  ) 
+     \  __ /  
+      \/  \/   
+     
+  ___  __   __  ___ 
+ / _ \ \ \ / / / __|
+| (_) | \ V / | \__|
+ \___/   \_/  |___/
+     
+     OpenEyes
+  Vision System for Humanoid Robots
   </pre>
 </p>
 
