@@ -1,7 +1,7 @@
 # OpenEyes - Robot Vision System
 
 <p align="center">
-  <pre style="font-family: monospace; font-size: 11px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 15px; border-radius: 8px;">
+  <pre style="font-family: monospace; font-size: 11px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 15px; border-radius: 8px; text-align: center;">
  ___  ____  _____ _   _ _______   _______ ____   
 / _ \|  _ \| ____| \ | | ____\ \ / / ____/ ___|  
 | | | | |_) |  _| |  \| |  _|  \ V /|  _| \___ \  
