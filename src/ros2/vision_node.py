@@ -1,8 +1,18 @@
+import sys
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from rclpy.executors import MultiThreadedExecutor
 from rclpy.callback_groups import ReentrantCallbackGroup
+
+ros2_python_paths = [
+    '/opt/ros/humble/local/lib/python3.10/dist-packages',
+    '/opt/ros/humble/lib/python3/dist-packages',
+    '/usr/lib/python3/dist-packages',
+]
+for p in ros2_python_paths:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from sensor_msgs.msg import Image, CameraInfo
 from vision_msgs.msg import Detection2DArray, Detection2D, BoundingBox2D, ObjectHypothesis

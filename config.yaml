@@ -6,7 +6,7 @@ camera:
 
 models:
   yolo:
-    path: models/yolov8n.pt
+    path: models/yolo11n.onnx
     confidence: 0.5
     iou_threshold: 0.45
   depth:

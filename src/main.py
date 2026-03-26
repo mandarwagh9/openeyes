@@ -15,6 +15,15 @@ if not os.environ.get('DISPLAY'):
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+ros2_python_paths = [
+    '/opt/ros/humble/local/lib/python3.10/dist-packages',
+    '/opt/ros/humble/lib/python3/dist-packages',
+    '/usr/lib/python3/dist-packages',
+]
+for p in ros2_python_paths:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 from src.camera.camera_handler import CameraHandler
 from src.camera.types import DepthData, FaceDetection, Gesture, PoseData, VisionResult
 from src.exceptions import CameraError, ModelError
