@@ -1,0 +1,64 @@
+# OpenEyes Vision System Launch File (YAML Format)
+# Use with: ros2 launch openeyes vision_system.launch.yaml
+
+launch:
+  # Environment variables
+  - env:
+      - OPENCV_VIDEOIO_DEBUG: "0"
+      - CUDA_VISIBLE_DEVICES: "0"
+
+  # Node: OpenEyes Vision System
+  - node:
+      pkg: openeyes
+      exec: src.main
+      name: openeyes_vision
+      namespace: vision
+      parameters:
+        - src/config.yaml
+      output: screen
+      emulate_tty: true
+
+  # Node: Vision Publisher
+  - node:
+      pkg: openeyes
+      exec: src.ros2.vision_node
+      name: vision_publisher
+      namespace: vision
+      parameters:
+        - output_topic: "/vision/detections"
+          camera_topic: "/camera/image_raw"
+          frame_id: "camera_link"
+          confidence_threshold: 0.5
+          enable_debug_image: true
+      output: screen
+      emulate_tty: true
+
+  # Node: Vision Control (optional)
+  - node:
+      pkg: openeyes
+      exec: src.ros2.vision_node
+      name: vision_control
+      namespace: vision
+      parameters:
+        - target_class: "person"
+          follow_distance: 1.5
+          max_linear_speed: 0.3
+          max_angular_speed: 0.8
+          detection_topic: "/vision/detections"
+          cmd_vel_topic: "/cmd_vel"
+      output: screen
+      # Uncomment to enable control:
+      # emulate_tty: true
+
+  # Node: Vision Service
+  - node:
+      pkg: openeyes
+      exec: src.ros2.services
+      name: vision_service
+      namespace: vision
+      parameters:
+        - model_path: "models/yolo11n.onnx"
+          confidence_threshold: 0.5
+          device: "cuda"
+      output: screen
+      emulate_tty: true

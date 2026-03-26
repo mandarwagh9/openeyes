@@ -1,0 +1,69 @@
+# ROS2 Vision System Configuration
+# OpenEyes v0.0.3
+
+/**:
+  ros__parameters:
+    # Model Configuration
+    model:
+      path: "models/yolo11n.onnx"
+      type: "yolo11n"
+      device: "cuda"
+      confidence_threshold: 0.5
+      iou_threshold: 0.45
+      input_size: [640, 640]
+    
+    # Frame Skipping
+    frame_skip:
+      detector: 1      # Process every frame
+      depth: 2        # Every 2nd frame
+      face: 2         # Every 2nd frame
+      gesture: 2      # Every 2nd frame
+      pose: 2         # Every 2nd frame
+      adaptive: true  # Enable adaptive skipping
+    
+    # Camera Configuration
+    camera:
+      topic: "/camera/image_raw"
+      camera_info_topic: "/camera/camera_info"
+      width: 640
+      height: 480
+      fps: 30
+      frame_id: "camera_link"
+    
+    # Output Topics
+    output:
+      detections_topic: "/vision/detections"
+      debug_image_topic: "/vision/debug/image"
+      status_topic: "/vision/status"
+      enable_debug_image: true
+    
+    # Control Configuration
+    control:
+      enabled: false
+      target_class: "person"
+      follow_distance: 1.5
+      max_linear_speed: 0.3
+      max_angular_speed: 0.8
+      cmd_vel_topic: "/cmd_vel"
+    
+    # Services
+    services:
+      enabled: true
+      set_model_service: "/vision/control/set_model"
+      set_confidence_service: "/vision/control/set_confidence"
+      set_frame_skip_service: "/vision/control/set_frame_skip"
+      get_status_service: "/vision/control/get_status"
+    
+    # Performance
+    performance:
+      parallel_processing: true
+      num_threads: 4
+      queue_size: 1
+    
+    # Models to enable
+    models:
+      detector: true
+      depth: false
+      face: true
+      gesture: true
+      pose: true
