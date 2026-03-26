@@ -1,7 +1,7 @@
 # INSTALL.md - Detailed Installation Guide for OpenEyes
 
-> **Version**: v0.0.2  
-> **Last Updated**: 2026-03-25
+> **Version**: v0.0.3  
+> **Last Updated**: 2026-03-26
 
 ---
 

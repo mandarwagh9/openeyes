@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.0.2  
+> **Version**: v0.0.3  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -88,7 +88,7 @@ You should see:
 - Camera feed window (with --debug)
 - Object detection boxes (green)
 - Face detection boxes (blue)
-- Console output with FPS (7-10 FPS with all models)
+- Console output with FPS (15-25 FPS with all models)
 
 ---
 
@@ -133,9 +133,12 @@ python src/main.py --host 192.168.1.100 --port 5000
 
 | Configuration | Expected FPS |
 |:--------------|:------------|
-| All models enabled | 7-10 FPS |
-| Object detection only | 30+ FPS |
+| All models enabled | 15-25 FPS |
+| Object detection only | 50-70 FPS |
+| YOLO11n TensorRT INT8 | 80-100 FPS |
 | Without display | Slightly higher |
+
+> **Tip**: See [OPTIMIZATION.md](OPTIMIZATION.md) for more performance tuning options.
 
 ---
 

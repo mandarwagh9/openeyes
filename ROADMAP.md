@@ -1,7 +1,7 @@
 # ROADMAP.md - Project Roadmap for OpenEyes
 
-> **Version**: v0.0.2  
-> **Last Updated**: 2026-03-25
+> **Version**: v0.0.3  
+> **Last Updated**: 2026-03-26
 
 ---
 
@@ -15,7 +15,8 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.0.2 | Current | 2026-03-25 | Full Vision Pipeline |
+| v0.0.3 | Current | 2026-03-26 | Performance + ROS2 |
+| v0.0.2 | Released | 2026-03-25 | Full Vision Pipeline |
 | v0.0.1 | Released | 2026-03-15 | Object Detection |
 
 ---
@@ -24,10 +25,10 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 ### v0.0.x - Foundation Phase
 
-#### v0.0.2 - Full Vision Pipeline ✓
+#### v0.0.3 - Performance + ROS2 ✓
 **Status:** Complete
 
-- [x] YOLOv10n integration (replaced YOLOv8)
+- [x] YOLO11n integration (better than YOLOv10n)
 - [x] MiDaS depth estimation
 - [x] MediaPipe Face detection
 - [x] MediaPipe Gesture recognition

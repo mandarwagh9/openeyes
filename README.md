@@ -89,13 +89,13 @@ A humanoid robot needs vision like humans need eyes. OpenEyes provides:
 
 | Layer | Technology |
 |:------|:-----------|
-| **AI Framework** | PyTorch, ONNX Runtime |
-| **Vision** | OpenCV, CUDA, GStreamer |
-| **Models** | YOLOv10, MediaPipe, MiDaS |
-| **Deployment** | TensorRT optimization |
-| **Communication** | JSON, UDP, ROS2-ready |
+| **AI Framework** | PyTorch, ONNX Runtime, TensorRT |
+| **Vision** | OpenCV, CUDA, GStreamer, DeepStream |
+| **Models** | YOLO11n, MediaPipe, MiDaS |
+| **Deployment** | TensorRT optimization (FP16/INT8) |
+| **Communication** | JSON, UDP, ROS2 |
 
-> **Note:** YOLOv10 uses AGPL-3.0 license. For commercial use, consider RTMDet (Apache 2.0).
+> **Note:** YOLO11n uses AGPL-3.0 license. For commercial use, consider RTMDet (Apache 2.0).
 
 ---
 
@@ -128,17 +128,19 @@ openeyes/
 ├── src/
 │   ├── camera/           # Camera input handling (CSI + USB)
 │   ├── models/           # AI model wrappers
-│   │   ├── object_detector.py    # YOLOv10
-│   │   ├── depth_estimator.py   # MiDaS
-│   │   ├── face_detector.py     # MediaPipe
+│   │   ├── object_detector.py    # YOLO11n
+│   │   ├── depth_estimator.py    # MiDaS
+│   │   ├── face_detector.py      # MediaPipe
 │   │   ├── gesture_recognizer.py # MediaPipe
-│   │   └── pose_estimator.py   # MediaPipe
-│   ├── output/           # Output handlers
-│   └── utils/            # Utilities
-├── models/               # AI model weights
-├── docs/                # Documentation
-├── tests/                # Test suites
-├── requirements.txt      # Python dependencies
+│   │   └── pose_estimator.py    # MediaPipe
+│   ├── output/           # Output handlers (JSON, UDP)
+│   ├── ros2/            # ROS2 integration nodes
+│   ├── deepstream/      # DeepStream pipeline scripts
+│   └── utils/           # Utilities (frame skipping, config)
+├── models/              # AI model weights (YOLO11n, MiDaS)
+├── docs/                # Technical documentation
+├── tests/               # Test suites
+├── requirements.txt     # Python dependencies
 └── README.md            # This file
 ```
 
@@ -151,18 +153,22 @@ openeyes/
 - [INSTALL.md](INSTALL.md) - Detailed installation
 - [USER_GUIDE.md](USER_GUIDE.md) - How to use the system
 
+### Performance & Optimization
+- [OPTIMIZATION.md](OPTIMIZATION.md) - Performance tuning guide (15+ FPS)
+- [DEEPSTREAM.md](DEEPSTREAM.md) - DeepStream SDK integration
+
 ### Technical
 - [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) - Full technical specification
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
 - [HARDWARE.md](docs/HARDWARE.md) - Hardware specifications
 - [API_SPEC.md](docs/API_SPEC.md) - API documentation
-- [HOW_HUMANOID_ROBOTS_SEE.md](docs/HOW_HUMANOID_ROBOTS_SEE.md) - How robot vision works
 
 ### Developer
 - [AGENTS.md](AGENTS.md) - Developer guidelines
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
 - [ROADMAP.md](ROADMAP.md) - Project roadmap
 - [CHANGELOG.md](CHANGELOG.md) - Version history
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
 
 ---
 
@@ -172,7 +178,8 @@ openeyes/
 |:------|:------------|:-------|
 | v0.0.1 | Object Detection | Complete |
 | v0.0.2 | Depth, Face, Gesture, Pose | Complete |
-| v1.0.0 | Full Integration | In Progress |
+| v0.0.3 | YOLO11n, Frame Skipping, ROS2 | Complete |
+| v1.0.0 | Production Integration | In Progress |
 
 ---
 
