@@ -26,7 +26,7 @@ class PoseEstimator:
             self._mp_drawing = mp.solutions.drawing_utils
             self._pose = self._mp_pose.Pose(
                 static_image_mode=False,
-                model_complexity=1,
+                model_complexity=0,
                 smooth_landmarks=True,
                 min_detection_confidence=self._min_confidence,
                 min_tracking_confidence=0.5,

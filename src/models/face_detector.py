@@ -28,8 +28,8 @@ class FaceDetector:
             self._mp_drawing = mp.solutions.drawing_utils
             self._face_mesh = self._mp_face_mesh.FaceMesh(
                 static_image_mode=False,
-                max_num_faces=5,
-                refine_landmarks=True,
+                max_num_faces=3,
+                refine_landmarks=False,
                 min_detection_confidence=self._min_confidence,
                 min_tracking_confidence=0.5,
             )
