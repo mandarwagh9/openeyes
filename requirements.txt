@@ -27,9 +27,15 @@ black>=23.0.0
 isort>=5.12.0
 
 # DeepStream SDK (Optional - for production pipelines)
+# Install on Jetson: sudo apt install deepstream-7.1
 # pip install pyds
 
 # ROS2 (Optional - for robot integration)
-# ros-humble-vision-msgs
-# ros-humble-image-transport
-# rclpy
+# Install on Jetson: 
+#   sudo apt install ros-humble-vision-msgs
+#   sudo apt install ros-humble-cv-bridge
+#   sudo apt install ros-humble-image-transport
+#   pip install python-can
+#
+# cv_bridge is required for ROS2 image conversion
+# Note: cv_bridge must be installed via apt, not pip
