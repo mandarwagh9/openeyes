@@ -115,6 +115,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [v0.0.3] - 2026-03-25
+
+### Added
+
+- **DeepStream SDK Integration**
+  - DeepStream 7.1 installation and setup
+  - Python bindings (pyds) for DeepStream
+  - DeepStream-Yolo custom parser library
+  - GStreamer pipeline for CSI camera
+  - Test scripts for DeepStream pipeline
+
+- **Documentation**
+  - DEEPSTREAM.md integration guide
+  - DeepStream configuration files
+
+### Known Issues
+
+- TensorRT engine build requires significant time (~5-10 minutes)
+- Hybrid DeepStream + MediaPipe integration requires further testing
+
+---
+
 ## [Unreleased]
 
 ### Planned for v1.0.0
