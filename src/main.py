@@ -4,10 +4,14 @@ import os
 import signal
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Optional
 
 import cv2
+
+if not os.environ.get('DISPLAY'):
+    os.environ['DISPLAY'] = ':0'
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -26,6 +30,8 @@ from src.utils.logger import setup_logger
 
 
 class VisionSystem:
+    """Optimized vision system with parallel processing."""
+
     def __init__(self, config: Config):
         self._config = config
         self._logger = setup_logger(
@@ -41,8 +47,16 @@ class VisionSystem:
         self._udp_sender: Optional[UDPSender] = None
         self._running = False
         self._frame_id = 0
+
         self._fps_counter = 0
         self._fps_start_time = time.time()
+        self._last_pose = None
+        self._last_faces = []
+        self._last_gestures = []
+
+        self._use_parallel = True
+        self._pose_skip_frames = 1
+
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
@@ -52,7 +66,9 @@ class VisionSystem:
         sys.exit(0)
 
     def start(self) -> None:
-        self._logger.info("Starting OpenEyes Vision System")
+        self._logger.info("Starting OpenEyes Vision System (Optimized)")
+        self._logger.info(f"Parallel processing: {self._use_parallel}")
+        self._logger.info(f"Pose skip frames: {self._pose_skip_frames + 1}")
 
         self._init_camera()
         self._init_detectors()
@@ -89,13 +105,13 @@ class VisionSystem:
 
     def _init_detectors(self) -> None:
         self._detector = ObjectDetector(
-            model_path=self._config.yolo_path,
+            model_path=self._config.yolo_path or "models/yolov10n.onnx",
             confidence=self._config.yolo_confidence,
             iou_threshold=self._config.yolo_iou_threshold,
         )
         try:
             self._detector.load()
-            self._logger.info("Object Detector loaded")
+            self._logger.info(f"Object Detector loaded: {self._detector.name}")
         except ModelError as e:
             self._logger.error(f"Detector initialization failed: {e}")
             raise
@@ -103,7 +119,10 @@ class VisionSystem:
         try:
             self._depth_estimator = DepthEstimator()
             self._depth_estimator.load()
-            self._logger.info("Depth Estimator loaded")
+            if self._depth_estimator.is_loaded:
+                self._logger.info("Depth Estimator loaded")
+            else:
+                self._logger.warning("Depth Estimator using fallback")
         except ModelError as e:
             self._logger.warning(f"Depth Estimator not available: {e}")
 
@@ -182,17 +201,10 @@ class VisionSystem:
 
         depth = DepthData(enabled=False)
 
-        faces: list[FaceDetection] = []
-        if self._face_detector:
-            faces = self._face_detector.detect(frame)
-
-        gestures: list[Gesture] = []
-        if self._gesture_recognizer:
-            gestures = self._gesture_recognizer.recognize(frame)
-
-        pose = PoseData(detected=False)
-        if self._pose_estimator:
-            pose = self._pose_estimator.estimate(frame)
+        if self._use_parallel:
+            faces, gestures, pose = self._process_models_parallel(frame)
+        else:
+            faces, gestures, pose = self._process_models_sequential(frame)
 
         result = VisionResult(
             timestamp=timestamp,
@@ -205,6 +217,108 @@ class VisionSystem:
         )
 
         return result
+
+    def _process_models_parallel(
+        self, frame
+    ) -> tuple:
+        """Process face, gesture, and pose in parallel."""
+        faces = []
+        gestures = []
+        pose = PoseData(detected=False)
+
+        results = {}
+
+        def safe_face():
+            try:
+                return self._face_detector.detect(frame)
+            except Exception as e:
+                return []
+
+        def safe_gesture():
+            try:
+                return self._gesture_recognizer.recognize(frame)
+            except Exception as e:
+                return []
+
+        def safe_pose():
+            try:
+                return self._pose_estimator.estimate(frame)
+            except Exception as e:
+                return PoseData(detected=False)
+
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = []
+
+            if self._face_detector:
+                futures.append(("face", executor.submit(safe_face)))
+
+            if self._gesture_recognizer:
+                futures.append(("gesture", executor.submit(safe_gesture)))
+
+            if self._pose_estimator:
+                if self._frame_id % (self._pose_skip_frames + 1) == 0:
+                    futures.append(("pose", executor.submit(safe_pose)))
+                else:
+                    pose = self._last_pose if self._last_pose else PoseData(detected=False)
+
+            for key, future in futures:
+                try:
+                    result = future.result()
+                    if key == "face":
+                        faces = result if isinstance(result, list) else []
+                        if faces:
+                            self._last_faces = faces
+                    elif key == "gesture":
+                        gestures = result if isinstance(result, list) else []
+                        if gestures:
+                            self._last_gestures = gestures
+                    elif key == "pose":
+                        if hasattr(result, 'detected'):
+                            pose = result
+                            if result.detected:
+                                self._last_pose = result
+                except Exception as e:
+                    self._logger.warning(f"Model {key} failed: {e}")
+
+        if not faces and self._last_faces:
+            faces = self._last_faces
+        if not gestures and self._last_gestures:
+            gestures = self._last_gestures
+        if not pose.detected and self._last_pose:
+            pose = self._last_pose
+
+        return faces, gestures, pose
+
+    def _process_models_sequential(
+        self, frame
+    ) -> tuple:
+        """Process models sequentially (fallback)."""
+        faces: list[FaceDetection] = []
+        if self._face_detector:
+            try:
+                faces = self._face_detector.detect(frame)
+            except Exception as e:
+                self._logger.warning(f"Face detection failed: {e}")
+
+        gestures: list[Gesture] = []
+        if self._gesture_recognizer:
+            try:
+                gestures = self._gesture_recognizer.recognize(frame)
+            except Exception as e:
+                self._logger.warning(f"Gesture recognition failed: {e}")
+
+        pose = PoseData(detected=False)
+        if self._pose_estimator:
+            if self._frame_id % (self._pose_skip_frames + 1) == 0:
+                try:
+                    pose = self._pose_estimator.estimate(frame)
+                    self._last_pose = pose
+                except Exception as e:
+                    self._logger.warning(f"Pose estimation failed: {e}")
+            else:
+                pose = self._last_pose if self._last_pose else PoseData(detected=False)
+
+        return faces, gestures, pose
 
     def _debug_display(self, frame, result: VisionResult) -> None:
         for det in result.objects:
@@ -305,6 +419,17 @@ def main() -> None:
         action="store_true",
         help="Disable pose estimation",
     )
+    parser.add_argument(
+        "--no-parallel",
+        action="store_true",
+        help="Disable parallel processing",
+    )
+    parser.add_argument(
+        "--pose-every",
+        type=int,
+        default=2,
+        help="Run pose estimation every N frames",
+    )
 
     args = parser.parse_args()
 
@@ -324,6 +449,12 @@ def main() -> None:
 
     try:
         system = VisionSystem(config)
+
+        if args.no_parallel:
+            system._use_parallel = False
+        if args.pose_every:
+            system._pose_skip_frames = args.pose_every - 1
+
         system.start()
     except Exception as e:
         print(f"Fatal error: {e}")
