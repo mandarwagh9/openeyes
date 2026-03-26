@@ -1,7 +1,7 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Version**: v0.0.2  
+> **Last Updated**: 2026-03-25
 
 ---
 
@@ -64,7 +64,8 @@ python src/main.py --help
 ```
 usage: main.py [-h] [--camera CAMERA] [--width WIDTH] [--height HEIGHT]
                [--fps FPS] [--host HOST] [--port PORT] [--debug]
-               [--config CONFIG]
+               [--config CONFIG] [--no-face] [--no-gesture] [--no-pose]
+               [--no-parallel] [--pose-every POSE_EVERY]
 
 optional arguments:
   --camera CAMERA       Camera index (0, 1...) or RTSP URL
@@ -73,8 +74,13 @@ optional arguments:
   --fps FPS             Target FPS (default: 30)
   --host HOST           Output host IP (default: 127.0.0.1)
   --port PORT           Output port (default: 5000)
-  --debug               Enable debug mode
-  --config CONFIG       Config file path
+  --debug               Enable debug mode (shows video window)
+  --config CONFIG        Config file path
+  --no-face             Disable face detection
+  --no-gesture          Disable gesture recognition
+  --no-pose             Disable pose estimation
+  --no-parallel         Disable parallel processing (more stable)
+  --pose-every POSE_EVERY  Run pose estimation every N frames (default: 2)
 ```
 
 ### 3.2 Config File
@@ -221,6 +227,34 @@ python src/main.py --camera 0 --name front
 # Camera 1 - back view (separate terminal)
 python src/main.py --camera 1 --name back
 ```
+
+### 6.5 Performance Tuning
+
+For optimal performance on Jetson Orin Nano:
+
+```bash
+# Run with all optimizations enabled
+python src/main.py --debug
+
+# Disable parallel processing if unstable
+python src/main.py --no-parallel
+
+# Run pose less frequently for higher FPS
+python src/main.py --pose-every 3
+
+# Disable all extra models for maximum object detection FPS
+python src/main.py --no-face --no-gesture --no-pose
+```
+
+### Performance Examples
+
+| Command | Expected FPS |
+|:--------|:------------|
+| `python src/main.py` | 7-10 FPS |
+| `python src/main.py --debug` | 7-10 FPS |
+| `python src/main.py --no-parallel` | 4-6 FPS (more stable) |
+| `python src/main.py --pose-every 3` | 8-12 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose` | 25-35 FPS |
 
 ---
 

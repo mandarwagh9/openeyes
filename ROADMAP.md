@@ -1,7 +1,7 @@
 # ROADMAP.md - Project Roadmap for OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Version**: v0.0.2  
+> **Last Updated**: 2026-03-25
 
 ---
 
@@ -15,8 +15,8 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.0.1 | Current | 2026-03-16 | Object Detection - Complete |
-| v0.0.1 | Released | 2026-03-13 | Initial release - Object Detection |
+| v0.0.2 | Current | 2026-03-25 | Full Vision Pipeline |
+| v0.0.1 | Released | 2026-03-15 | Object Detection |
 
 ---
 
@@ -24,66 +24,38 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 ### v0.0.x - Foundation Phase
 
-#### v0.0.1 - Object Detection ✓
+#### v0.0.2 - Full Vision Pipeline ✓
 **Status:** Complete
 
-- [x] Project setup
-- [x] Basic architecture
-- [x] YOLOv8n integration
-- [x] Camera handler
-- [x] Basic output (JSON/UDP)
-- [x] Unit tests
+- [x] YOLOv10n integration (replaced YOLOv8)
+- [x] MiDaS depth estimation
+- [x] MediaPipe Face detection
+- [x] MediaPipe Gesture recognition
+- [x] MediaPipe Pose estimation
+- [x] Parallel processing optimization
+- [x] CSI camera support (IMX219)
+- [x] Auto-display detection
+- [x] TensorRT/ONNX optimization
 
 **Released:** March 2026
 
-#### v0.0.2 - Depth Estimation
-**Status:** Planned
-
-- [ ] MiDaS integration
-- [ ] Depth visualization
-- [ ] Distance calculation
-- [ ] Obstacle detection
-
-**Target:** April 2026
-
-#### v0.0.3 - Face Detection
-**Status:** Planned
-
-- [ ] MediaPipe Face detection
-- [ ] Face tracking
-- [ ] Multi-face support
-
-**Target:** April 2026
-
-#### v0.0.4 - Gesture Recognition
-**Status:** Planned
-
-- [ ] MediaPipe Hands
-- [ ] Gesture classification
-- [ ] Hand tracking
-
-**Target:** May 2026
-
-#### v0.0.5 - Pose Estimation
-**Status:** Planned
-
-- [ ] MediaPipe Pose
-- [ ] Body keypoint detection
-- [ ] Pose tracking
-
-**Target:** May 2026
+**Performance:**
+- 7-10 FPS with all models
+- 30+ FPS with object detection only
 
 ---
 
 ### v1.0.x - Integration Phase
 
 #### v1.0.0 - Full Integration
-**Status:** Planned
+**Status:** In Progress
 
-- [ ] Unified vision pipeline
-- [ ] Performance optimization
+- [ ] Unified vision pipeline optimization
+- [ ] Performance tuning (target: 15+ FPS)
 - [ ] ROS2 integration (optional)
 - [ ] Production ready
+- [ ] Multi-camera support
+- [ ] Model switching (YOLOv10s/m for accuracy)
 
 **Target:** June 2026
 
@@ -94,7 +66,7 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 #### v1.1.0 - Enhanced Models
 **Status:** Planned
 
-- [ ] YOLOv8m (medium model)
+- [ ] YOLOv10s (higher accuracy)
 - [ ] Better depth estimation
 - [ ] Custom model training
 
@@ -118,20 +90,20 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 ### Phase 1: Core Vision (v0.0.x)
 
-| Feature | Priority | Version |
-|:--------|:---------|:--------|
-| Object Detection | P0 | v0.0.1 |
-| Depth Estimation | P0 | v0.0.2 |
-| Face Detection | P1 | v0.0.3 |
-| Gesture Recognition | P1 | v0.0.4 |
-| Pose Estimation | P1 | v0.0.5 |
+| Feature | Priority | Version | Status |
+|:--------|:---------|:--------|:-------|
+| Object Detection (YOLOv10) | P0 | v0.0.1 | Complete |
+| Depth Estimation (MiDaS) | P0 | v0.0.2 | Complete |
+| Face Detection | P1 | v0.0.2 | Complete |
+| Gesture Recognition | P1 | v0.0.2 | Complete |
+| Pose Estimation | P1 | v0.0.2 | Complete |
 
 ### Phase 2: Integration (v1.0.x)
 
 | Feature | Priority | Version |
 |:--------|:---------|:--------|
 | Unified Pipeline | P0 | v1.0.0 |
-| Performance | P0 | v1.0.0 |
+| Performance (15+ FPS) | P0 | v1.0.0 |
 | ROS2 Bridge | P2 | v1.0.0 |
 | Multi-Camera | P1 | v1.1.0 |
 
@@ -152,13 +124,13 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 **Goal:** Get object detection working
 **Status:** Complete
 
-### M2: Depth Perception
+### M2: Depth Perception ✓
 **Goal:** Add 3D understanding
-**Target:** April 2026
+**Status:** Complete
 
-### M3: Human Interaction
+### M3: Human Interaction ✓
 **Goal:** Detect faces, gestures, poses
-**Target:** May 2026
+**Status:** Complete
 
 ### M4: Production Ready
 **Goal:** Stable, optimized, documented
@@ -192,3 +164,4 @@ Want to suggest features? Please [open an issue](https://github.com/mandarwagh9/
 - Timeline is approximate and may change based on resources and feedback
 - Priorities may shift based on user requirements
 - Community contributions can accelerate development
+- YOLOv10 uses AGPL-3.0 license - consider RTMDet for commercial use

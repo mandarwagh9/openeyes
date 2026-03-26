@@ -1,7 +1,7 @@
 # TROUBLESHOOTING.md - Common Issues and Solutions for OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Version**: v0.0.2  
+> **Last Updated**: 2026-03-25
 
 ---
 
@@ -10,9 +10,11 @@
 1. [Camera Issues](#1-camera-issues)
 2. [Model Issues](#2-model-issues)
 3. [Performance Issues](#3-performance-issues)
-4. [Output Issues](#4-output-issues)
-5. [Installation Issues](#5-installation-issues)
-6. [Hardware Issues](#6-hardware-issues)
+4. [Display Issues](#4-display-issues)
+5. [OpenCV Issues](#5-opencv-issues)
+6. [MediaPipe Issues](#6-mediapipe-issues)
+7. [Installation Issues](#7-installation-issues)
+8. [Hardware Issues](#8-hardware-issues)
 
 ---
 
@@ -404,6 +406,172 @@ ModuleNotFoundError: No module named 'cv2'
 2. Try powered USB hub
 
 3. Check for driver issues
+
+---
+
+## 4. Display Issues
+
+### Issue: Window Doesn't Show
+
+**Symptoms:**
+- Running with `--debug` but no window appears
+
+**Solutions:**
+
+1. Set DISPLAY environment variable:
+   ```bash
+   export DISPLAY=:0
+   python src/main.py --debug
+   ```
+
+2. Check X server is running:
+   ```bash
+   ps aux | grep X
+   ```
+
+3. Check permissions:
+   ```bash
+   xhost +local:*
+   ```
+
+### Issue: GTK Errors
+
+**Symptoms:**
+```
+Gtk-Message: Failed to load module "canberra-gtk-module"
+```
+
+**Solutions:**
+
+This is a harmless warning. Install the module or ignore:
+```bash
+sudo apt install libcanberra-gtk-module
+```
+
+---
+
+## 5. OpenCV Issues
+
+### Issue: GStreamer Not Available
+
+**Symptoms:**
+```
+OpenCV | GStreamer warning: Cannot query video position
+```
+
+or
+
+```
+All camera methods failed
+```
+
+**Solutions:**
+
+1. Use system OpenCV instead of pip OpenCV:
+   ```bash
+   pip uninstall -y opencv-python opencv-contrib-python
+   ```
+
+2. Verify system OpenCV has GStreamer:
+   ```bash
+   python -c "import cv2; print(cv2.getBuildInformation())" | grep GStreamer
+   ```
+
+3. Restart nvargus-daemon:
+   ```bash
+   sudo systemctl restart nvargus-daemon
+   ```
+
+### Issue: Camera Works in GStreamer but Not OpenCV
+
+**Solutions:**
+
+1. Test GStreamer directly:
+   ```bash
+   gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! fakesink
+   ```
+
+2. Use correct pipeline in Python:
+   ```python
+   pipeline = (
+       'nvarguscamerasrc sensor-id=0 ! '
+       'video/x-raw(memory:NVMM),width=640,height=480,format=NV12,framerate=30/1 ! '
+       'nvvidconv flip-method=0 ! '
+       'video/x-raw,format=BGRx ! '
+       'videoconvert ! '
+       'video/x-raw,format=BGR ! '
+       'appsink drop=True'
+   )
+   cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+   ```
+
+---
+
+## 6. MediaPipe Issues
+
+### Issue: MediaPipe Crashes
+
+**Symptoms:**
+```
+Fatal error: 'str' object has no attribute '_condition'
+```
+
+**Solutions:**
+
+1. Downgrade MediaPipe to stable version:
+   ```bash
+   pip install mediapipe==0.10.9
+   ```
+
+2. Disable parallel processing:
+   ```bash
+   python src/main.py --no-parallel
+   ```
+
+3. Use frame skipping:
+   ```bash
+   python src/main.py --pose-every 3
+   ```
+
+### Issue: MediaPipe Memory Error
+
+**Symptoms:**
+- Out of memory errors
+
+**Solutions:**
+
+1. Reduce model complexity in code:
+   ```python
+   # In face_detector.py or pose_estimator.py
+   model_complexity=0  # Instead of 1
+   ```
+
+---
+
+## 7. Installation Issues
+
+### Issue: Module Not Found After Installation
+
+**Solutions:**
+
+1. Activate virtual environment:
+   ```bash
+   source venv/bin/activate
+   ```
+
+2. Reinstall requirements:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+### Issue: TensorRT Not Found
+
+**Solutions:**
+
+TensorRT should come with JetPack. Verify:
+```bash
+python -c "import tensorrt; print(tensorrt.__version__)"
+```
 
 ---
 

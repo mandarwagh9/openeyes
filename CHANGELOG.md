@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-16
+> **Version**: v0.0.2  
+> **Last Updated**: 2026-03-25
 
 ---
 
@@ -9,6 +9,66 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.0.2] - 2026-03-25
+
+### Added
+
+- **Object Detection**
+  - YOLOv10n model with PyTorch + CUDA acceleration
+  - ONNX Runtime support with TensorRT provider
+  - Automatic CUDA/ONNX fallback detection
+
+- **Depth Estimation**
+  - MiDaS_small model integration
+  - GPU acceleration support
+  - Depth map estimation and distance calculation
+
+- **Face Detection**
+  - MediaPipe FaceMesh integration
+  - Multi-face support (up to 3)
+
+- **Gesture Recognition**
+  - MediaPipe Hands integration
+  - Real-time hand tracking
+
+- **Pose Estimation**
+  - MediaPipe Pose integration
+  - Body keypoint detection
+
+- **Performance Optimizations**
+  - Parallel processing with ThreadPoolExecutor
+  - Frame skipping for pose estimation
+  - Result caching for face/gesture
+
+- **Camera Support**
+  - CSI camera (IMX219) via nvarguscamerasrc
+  - GStreamer pipeline integration
+  - Auto-detection of Jetson platform
+
+- **Display**
+  - Auto-display detection (DISPLAY=:0 fallback)
+  - Debug visualization with bounding boxes
+
+### Changed
+
+- Updated version to v0.0.2
+- Performance: 5-6 FPS → 7-10 FPS with all models
+- Default model: YOLOv8n → YOLOv10n
+- CLI options added: --no-parallel, --pose-every
+
+### Dependencies Updated
+
+- Added `timm` for depth estimation
+- Added `onnxruntime-gpu` for TensorRT support
+- Downgraded MediaPipe to 0.10.9 for stability
+
+### Known Issues
+
+- MediaPipe may crash with certain frame sizes (workaround: use frame skipping)
+- TensorRT engine build may timeout on low-memory systems (use ONNX fallback)
 
 ---
 
@@ -53,24 +113,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project named "OpenEyes"
 - License set to Apache 2.0
 
-### Known Issues
-
-- None
-
 ---
 
 ## [Unreleased]
 
-### Planned for v0.0.2
+### Planned for v1.0.0
 
-- [ ] MiDaS depth estimation integration
-- [ ] Depth visualization
-- [ ] Distance calculation utilities
+- [ ] Performance optimization (target: 15+ FPS)
+- [ ] ROS2 integration
+- [ ] Multi-camera support
+- [ ] Production hardening
 
-### Planned for v0.0.3
+### Planned for v1.1.0
 
-- [ ] MediaPipe Face detection
-- [ ] Face tracking
+- [ ] YOLOv10s for higher accuracy
+- [ ] Custom model training
+- [ ] Stereo vision
 
 ---
 
@@ -93,14 +151,20 @@ Given a version number `MAJOR.MINOR.PATCH`:
    pip install -r requirements.txt
    ```
 
-2. Download models:
+2. Download new models (if not already included):
    ```bash
-   python scripts/download_models.py
+   # YOLOv10n is included in models/ folder
    ```
 
 3. Run vision system:
    ```bash
-   python src/main.py
+   python src/main.py --debug
+   ```
+
+4. For optimal performance, enable Jetson max mode:
+   ```bash
+   sudo nvpmodel -m 0
+   sudo jetson_clocks
    ```
 
 ---
@@ -110,8 +174,7 @@ Given a version number `MAJOR.MINOR.PATCH`:
 | Version | Type | Target |
 |:--------|:-----|:-------|
 | v0.0.1 | Initial | March 2026 |
-| v0.0.2 | Minor | April 2026 |
-| v0.0.3 | Minor | April 2026 |
+| v0.0.2 | Minor | March 2026 |
 | v1.0.0 | Major | June 2026 |
 
 ---

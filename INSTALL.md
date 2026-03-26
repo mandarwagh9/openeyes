@@ -1,7 +1,7 @@
 # INSTALL.md - Detailed Installation Guide for OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Version**: v0.0.2  
+> **Last Updated**: 2026-03-25
 
 ---
 
@@ -13,7 +13,9 @@
 4. [Project Setup](#4-project-setup)
 5. [Model Download](#5-model-download)
 6. [Testing](#6-testing)
-7. [Optional: TensorRT](#7-optional-tensorrt)
+7. [Jetson Performance](#7-jetson-performance)
+8. [CSI Camera Setup](#8-csi-camera-setup)
+9. [Troubleshooting](#9-troubleshooting)
 
 ---
 
@@ -24,11 +26,21 @@
 | Item | Specification |
 |:-----|:--------------|
 | **Jetson** | NVIDIA Jetson Orin Nano (4GB or 8GB) |
-| **Camera** | USB Webcam (720p or 1080p) |
+| **Camera** | CSI Camera (IMX219) or USB Webcam (720p/1080p) |
 | **Storage** | 64GB+ microSD or NVMe |
 | **Power** | 5V/4A barrel jack or USB-C PD |
 
-### 1.2 Connect Hardware
+### 1.2 Connect Hardware (CSI Camera)
+
+```
+1. Insert microSD card into Jetson
+2. Connect CSI camera ribbon to CAM0 connector
+3. Connect Ethernet cable (or configure WiFi)
+4. Connect power supply
+5. Press power button
+```
+
+### 1.3 Connect Hardware (USB Webcam)
 
 ```
 1. Insert microSD card into Jetson
@@ -99,16 +111,23 @@ pip install -r requirements.txt
 ### 3.3 Requirements.txt
 
 ```
+# Core
 opencv-python>=4.8.0
 numpy>=1.24.0
+PyYAML>=6.0
+python-dotenv>=1.0.0
+
+# AI/ML
 torch>=2.0.0
 torchvision>=0.15.0
 ultralytics>=8.0.0
 onnxruntime>=1.15.0
-mediapipe>=0.10.0
+onnxruntime-gpu>=1.15.0
+mediapipe==0.10.9
+timm>=1.0.0
+
+# Communication
 pyserial>=3.5
-PyYAML>=6.0
-python-dotenv>=1.0.0
 ```
 
 ---
@@ -220,46 +239,90 @@ python src/main.py --debug
 Expected output:
 ```
 [INFO] Camera initialized: 640x480 @ 30fps
-[INFO] YOLOv8n loaded successfully
+[INFO] YOLOv10 loaded successfully
 [INFO] Starting vision pipeline...
 [INFO] Processing frames...
 ```
 
 ---
 
-## 7. Optional: TensorRT
+## 7. Jetson Performance
 
-For better performance, convert models to TensorRT:
+### 7.1 Enable Maximum Performance Mode
 
-### 7.1 Install TensorRT
-
-```bash
-# TensorRT comes with JetPack
-# Verify installation
-python -c "import tensorrt; print(tensorrt.__version__)"
-```
-
-### 7.2 Convert YOLO to TensorRT
+For best AI performance on Jetson Orin Nano:
 
 ```bash
-python scripts/convert_to_tensorrt.py --model yolov8n.pt
+# Enable 15W power mode (MAXN)
+sudo nvpmodel -m 0
+
+# Lock CPU/GPU clocks to maximum
+sudo jetson_clocks
+
+# Verify performance mode
+sudo nvpmodel -q
 ```
+
+### 7.2 Verify CUDA
+
+```bash
+python -c "import torch; print('CUDA:', torch.cuda.is_available())"
+```
+
+### 7.3 Performance Tips
+
+- Use CSI camera instead of USB for lower latency
+- Disable unused models for higher FPS
+- Use `--no-parallel` if experiencing stability issues
+- Use `--pose-every 3` to reduce pose estimation frequency
 
 ---
 
-## 8. Troubleshooting
+## 8. CSI Camera Setup
 
-### 8.1 Camera Issues
+### 8.1 Verify CSI Camera
+
+```bash
+# Check camera device
+ls -la /dev/video*
+
+# Test with GStreamer
+gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! fakesink
+```
+
+### 8.2 Camera Device Tree
+
+If camera is not detected, you may need to enable it in extlinux.conf:
+
+```bash
+sudo nano /boot/extlinux/extlinux.conf
+```
+
+Add to APPEND line:
+```
+FDT /boot/kernel_og_tegra234-p3768-0000+p3767-0000-nv.dtb
+```
+
+> Note: Modern JetPack versions usually auto-detect CSI cameras.
+
+---
+
+## 9. Troubleshooting
+
+### 9.1 Camera Issues
 
 ```bash
 # List video devices
 ls -la /dev/video*
 
-# Check camera with v4l2
-v4l2-ctl --list-devices
+# Restart Argus daemon
+sudo systemctl restart nvargus-daemon
+
+# Check GStreamer
+gst-inspect-1.0 nvarguscamerasrc
 ```
 
-### 8.2 Memory Issues
+### 9.2 Memory Issues
 
 ```bash
 # Check available memory
@@ -269,16 +332,32 @@ free -h
 tegrastats
 ```
 
-### 8.3 Import Errors
+### 9.3 OpenCV Issues
+
+If OpenCV doesn't work with GStreamer:
+```bash
+# Uninstall pip OpenCV to use system OpenCV
+pip uninstall -y opencv-contrib-python opencv-python
+```
+
+### 9.4 Import Errors
 
 ```bash
 # Reinstall dependencies
 pip install --force-reinstall -r requirements.txt
 ```
 
+### 9.5 Display Issues
+
+If display doesn't show:
+```bash
+# Set display manually
+export DISPLAY=:0
+```
+
 ---
 
-## 9. Uninstall
+## 10. Uninstall
 
 ```bash
 # Deactivate virtual environment
@@ -294,4 +373,4 @@ rm -rf openeyes
 ## Next Steps
 
 - Read [USER_GUIDE.md](USER_GUIDE.md) for usage guide
-- Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues
+- Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for issues
