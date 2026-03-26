@@ -29,6 +29,7 @@ output:
 performance:
   target_fps: 30
   max_latency_ms: 50
-  use_tensorrt: false
+  use_tensorrt: true
+  parallel_models: true
 
 debug: false

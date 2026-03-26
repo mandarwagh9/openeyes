@@ -278,70 +278,89 @@ class VisionSystem:
     def _process_models_parallel(
         self, frame
     ) -> tuple:
-        """Process face, gesture, and pose in parallel."""
+        """Process face, gesture, and pose in parallel with frame skipping."""
         faces = []
         gestures = []
         pose = PoseData(detected=False)
+
+        skip_face = (self._frame_id % 4 != 0)
+        skip_gesture = (self._frame_id % 4 != 0)
+        skip_pose = (self._frame_id % 4 != 0)
+
+        if skip_face and self._last_faces:
+            return self._last_faces, self._last_gestures, self._last_pose if self._last_pose else PoseData(detected=False)
 
         results = {}
 
         def safe_face():
             try:
-                return self._face_detector.detect(frame)
+                if self._face_detector:
+                    return self._face_detector.detect(frame)
+                return []
             except Exception as e:
+                self._logger.warning(f"Face detection failed: {e}")
                 return []
 
         def safe_gesture():
             try:
-                return self._gesture_recognizer.recognize(frame)
+                if self._gesture_recognizer:
+                    return self._gesture_recognizer.recognize(frame)
+                return []
             except Exception as e:
+                self._logger.warning(f"Gesture recognition failed: {e}")
                 return []
 
         def safe_pose():
             try:
-                return self._pose_estimator.estimate(frame)
+                if self._pose_estimator:
+                    return self._pose_estimator.estimate(frame)
+                return PoseData(detected=False)
             except Exception as e:
+                self._logger.warning(f"Pose estimation failed: {e}")
                 return PoseData(detected=False)
 
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = []
 
-            if self._face_detector:
+            if self._face_detector and not skip_face:
                 futures.append(("face", executor.submit(safe_face)))
+            elif skip_face and self._last_faces:
+                results["face"] = self._last_faces
 
-            if self._gesture_recognizer:
+            if self._gesture_recognizer and not skip_gesture:
                 futures.append(("gesture", executor.submit(safe_gesture)))
+            elif skip_gesture and self._last_gestures:
+                results["gesture"] = self._last_gestures
 
-            if self._pose_estimator:
-                if self._frame_id % (self._pose_skip_frames + 1) == 0:
-                    futures.append(("pose", executor.submit(safe_pose)))
-                else:
-                    pose = self._last_pose if self._last_pose else PoseData(detected=False)
+            if self._pose_estimator and not skip_pose:
+                futures.append(("pose", executor.submit(safe_pose)))
+            elif skip_pose and self._last_pose:
+                results["pose"] = self._last_pose
 
             for key, future in futures:
                 try:
                     result = future.result()
-                    if key == "face":
-                        faces = result if isinstance(result, list) else []
-                        if faces:
-                            self._last_faces = faces
-                    elif key == "gesture":
-                        gestures = result if isinstance(result, list) else []
-                        if gestures:
-                            self._last_gestures = gestures
-                    elif key == "pose":
-                        if hasattr(result, 'detected'):
-                            pose = result
-                            if result.detected:
-                                self._last_pose = result
+                    results[key] = result
                 except Exception as e:
                     self._logger.warning(f"Model {key} failed: {e}")
 
-        if not faces and self._last_faces:
+        faces = results.get("face", [])
+        gestures = results.get("gesture", [])
+        pose = results.get("pose", PoseData(detected=False))
+
+        if faces:
+            self._last_faces = faces
+        elif not faces and self._last_faces:
             faces = self._last_faces
-        if not gestures and self._last_gestures:
+
+        if gestures:
+            self._last_gestures = gestures
+        elif not gestures and self._last_gestures:
             gestures = self._last_gestures
-        if not pose.detected and self._last_pose:
+
+        if hasattr(pose, 'detected') and pose.detected:
+            self._last_pose = pose
+        elif not (hasattr(pose, 'detected') and pose.detected) and self._last_pose:
             pose = self._last_pose
 
         return faces, gestures, pose
