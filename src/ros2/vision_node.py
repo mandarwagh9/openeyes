@@ -1,12 +1,80 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy
-from sensor_msgs.msg import Image
-from vision_msgs.msg import Detection2DArray, BoundingBox2D, ObjectHypothesis
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.executors import MultiThreadedExecutor
+from rclpy.callback_groups import ReentrantCallbackGroup
+
+from sensor_msgs.msg import Image, CameraInfo
+from vision_msgs.msg import Detection2DArray, Detection2D, BoundingBox2D, ObjectHypothesis
 from geometry_msgs.msg import Pose, PoseStamped, Twist
 from std_msgs.msg import Header, String
+
 import numpy as np
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Dict
+import threading
+import queue
+
+
+SENSOR_QOS = QoSProfile(
+    depth=1,
+    reliability=ReliabilityPolicy.BEST_EFFORT,
+    history=HistoryPolicy.KEEP_LAST,
+    durability=DurabilityPolicy.VOLATILE
+)
+
+COMMAND_QOS = QoSProfile(
+    depth=10,
+    reliability=ReliabilityPolicy.RELIABLE,
+    history=HistoryPolicy.KEEP_LAST,
+    durability=DurabilityPolicy.VOLATILE
+)
+
+STATE_QOS = QoSProfile(
+    depth=1,
+    reliability=ReliabilityPolicy.RELIABLE,
+    history=HistoryPolicy.KEEP_LAST,
+    durability=DurabilityPolicy.TRANSIENT_LOCAL
+)
+
+
+try:
+    from cv_bridge import CvBridge
+    CV_BRIDGE_AVAILABLE = True
+except ImportError:
+    CV_BRIDGE_AVAILABLE = False
+
+
+class ImageConverter:
+    """Utility class for converting between ROS Image and OpenCV."""
+
+    def __init__(self):
+        if CV_BRIDGE_AVAILABLE:
+            self.bridge = CvBridge()
+        else:
+            self.bridge = None
+
+    def ros_to_cv2(self, ros_image: Image, encoding: str = 'bgr8') -> Optional[np.ndarray]:
+        """Convert ROS Image to OpenCV format."""
+        if not self.bridge:
+            self.get_logger().warn("cv_bridge not available")
+            return None
+
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(ros_image, desired_encoding=encoding)
+            return cv_image
+        except Exception as e:
+            return None
+
+    def cv2_to_ros(self, cv_image: np.ndarray, encoding: str = 'bgr8') -> Optional[Image]:
+        """Convert OpenCV image to ROS Image."""
+        if not self.bridge:
+            return None
+
+        try:
+            ros_image = self.bridge.cv2_to_imgmsg(cv_image, encoding=encoding)
+            return ros_image
+        except Exception as e:
+            return None
 
 
 class VisionPublisher(Node):
@@ -15,90 +83,132 @@ class VisionPublisher(Node):
     def __init__(
         self,
         output_topic: str = "/vision/detections",
-        camera_topic: str = "/camera/image_raw"
+        camera_topic: str = "/camera/image_raw",
+        debug_image_topic: Optional[str] = "/vision/debug/image",
+        status_topic: str = "/vision/status"
     ):
         super().__init__("vision_publisher")
 
         self.declare_parameter("output_topic", output_topic)
         self.declare_parameter("camera_topic", camera_topic)
+        self.declare_parameter("debug_image_topic", debug_image_topic)
+        self.declare_parameter("status_topic", status_topic)
         self.declare_parameter("frame_id", "camera_link")
         self.declare_parameter("confidence_threshold", 0.5)
+        self.declare_parameter("enable_debug_image", True)
 
         self.output_topic = self.get_parameter("output_topic").value
         self.camera_topic = self.get_parameter("camera_topic").value
+        self.debug_image_topic = self.get_parameter("debug_image_topic").value
+        self.status_topic = self.get_parameter("status_topic").value
         self.frame_id = self.get_parameter("frame_id").value
         self.confidence_threshold = self.get_parameter("confidence_threshold").value
-
-        sensor_qos = QoSProfile(
-            depth=5,
-            reliability=ReliabilityPolicy.BEST_EFFORT
-        )
+        self.enable_debug_image = self.get_parameter("enable_debug_image").value
 
         self.detection_pub = self.create_publisher(
             Detection2DArray,
             self.output_topic,
-            sensor_qos
+            SENSOR_QOS
         )
 
-        self.image_pub = self.create_publisher(
-            Image,
-            "/vision/debug/image",
-            sensor_qos
-        )
+        if self.enable_debug_image and self.debug_image_topic:
+            self.image_pub = self.create_publisher(
+                Image,
+                self.debug_image_topic,
+                SENSOR_QOS
+            )
 
         self.status_pub = self.create_publisher(
             String,
-            "/vision/status",
-            QoSProfile(depth=1)
+            self.status_topic,
+            STATE_QOS
         )
+
+        self.image_converter = ImageConverter() if CV_BRIDGE_AVAILABLE else None
+
+        self._detection_count = 0
+        self._last_status_time = self.get_clock().now()
 
         self.get_logger().info(f"Vision publisher initialized: {self.output_topic}")
 
     def publish_detections(
         self,
         detections: List[Any],
-        frame_shape: tuple
+        frame_shape: tuple,
+        header: Optional[Header] = None
     ) -> None:
         """Publish detection results as ROS2 messages."""
         msg = Detection2DArray()
-        msg.header = self._create_header()
+
+        if header:
+            msg.header = header
+        else:
+            msg.header = self._create_header()
+
         msg.detections = []
 
-        height, width = frame_shape[:2]
-
         for det in detections:
+            confidence = det.get("confidence", 0.0)
+            if confidence < self.confidence_threshold:
+                continue
+
             detection = Detection2D()
 
-            x1, y1, x2, y2 = det.get("bbox", [0, 0, 0, 0])
-            cx = (x1 + x2) / 2
-            cy = (y1 + y2) / 2
-            w = x2 - x1
-            h = y2 - y1
+            bbox = det.get("bbox", [0, 0, 0, 0])
+            if len(bbox) >= 4:
+                x1, y1, x2, y2 = bbox[:4]
+                cx = (x1 + x2) / 2
+                cy = (y1 + y2) / 2
+                w = x2 - x1
+                h = y2 - y1
 
-            detection.bbox.center.position.x = cx
-            detection.bbox.center.position.y = cy
-            detection.bbox.size_x = w
-            detection.bbox.size_y = h
+                detection.bbox.center.position.x = float(cx)
+                detection.bbox.center.position.y = float(cy)
+                detection.bbox.size_x = float(w)
+                detection.bbox.size_y = float(h)
 
             hypothesis = ObjectHypothesis()
-            hypothesis.class_id = det.get("class_name", "unknown")
-            hypothesis.score = det.get("confidence", 0.0)
+            hypothesis.class_id = str(det.get("class_name", det.get("class_id", "unknown")))
+            hypothesis.score = float(confidence)
             detection.results.append(hypothesis)
 
             msg.detections.append(detection)
 
         self.detection_pub.publish(msg)
+        self._detection_count += 1
+
+    def publish_debug_image(self, cv_image: np.ndarray, header: Optional[Header] = None) -> None:
+        """Publish debug image with annotations."""
+        if not self.image_pub or not self.image_converter:
+            return
+
+        ros_image = self.image_converter.cv2_to_ros(cv_image, 'bgr8')
+        if ros_image:
+            if header:
+                ros_image.header = header
+            else:
+                ros_image.header = self._create_header()
+            self.image_pub.publish(ros_image)
 
     def publish_status(self, fps: float, num_objects: int) -> None:
         """Publish vision system status."""
-        msg = String()
-        msg.data = f"FPS: {fps:.1f} | Objects: {num_objects}"
-        self.status_pub.publish(msg)
+        current_time = self.get_clock().now()
+        time_diff = (current_time - self._last_status_time).nanoseconds / 1e9
 
-    def _create_header(self) -> Header:
+        if time_diff >= 1.0:
+            msg = String()
+            msg.data = f"FPS: {fps:.1f} | Objects: {num_objects} | Detections: {self._detection_count}"
+            self.status_pub.publish(msg)
+            self._last_status_time = current_time
+            self._detection_count = 0
+
+    def _create_header(self, stamp: Optional[Any] = None) -> Header:
         """Create ROS2 header with timestamp."""
         header = Header()
-        header.stamp = self.get_clock().now().to_msg()
+        if stamp:
+            header.stamp = stamp
+        else:
+            header.stamp = self.get_clock().now().to_msg()
         header.frame_id = self.frame_id
         return header
 
@@ -115,6 +225,8 @@ class VisionControlNode(Node):
         self.declare_parameter("max_angular_speed", 0.8)
         self.declare_parameter("image_width", 640)
         self.declare_parameter("image_height", 480)
+        self.declare_parameter("detection_topic", "/vision/detections")
+        self.declare_parameter("cmd_vel_topic", "/cmd_vel")
 
         self.target_class = self.get_parameter("target_class").value
         self.follow_distance = self.get_parameter("follow_distance").value
@@ -122,26 +234,38 @@ class VisionControlNode(Node):
         self.max_angular_speed = self.get_parameter("max_angular_speed").value
         self.image_width = self.get_parameter("image_width").value
         self.image_height = self.get_parameter("image_height").value
+        self.detection_topic = self.get_parameter("detection_topic").value
+        self.cmd_vel_topic = self.get_parameter("cmd_vel_topic").value
 
         self.cmd_vel_pub = self.create_publisher(
             Twist,
-            "/cmd_vel",
-            QoSProfile(depth=10, reliability=ReliabilityPolicy.RELIABLE)
+            self.cmd_vel_topic,
+            COMMAND_QOS
         )
 
         self.detection_sub = self.create_subscription(
             Detection2DArray,
-            "/vision/detections",
+            self.detection_topic,
             self.detection_callback,
-            QoSProfile(depth=5)
+            SENSOR_QOS
         )
 
         self.latest_detection: Optional[Detection2DArray] = None
+        self._enabled = True
 
-        self.get_logger().info("Vision control node initialized")
+        self.get_logger().info(f"Vision control node initialized: {self.cmd_vel_topic}")
+
+    def set_enabled(self, enabled: bool) -> None:
+        """Enable or disable control."""
+        self._enabled = enabled
+        if not enabled:
+            self._publish_stop()
 
     def detection_callback(self, msg: Detection2DArray) -> None:
         """Process detection results and generate control commands."""
+        if not self._enabled:
+            return
+
         self.latest_detection = msg
 
         target = self._find_target(msg)
@@ -190,6 +314,74 @@ class VisionControlNode(Node):
         self.cmd_vel_pub.publish(cmd)
 
 
+class VisionSubscriberNode(Node):
+    """ROS2 node for subscribing to camera images and processing with vision models."""
+
+    def __init__(self):
+        super().__init__("vision_subscriber")
+
+        self.declare_parameter("camera_topic", "/camera/image_raw")
+        self.declare_parameter("camera_info_topic", "/camera/camera_info")
+        self.declare_parameter("processing_queue_size", 1)
+
+        self.camera_topic = self.get_parameter("camera_topic").value
+        self.camera_info_topic = self.get_parameter("camera_info_topic").value
+        self.queue_size = self.get_parameter("processing_queue_size").value
+
+        self.image_converter = ImageConverter() if CV_BRIDGE_AVAILABLE else None
+
+        self._frame_queue: queue.Queue = queue.Queue(maxsize=self.queue_size)
+
+        self.camera_sub = self.create_subscription(
+            Image,
+            self.camera_topic,
+            self._image_callback,
+            SENSOR_QOS
+        )
+
+        self.camera_info_sub = self.create_subscription(
+            CameraInfo,
+            self.camera_info_topic,
+            self._camera_info_callback,
+            STATE_QOS
+        )
+
+        self._latest_camera_info: Optional[CameraInfo] = None
+        self._running = True
+
+        self.get_logger().info(f"Vision subscriber initialized: {self.camera_topic}")
+
+    def _image_callback(self, msg: Image) -> None:
+        """Callback for incoming images."""
+        if self._frame_queue.full():
+            try:
+                self._frame_queue.get_nowait()
+            except queue.Empty:
+                pass
+
+        if not self._frame_queue.full():
+            self._frame_queue.put(msg)
+
+    def _camera_info_callback(self, msg: CameraInfo) -> None:
+        """Callback for camera info."""
+        self._latest_camera_info = msg
+
+    def get_latest_frame(self, timeout: float = 0.1) -> Optional[tuple]:
+        """Get the latest frame from the queue."""
+        try:
+            msg = self._frame_queue.get(timeout=timeout)
+            if self.image_converter:
+                cv_image = self.image_converter.ros_to_cv2(msg)
+                return cv_image, msg.header
+            return None, msg.header
+        except queue.Empty:
+            return None, None
+
+    def get_camera_info(self) -> Optional[CameraInfo]:
+        """Get latest camera info."""
+        return self._latest_camera_info
+
+
 class VisionWrapperNode(Node):
     """Wrapper node for integrating OpenEyes with ROS2."""
 
@@ -199,41 +391,149 @@ class VisionWrapperNode(Node):
         self.declare_parameter("model_path", "models/yolo11n.onnx")
         self.declare_parameter("device", "cuda")
         self.declare_parameter("confidence_threshold", 0.5)
+        self.declare_parameter("enable_control", False)
+        self.declare_parameter("enable_subscriber", False)
 
         self.model_path = self.get_parameter("model_path").value
         self.device = self.get_parameter("device").value
         self.confidence_threshold = self.get_parameter("confidence_threshold").value
+        self.enable_control = self.get_parameter("enable_control").value
+        self.enable_subscriber = self.get_parameter("enable_subscriber").value
+
+        callback_group = ReentrantCallbackGroup()
 
         self.vision_pub = VisionPublisher()
-        self.control_node = VisionControlNode()
+        self.vision_pub.get_logger()
+
+        if self.enable_control:
+            self.control_node = VisionControlNode()
+            self.get_logger().info("Vision control enabled")
+
+        if self.enable_subscriber:
+            self.subscriber = VisionSubscriberNode()
+            self.get_logger().info("Vision subscriber enabled")
+
+        self._publishers = []
+        self._subscriptions = []
 
         self.get_logger().info("OpenEyes ROS2 wrapper initialized")
 
-    def publish_results(self, result) -> None:
+    def publish_results(self, result, frame: Optional[Any] = None) -> None:
         """Publish vision results to ROS2 topics."""
         detections = []
         for obj in result.objects:
             detections.append({
-                "bbox": obj.bbox,
+                "bbox": [obj.bbox[0], obj.bbox[1], obj.bbox[2], obj.bbox[3]],
                 "class_name": obj.class_name,
                 "confidence": obj.confidence
             })
 
-        self.vision_pub.publish_detections(
-            detections,
-            result.objects[0].bbox if result.objects else (480, 640, 3)
-        )
+        frame_shape = (480, 640, 3)
+        self.vision_pub.publish_detections(detections, frame_shape)
+
+    def add_publisher(self, publisher) -> None:
+        """Add a publisher to the wrapper."""
+        self._publishers.append(publisher)
+
+    def add_subscription(self, subscription) -> None:
+        """Add a subscription to the wrapper."""
+        self._subscriptions.append(subscription)
+
+
+class VisionPipeline:
+    """Utility class to create a complete vision pipeline with multiple nodes."""
+
+    def __init__(self):
+        self.nodes: Dict[str, Node] = {}
+        self.executor: Optional[MultiThreadedExecutor] = None
+
+    def add_vision_publisher(
+        self,
+        output_topic: str = "/vision/detections",
+        camera_topic: str = "/camera/image_raw"
+    ) -> VisionPublisher:
+        """Add a vision publisher node."""
+        node = VisionPublisher(output_topic=output_topic, camera_topic=camera_topic)
+        self.nodes['publisher'] = node
+        return node
+
+    def add_vision_control(
+        self,
+        target_class: str = "person"
+    ) -> VisionControlNode:
+        """Add a vision control node."""
+        node = VisionControlNode()
+        node.target_class = target_class
+        self.nodes['control'] = node
+        return node
+
+    def add_vision_subscriber(
+        self,
+        camera_topic: str = "/camera/image_raw"
+    ) -> VisionSubscriberNode:
+        """Add a vision subscriber node."""
+        node = VisionSubscriberNode()
+        node.camera_topic = camera_topic
+        self.nodes['subscriber'] = node
+        return node
+
+    def create_executor(self, num_threads: int = 4) -> MultiThreadedExecutor:
+        """Create a multi-threaded executor for parallel node processing."""
+        self.executor = MultiThreadedExecutor(num_threads=num_threads)
+        for name, node in self.nodes.items():
+            self.executor.add_node(node)
+        return self.executor
+
+    def spin(self) -> None:
+        """Run the vision pipeline."""
+        if not self.executor:
+            self.create_executor()
+
+        try:
+            self.executor.spin()
+        except KeyboardInterrupt:
+            pass
+
+    def shutdown(self) -> None:
+        """Shutdown the pipeline."""
+        for node in self.nodes.values():
+            node.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
+
+
+def create_vision_pipeline(
+    output_topic: str = "/vision/detections",
+    camera_topic: str = "/camera/image_raw",
+    enable_control: bool = False,
+    target_class: str = "person"
+) -> VisionPipeline:
+    """Factory function to create a complete vision pipeline."""
+    pipeline = VisionPipeline()
+
+    pipeline.add_vision_publisher(output_topic=output_topic, camera_topic=camera_topic)
+
+    if enable_control:
+        pipeline.add_vision_control(target_class=target_class)
+
+    return pipeline
 
 
 def main(args=None):
     rclpy.init(args=args)
 
+    pipeline = VisionPipeline()
+    pipeline.add_vision_publisher()
+    pipeline.add_vision_control(target_class="person")
+
+    executor = pipeline.create_executor(num_threads=4)
+
     try:
-        rclpy.spin(VisionPublisher())
+        executor.spin()
     except KeyboardInterrupt:
         pass
     finally:
-        rclpy.shutdown()
+        pipeline.shutdown()
 
 
 if __name__ == "__main__":
