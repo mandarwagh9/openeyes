@@ -6,12 +6,18 @@ camera:
 
 models:
   yolo:
-    path: models/yolo11n.onnx
+    path: models/yolo11n.engine
     confidence: 0.5
     iou_threshold: 0.45
   depth:
-    enabled: true
+    enabled: false
     path: models/depth_midas.pt
+  face:
+    skip_frames: 3
+  gesture:
+    skip_frames: 3
+  pose:
+    skip_frames: 3
 
 output:
   format: json

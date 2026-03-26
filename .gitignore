@@ -14,3 +14,7 @@ ENV/
 .env
 *.log
 .DS_Store
+*.engine
+*.onnx
+models/*.pt
+models/*.pth

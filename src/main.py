@@ -81,17 +81,17 @@ class VisionSystem:
     def _init_frame_scheduler(self) -> None:
         skip_intervals = {
             'detector': 1,
-            'depth': 2,
-            'face': 2,
-            'gesture': 2,
-            'pose': 2
+            'depth': 4,
+            'face': 4,
+            'gesture': 4,
+            'pose': 4
         }
         self._frame_scheduler = MultiModelFrameScheduler(skip_intervals)
         self._adaptive_skipper = AdaptiveFrameSkipper(
-            base_skip=2,
+            base_skip=3,
             motion_threshold=5000.0,
-            min_skip=1,
-            max_skip=3
+            min_skip=2,
+            max_skip=5
         )
         self._logger.info(f"Frame scheduler initialized: {skip_intervals}")
 
