@@ -1,8 +1,25 @@
+import sys
+import os
+
+ros2_paths = [
+    '/opt/ros/humble/lib/python3/dist-packages',
+    '/opt/ros/humble/local/lib/python3.10/dist-packages',
+]
+for p in ros2_paths:
+    if p not in sys.path and os.path.exists(p):
+        sys.path.insert(0, p)
+
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy
 
-from std_srvs.srv import SetBool
+try:
+    from std_srvs.srv import SetBool
+    STD_SRVS_AVAILABLE = True
+except ImportError:
+    SetBool = None
+    STD_SRVS_AVAILABLE = False
+
 from vision_msgs.srv import DetectObject2D, DetectObjects2D
 from sensor_msgs.msg import Image
 from std_msgs.msg import String
