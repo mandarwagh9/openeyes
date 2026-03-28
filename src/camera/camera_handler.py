@@ -51,12 +51,17 @@ class CameraHandler:
         except Exception:
             return False
 
+    def _check_csi_available(self) -> bool:
+        """Check if CSI camera device exists."""
+        return os.path.exists(f"/dev/video{self._source}")
+
     def open(self) -> None:
         """Open the camera with appropriate backend for the platform."""
         self._logger.info(f"Opening camera (source={self._source}, {self._width}x{self._height}@{self._fps})")
         self._logger.info(f"Jetson platform detected: {self._is_jetson}")
+        self._logger.info(f"CSI camera device exists: {self._check_csi_available()}")
 
-        if self._is_jetson:
+        if self._is_jetson and self._check_csi_available():
             if self._try_jetson_csi():
                 self._logger.info("Using Jetson CSI camera (nvarguscamerasrc)")
                 return
@@ -77,6 +82,7 @@ class CameraHandler:
             "video/x-raw,format=BGRx ! "
             "videoconvert ! "
             "video/x-raw,format=BGR ! "
+            "queue ! "
             "appsink drop=True"
         )
 
@@ -84,43 +90,45 @@ class CameraHandler:
         """Try to open CSI camera using nvarguscamerasrc."""
         self._logger.info("Trying Jetson CSI camera...")
 
-        # Try multiple resolution options
         resolutions = [
-            (self._width, self._height),
-            (1280, 720),
-            (640, 480),
             (1920, 1080),
+            (1280, 720),
+            (self._width, self._height),
+            (640, 480),
         ]
 
         for width, height in resolutions:
             pipeline = self._get_jetson_pipeline(width, height, self._fps)
-            self._logger.debug(f"Trying pipeline: {pipeline}")
+            self._logger.debug(f"Trying CSI pipeline: {width}x{height}")
 
             self._cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
             if self._cap is not None and self._cap.isOpened():
-                # Test reading a frame
-                ret, frame = self._cap.read()
-                if ret and frame is not None:
-                    self._width, self._height = width, height
-                    self._logger.info(f"CSI camera opened: {self._width}x{self._height}")
-                    return True
+                time.sleep(0.1)
+                
+                for _ in range(3):
+                    ret, frame = self._cap.read()
+                    if ret and frame is not None:
+                        self._width, self._height = frame.shape[1], frame.shape[0]
+                        self._logger.info(f"CSI camera opened: {self._width}x{self._height}")
+                        return True
                 self._cap.release()
 
             self._cap = None
             self._logger.debug(f"Failed to open at {width}x{height}")
 
-        # Last resort: try without specifying resolution
-        self._logger.info("Trying default CSI pipeline...")
-        pipeline = self._get_jetson_pipeline(640, 480, 30)
+        self._logger.info("Trying default CSI pipeline (1920x1080)...")
+        pipeline = self._get_jetson_pipeline(1920, 1080, 30)
         self._cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
         if self._cap is not None and self._cap.isOpened():
-            ret, frame = self._cap.read()
-            if ret and frame is not None:
-                self._height, self._width = frame.shape[:2]
-                self._logger.info(f"CSI camera opened (default): {self._width}x{self._height}")
-                return True
+            time.sleep(0.2)
+            for _ in range(5):
+                ret, frame = self._cap.read()
+                if ret and frame is not None:
+                    self._height, self._width = frame.shape[:2]
+                    self._logger.info(f"CSI camera opened (default): {self._width}x{self._height}")
+                    return True
             self._cap.release()
 
         self._cap = None
