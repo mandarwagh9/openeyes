@@ -14,7 +14,13 @@ from .vision_node import (
     ImageConverter
 )
 
-from .services import VisionService, VisionModelController
+try:
+    from .services import VisionService, VisionModelController
+    SERVICES_AVAILABLE = True
+except ImportError:
+    VisionService = None
+    VisionModelController = None
+    SERVICES_AVAILABLE = False
 
 __all__ = [
     # Nodes
