@@ -53,7 +53,13 @@ class CameraHandler:
 
     def _check_csi_available(self) -> bool:
         """Check if CSI camera device exists."""
-        return os.path.exists(f"/dev/video{self._source}")
+        device_path = f"/dev/video{self._source}"
+        exists = os.path.exists(device_path)
+        if exists:
+            self._logger.debug(f"CSI camera device found at {device_path}")
+        else:
+            self._logger.debug(f"CSI camera device not found at {device_path}")
+        return exists
 
     def open(self) -> None:
         """Open the camera with appropriate backend for the platform."""
