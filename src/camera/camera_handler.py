@@ -30,6 +30,13 @@ class CameraHandler:
         height: int = 480,
         fps: int = 30,
     ):
+        if source < 0:
+            raise ValueError(f"Camera source must be non-negative, got {source}")
+        if width <= 0 or height <= 0:
+            raise ValueError(f"Camera width and height must be positive, got {width}x{height}")
+        if fps <= 0:
+            raise ValueError(f"Camera FPS must be positive, got {fps}")
+        
         self._source = source
         self._width = width
         self._height = height
