@@ -51,6 +51,8 @@ class PoseKeypoint:
 class PoseData:
     detected: bool
     keypoints: Optional[List[PoseKeypoint]] = None
+    bbox: Optional[BoundingBox] = None
+    landmarks: Optional[List[PoseKeypoint]] = None
 
 
 @dataclass
