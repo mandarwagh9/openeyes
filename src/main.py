@@ -620,6 +620,11 @@ def main() -> None:
         action="store_true",
         help="Enable ROS2 publishing (requires ros-humble-vision-msgs)",
     )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version="OpenEyes v0.0.4",
+    )
 
     args = parser.parse_args()
 
