@@ -524,12 +524,14 @@ class VisionPublisher(Node):
 
     def publish_status(self, fps: float, num_objects: int, num_faces: int = 0, num_gestures: int = 0) -> None:
         """Publish vision system status."""
+        import time
         current_time = self.get_clock().now()
         time_diff = (current_time - self._last_status_time).nanoseconds / 1e9
 
         if time_diff >= 1.0:
             msg = String()
-            msg.data = f"FPS: {fps:.1f} | Objects: {num_objects} | Faces: {num_faces} | Gestures: {num_gestures} | Cmd: {self._current_cmd}"
+            timestamp = time.strftime("%H:%M:%S")
+            msg.data = f"[{timestamp}] FPS: {fps:.1f} | Objects: {num_objects} | Faces: {num_faces} | Gestures: {num_gestures} | Cmd: {self._current_cmd}"
             self.status_pub.publish(msg)
             self._last_status_time = current_time
             self._detection_count = 0
