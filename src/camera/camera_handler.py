@@ -205,6 +205,8 @@ class CameraHandler:
                 return None
 
         self._frame_count += 1
+        if self._frame_count % 300 == 0:
+            self._logger.debug(f"Frame count: {self._frame_count}")
         return frame
 
     def _attempt_reconnect(self) -> bool:
