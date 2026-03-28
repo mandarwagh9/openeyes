@@ -84,7 +84,11 @@ class Config:
 
     @property
     def yolo_path(self) -> str:
-        return self.get("models", "yolo", "path", default="models/yolov8n.pt")
+        path = self.get("models", "yolo", "path", default="models/yolov8n.pt")
+        base_dir = self._config_path.parent
+        if not Path(path).is_absolute():
+            path = str(base_dir / path)
+        return path
 
     @property
     def yolo_confidence(self) -> float:
