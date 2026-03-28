@@ -117,6 +117,11 @@ class VisionPublisher(Node):
     ):
         super().__init__("openeyes_vision")
 
+        if not 0.0 <= confidence_threshold <= 1.0:
+            raise ValueError(f"confidence_threshold must be between 0 and 1, got {confidence_threshold}")
+        if max_depth_range <= 0:
+            raise ValueError(f"max_depth_range must be positive, got {max_depth_range}")
+
         self.detections_topic = detections_topic
         self.depth_topic = depth_topic
         self.faces_topic = faces_topic
