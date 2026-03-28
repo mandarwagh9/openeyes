@@ -38,12 +38,22 @@ from src.utils.config import Config
 from src.utils.logger import setup_logger
 from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
 
+ROS2_AVAILABLE = False
+try:
+    import rclpy
+    from src.ros2.vision_node import VisionPublisher
+    ROS2_AVAILABLE = True
+except ImportError:
+    VisionPublisher = None
+    rclpy = None
+
 
 class VisionSystem:
     """Optimized vision system with parallel processing."""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, use_ros2: bool = False):
         self._config = config
+        self._use_ros2 = use_ros2
         self._logger = setup_logger(
             "openeyes",
             level=logging.DEBUG if config.debug else logging.INFO
@@ -55,6 +65,8 @@ class VisionSystem:
         self._gesture_recognizer: Optional[GestureRecognizer] = None
         self._pose_estimator: Optional[PoseEstimator] = None
         self._udp_sender: Optional[UDPSender] = None
+        self._ros2_pub: Optional[VisionPublisher] = None
+        self._ros2_node = None
         self._running = False
         self._frame_id = 0
 
@@ -185,8 +197,63 @@ class VisionSystem:
         )
         self._udp_sender.open()
 
+        if self._use_ros2 and ROS2_AVAILABLE and VisionPublisher:
+            self._init_ros2()
+        elif self._use_ros2 and not ROS2_AVAILABLE:
+            self._logger.warning("ROS2 requested but not available. Install ros-humble-vision-msgs")
+
+    def _init_ros2(self) -> None:
+        """Initialize ROS2 publisher."""
+        try:
+            self._logger.info("Initializing ROS2...")
+            if not rclpy.ok():
+                self._logger.info("Calling rclpy.init()")
+                rclpy.init()
+            
+            self._logger.info(f"rclpy.ok() = {rclpy.ok()}")
+
+            self._ros2_pub = VisionPublisher(
+                detections_topic="/vision/detections",
+                depth_topic="/vision/depth",
+                faces_topic="/vision/faces",
+                gestures_topic="/vision/gestures",
+                poses_topic="/vision/poses",
+                cmd_topic="/vision/cmd",
+                status_topic="/vision/status",
+                frame_id="camera_link",
+                confidence_threshold=self._config.yolo_confidence,
+                max_depth_range=5.0,
+            )
+
+            def handle_cmd(cmd: str):
+                self._logger.info(f">>> ROBOT COMMAND: {cmd.upper()}")
+
+            self._ros2_pub.set_cmd_callback(handle_cmd)
+
+            self._ros2_node = rclpy.node.Node("openeyes_main")
+            
+            self._ros2_executor = rclpy.executors.MultiThreadedExecutor(num_threads=2)
+            self._ros2_executor.add_node(self._ros2_pub)
+            
+            import threading
+            self._ros2_thread = threading.Thread(target=self._ros2_executor.spin, daemon=True)
+            self._ros2_thread.start()
+            
+            self._logger.info("ROS2 Vision Publisher initialized")
+            self._logger.info("  Subscribed to: /vision/cmd")
+            self._logger.info("  Publishing: /vision/detections, /vision/depth, /vision/faces, /vision/gestures, /vision/poses, /vision/status")
+            
+            time.sleep(0.5)
+            self._logger.info("ROS2 initialization complete")
+        except Exception as e:
+            self._logger.error(f"Failed to initialize ROS2: {e}")
+            import traceback
+            self._logger.error(traceback.format_exc())
+            self._ros2_pub = None
+
     def _process_loop(self) -> None:
         frame_time = 1.0 / self._config.target_fps
+        frame_shape = (self._config.camera_height, self._config.camera_width, 3)
 
         while self._running:
             loop_start = time.time()
@@ -197,10 +264,14 @@ class VisionSystem:
                 time.sleep(0.1)
                 continue
 
+            frame_shape = frame.shape
             result = self._process_frame(frame)
 
             json_output = format_vision_result(result)
             self._udp_sender.send(json_output)
+
+            if self._ros2_pub:
+                self._publish_ros2(result, frame_shape)
 
             if self._config.debug:
                 self._debug_display(frame, result)
@@ -213,6 +284,13 @@ class VisionSystem:
                     f"FPS: {fps:.1f} | Objects: {len(result.objects)} | "
                     f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)}"
                 )
+                if self._ros2_pub:
+                    self._ros2_pub.publish_status(
+                        fps,
+                        len(result.objects),
+                        len(result.faces),
+                        len(result.gestures)
+                    )
                 self._fps_counter = 0
                 self._fps_start_time = time.time()
 
@@ -222,6 +300,37 @@ class VisionSystem:
                 time.sleep(sleep_time)
 
             self._frame_id += 1
+
+    def _publish_ros2(self, result: VisionResult, frame_shape: tuple) -> None:
+        """Publish vision results to ROS2 topics."""
+        if not self._ros2_pub:
+            return
+
+        try:
+            detections = []
+            for obj in result.objects:
+                detections.append({
+                    "bbox": [obj.bbox.x1, obj.bbox.y1, obj.bbox.x2, obj.bbox.y2],
+                    "class_name": obj.class_name,
+                    "confidence": obj.confidence
+                })
+            self._ros2_pub.publish_detections(detections, (frame_shape[1], frame_shape[0]))
+            self._logger.debug(f"Published {len(detections)} detections")
+
+            if result.depth and result.depth.enabled:
+                self._ros2_pub.publish_depth(result.depth, (frame_shape[1], frame_shape[0]))
+
+            if result.faces:
+                self._ros2_pub.publish_faces(result.faces, (frame_shape[1], frame_shape[0]))
+
+            if result.gestures:
+                self._ros2_pub.publish_gestures(result.gestures)
+
+            if result.pose and result.pose.detected:
+                self._ros2_pub.publish_poses(result.pose, (frame_shape[1], frame_shape[0]))
+
+        except Exception as e:
+            self._logger.warning(f"ROS2 publish error: {e}")
 
     def _process_frame(self, frame) -> VisionResult:
         timestamp = time.time()
@@ -506,6 +615,11 @@ def main() -> None:
         default=2,
         help="Run pose estimation every N frames",
     )
+    parser.add_argument(
+        "--ros2",
+        action="store_true",
+        help="Enable ROS2 publishing (requires ros-humble-vision-msgs)",
+    )
 
     args = parser.parse_args()
 
@@ -524,7 +638,7 @@ def main() -> None:
         config._config["camera"]["fps"] = args.fps
 
     try:
-        system = VisionSystem(config)
+        system = VisionSystem(config, use_ros2=args.ros2)
 
         if args.no_parallel:
             system._use_parallel = False
