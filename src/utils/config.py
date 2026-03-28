@@ -4,11 +4,14 @@ from typing import Any, Dict, Optional
 import yaml
 from dotenv import load_dotenv
 
+from src.utils.logger import get_logger
+
 
 class Config:
     def __init__(self, config_path: Optional[Path] = None):
         self._config: Dict[str, Any] = {}
         self._config_path = config_path or self._get_default_config_path()
+        self._logger = get_logger(__name__)
         self._load()
 
     def _get_default_config_path(self) -> Path:
@@ -88,6 +91,8 @@ class Config:
         base_dir = self._config_path.parent
         if not Path(path).is_absolute():
             path = str(base_dir / path)
+        if not Path(path).exists():
+            self._logger.warning(f"YOLO model path does not exist: {path}")
         return path
 
     @property
