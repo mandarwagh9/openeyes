@@ -32,4 +32,19 @@ performance:
   use_tensorrt: true
   parallel_models: true
 
+ros2:
+  enabled: false
+  node_name: "openeyes_vision"
+  topics:
+    detections: "/vision/detections"
+    depth: "/vision/depth"
+    faces: "/vision/faces"
+    gestures: "/vision/gestures"
+    poses: "/vision/poses"
+    cmd: "/vision/cmd"
+    status: "/vision/status"
+  frame_id: "camera_link"
+  confidence_threshold: 0.5
+  max_depth_range: 5.0
+
 debug: false
