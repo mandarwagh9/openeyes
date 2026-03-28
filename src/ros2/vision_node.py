@@ -1,4 +1,5 @@
 import sys
+import json
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
@@ -15,14 +16,22 @@ for p in ros2_python_paths:
         sys.path.insert(0, p)
 
 from sensor_msgs.msg import Image, CameraInfo
-from vision_msgs.msg import Detection2DArray, Detection2D, BoundingBox2D, ObjectHypothesis
 from geometry_msgs.msg import Pose, PoseStamped, Twist
 from std_msgs.msg import Header, String
 
+try:
+    from vision_msgs.msg import Detection2DArray, Detection2D, BoundingBox2D, ObjectHypothesis
+    VISION_MSGS_AVAILABLE = False  # Force JSON mode due to compatibility issues
+except (ImportError, Exception) as e:
+    VISION_MSGS_AVAILABLE = False
+
 import numpy as np
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any, Dict, Callable
 import threading
 import queue
+
+
+VALID_COMMANDS = ["forward", "backward", "stop", "left", "right", "follow"]
 
 
 SENSOR_QOS = QoSProfile(
@@ -88,126 +97,434 @@ class ImageConverter:
 
 
 class VisionPublisher(Node):
-    """ROS2 node for publishing vision results."""
+    """ROS2 node for publishing all vision results with command handling.
+    
+    Uses std_msgs/String with JSON payloads for maximum compatibility.
+    """
 
     def __init__(
         self,
-        output_topic: str = "/vision/detections",
-        camera_topic: str = "/camera/image_raw",
-        debug_image_topic: Optional[str] = "/vision/debug/image",
-        status_topic: str = "/vision/status"
+        detections_topic: str = "/vision/detections",
+        depth_topic: str = "/vision/depth",
+        faces_topic: str = "/vision/faces",
+        gestures_topic: str = "/vision/gestures",
+        poses_topic: str = "/vision/poses",
+        cmd_topic: str = "/vision/cmd",
+        status_topic: str = "/vision/status",
+        frame_id: str = "camera_link",
+        confidence_threshold: float = 0.5,
+        max_depth_range: float = 5.0,
     ):
-        super().__init__("vision_publisher")
+        super().__init__("openeyes_vision")
 
-        self.declare_parameter("output_topic", output_topic)
-        self.declare_parameter("camera_topic", camera_topic)
-        self.declare_parameter("debug_image_topic", debug_image_topic)
-        self.declare_parameter("status_topic", status_topic)
-        self.declare_parameter("frame_id", "camera_link")
-        self.declare_parameter("confidence_threshold", 0.5)
-        self.declare_parameter("enable_debug_image", True)
+        self.detections_topic = detections_topic
+        self.depth_topic = depth_topic
+        self.faces_topic = faces_topic
+        self.gestures_topic = gestures_topic
+        self.poses_topic = poses_topic
+        self.cmd_topic = cmd_topic
+        self.status_topic = status_topic
+        self.frame_id = frame_id
+        self.confidence_threshold = confidence_threshold
+        self.max_depth_range = max_depth_range
+        self.vision_msgs_available = VISION_MSGS_AVAILABLE
 
-        self.output_topic = self.get_parameter("output_topic").value
-        self.camera_topic = self.get_parameter("camera_topic").value
-        self.debug_image_topic = self.get_parameter("debug_image_topic").value
-        self.status_topic = self.get_parameter("status_topic").value
-        self.frame_id = self.get_parameter("frame_id").value
-        self.confidence_threshold = self.get_parameter("confidence_threshold").value
-        self.enable_debug_image = self.get_parameter("enable_debug_image").value
-
-        self.detection_pub = self.create_publisher(
-            Detection2DArray,
-            self.output_topic,
-            SENSOR_QOS
-        )
-
-        if self.enable_debug_image and self.debug_image_topic:
-            self.image_pub = self.create_publisher(
-                Image,
-                self.debug_image_topic,
-                SENSOR_QOS
+        if self.vision_msgs_available:
+            self.detection_pub = self.create_publisher(
+                Detection2DArray, self.detections_topic, SENSOR_QOS
+            )
+            self.faces_pub = self.create_publisher(
+                Detection2DArray, self.faces_topic, SENSOR_QOS
+            )
+            self.poses_pub = self.create_publisher(
+                Detection2DArray, self.poses_topic, SENSOR_QOS
+            )
+        else:
+            self.detection_pub = self.create_publisher(
+                String, self.detections_topic, SENSOR_QOS
+            )
+            self.faces_pub = self.create_publisher(
+                String, self.faces_topic, SENSOR_QOS
+            )
+            self.poses_pub = self.create_publisher(
+                String, self.poses_topic, SENSOR_QOS
             )
 
-        self.status_pub = self.create_publisher(
-            String,
-            self.status_topic,
-            STATE_QOS
+        self.depth_pub = self.create_publisher(Image, self.depth_topic, SENSOR_QOS)
+        self.gestures_pub = self.create_publisher(
+            String, self.gestures_topic, SENSOR_QOS
+        )
+        self.status_pub = self.create_publisher(String, self.status_topic, STATE_QOS)
+
+        self.cmd_sub = self.create_subscription(
+            String, self.cmd_topic, self._cmd_callback, COMMAND_QOS
         )
 
         self.image_converter = ImageConverter() if CV_BRIDGE_AVAILABLE else None
 
         self._detection_count = 0
         self._last_status_time = self.get_clock().now()
+        self._current_cmd = "stop"
+        self._cmd_callback_fn: Optional[Callable[[str], None]] = None
 
-        self.get_logger().info(f"Vision publisher initialized: {self.output_topic}")
+        mode = "vision_msgs" if self.vision_msgs_available else "JSON (std_msgs)"
+        self.get_logger().info(
+            f"OpenEyes Vision Publisher initialized ({mode}):\n"
+            f"  - detections: {self.detections_topic}\n"
+            f"  - depth: {self.depth_topic}\n"
+            f"  - faces: {self.faces_topic}\n"
+            f"  - gestures: {self.gestures_topic}\n"
+            f"  - poses: {self.poses_topic}\n"
+            f"  - cmd: {self.cmd_topic}\n"
+            f"  - status: {self.status_topic}"
+        )
+
+    def set_cmd_callback(self, callback: Callable[[str], None]) -> None:
+        """Set callback for command processing."""
+        self._cmd_callback_fn = callback
+
+    def _cmd_callback(self, msg: String) -> None:
+        """Handle incoming command messages."""
+        cmd = msg.data.strip().lower()
+        if cmd in VALID_COMMANDS:
+            self._current_cmd = cmd
+            self.get_logger().info(f">>> CMD RECEIVED: {cmd.upper()}")
+            if self._cmd_callback_fn:
+                self._cmd_callback_fn(cmd)
+        else:
+            self.get_logger().warn(f"Invalid command received: {cmd}")
+
+    def get_current_command(self) -> str:
+        """Get the current command."""
+        return self._current_cmd
 
     def publish_detections(
         self,
         detections: List[Any],
-        frame_shape: tuple,
+        frame_shape: tuple = (480, 640),
         header: Optional[Header] = None
     ) -> None:
-        """Publish detection results as ROS2 messages."""
-        msg = Detection2DArray()
-
-        if header:
-            msg.header = header
+        """Publish object detection results."""
+        if self.vision_msgs_available:
+            self._publish_detections_vision_msg(detections, frame_shape, header)
         else:
-            msg.header = self._create_header()
+            self._publish_detections_json(detections, frame_shape)
+        self._detection_count += 1
 
+    def _publish_detections_vision_msg(
+        self,
+        detections: List[Any],
+        frame_shape: tuple,
+        header: Optional[Header]
+    ) -> None:
+        """Publish using vision_msgs format."""
+        msg = Detection2DArray()
+        msg.header = header if header else self._create_header()
         msg.detections = []
 
         for det in detections:
-            confidence = det.get("confidence", 0.0)
+            confidence = getattr(det, "confidence", 0.0)
+            if isinstance(det, dict):
+                confidence = det.get("confidence", 0.0)
             if confidence < self.confidence_threshold:
                 continue
 
             detection = Detection2D()
 
-            bbox = det.get("bbox", [0, 0, 0, 0])
+            if hasattr(det, "bbox"):
+                bbox = [det.bbox.x1, det.bbox.y1, det.bbox.x2, det.bbox.y2]
+            elif isinstance(det, dict):
+                bbox = det.get("bbox", [0, 0, 0, 0])
+            else:
+                bbox = [0, 0, 0, 0]
+
             if len(bbox) >= 4:
                 x1, y1, x2, y2 = bbox[:4]
                 cx = (x1 + x2) / 2
                 cy = (y1 + y2) / 2
                 w = x2 - x1
                 h = y2 - y1
-
                 detection.bbox.center.position.x = float(cx)
                 detection.bbox.center.position.y = float(cy)
                 detection.bbox.size_x = float(w)
                 detection.bbox.size_y = float(h)
 
             hypothesis = ObjectHypothesis()
-            hypothesis.class_id = str(det.get("class_name", det.get("class_id", "unknown")))
+            if hasattr(det, "class_name"):
+                hypothesis.class_id = det.class_name
+            elif isinstance(det, dict):
+                hypothesis.class_id = str(det.get("class_name", det.get("class_id", "unknown")))
+            else:
+                hypothesis.class_id = "unknown"
             hypothesis.score = float(confidence)
             detection.results.append(hypothesis)
-
             msg.detections.append(detection)
 
         self.detection_pub.publish(msg)
-        self._detection_count += 1
 
-    def publish_debug_image(self, cv_image: np.ndarray, header: Optional[Header] = None) -> None:
-        """Publish debug image with annotations."""
-        if not self.image_pub or not self.image_converter:
+    def _publish_detections_json(
+        self,
+        detections: List[Any],
+        frame_shape: tuple
+    ) -> None:
+        """Publish using JSON string format (fallback)."""
+        detection_list = []
+        for det in detections:
+            confidence = getattr(det, "confidence", 0.0)
+            if isinstance(det, dict):
+                confidence = det.get("confidence", 0.0)
+            if confidence < self.confidence_threshold:
+                continue
+
+            if hasattr(det, "bbox"):
+                bbox = [det.bbox.x1, det.bbox.y1, det.bbox.x2, det.bbox.y2]
+            elif isinstance(det, dict):
+                bbox = det.get("bbox", [0, 0, 0, 0])
+            else:
+                bbox = [0, 0, 0, 0]
+
+            class_name = getattr(det, "class_name", "unknown")
+            if isinstance(det, dict):
+                class_name = det.get("class_name", det.get("class_id", "unknown"))
+
+            detection_list.append({
+                "class_name": str(class_name),
+                "confidence": float(confidence),
+                "bbox": {
+                    "x1": float(bbox[0]) if len(bbox) > 0 else 0.0,
+                    "y1": float(bbox[1]) if len(bbox) > 1 else 0.0,
+                    "x2": float(bbox[2]) if len(bbox) > 2 else 0.0,
+                    "y2": float(bbox[3]) if len(bbox) > 3 else 0.0,
+                }
+            })
+
+        msg = String()
+        msg.data = json.dumps({
+            "type": "detections",
+            "frame_shape": frame_shape,
+            "detections": detection_list
+        })
+        self.detection_pub.publish(msg)
+
+    def publish_depth(self, depth_data: Any, frame_shape: tuple = (480, 640)) -> None:
+        """Publish depth map as normalized 32FC1 image (0-1 meters)."""
+        if not self.depth_pub:
             return
 
-        ros_image = self.image_converter.cv2_to_ros(cv_image, 'bgr8')
-        if ros_image:
-            if header:
-                ros_image.header = header
-            else:
-                ros_image.header = self._create_header()
-            self.image_pub.publish(ros_image)
+        depth_array = None
+        if hasattr(depth_data, "depth_map") and depth_data.depth_map is not None:
+            depth_array = depth_data.depth_map
+        elif isinstance(depth_data, np.ndarray):
+            depth_array = depth_data
 
-    def publish_status(self, fps: float, num_objects: int) -> None:
+        if depth_array is None:
+            return
+
+        if depth_array.dtype != np.float32:
+            depth_array = depth_array.astype(np.float32)
+
+        if self.max_depth_range > 0:
+            depth_array = np.clip(depth_array / self.max_depth_range, 0.0, 1.0)
+
+        if self.image_converter and self.image_converter.bridge:
+            try:
+                ros_image = self.image_converter.bridge.cv2_to_imgmsg(
+                    depth_array, encoding="32FC1"
+                )
+                ros_image.header = self._create_header()
+                self.depth_pub.publish(ros_image)
+            except Exception:
+                pass
+
+    def publish_faces(self, faces: List[Any], frame_shape: tuple = (480, 640)) -> None:
+        """Publish face detections."""
+        if self.vision_msgs_available:
+            self._publish_faces_vision_msg(faces, frame_shape)
+        else:
+            self._publish_faces_json(faces, frame_shape)
+
+    def _publish_faces_vision_msg(self, faces: List[Any], frame_shape: tuple) -> None:
+        """Publish faces using vision_msgs format."""
+        msg = Detection2DArray()
+        msg.header = self._create_header()
+        msg.detections = []
+
+        for face in faces:
+            detection = Detection2D()
+
+            if hasattr(face, "bbox"):
+                bbox = [face.bbox.x1, face.bbox.y1, face.bbox.x2, face.bbox.y2]
+                confidence = getattr(face, "confidence", 0.9)
+            elif isinstance(face, dict):
+                bbox = face.get("bbox", [0, 0, 0, 0])
+                confidence = face.get("confidence", 0.9)
+            else:
+                continue
+
+            if len(bbox) >= 4:
+                x1, y1, x2, y2 = bbox[:4]
+                cx = (x1 + x2) / 2
+                cy = (y1 + y2) / 2
+                w = x2 - x1
+                h = y2 - y1
+                detection.bbox.center.position.x = float(cx)
+                detection.bbox.center.position.y = float(cy)
+                detection.bbox.size_x = float(w)
+                detection.bbox.size_y = float(h)
+
+            hypothesis = ObjectHypothesis()
+            hypothesis.class_id = "face"
+            hypothesis.score = float(confidence)
+            detection.results.append(hypothesis)
+            msg.detections.append(detection)
+
+        self.faces_pub.publish(msg)
+
+    def _publish_faces_json(self, faces: List[Any], frame_shape: tuple) -> None:
+        """Publish faces using JSON format."""
+        face_list = []
+        for face in faces:
+            if hasattr(face, "bbox"):
+                bbox = [face.bbox.x1, face.bbox.y1, face.bbox.x2, face.bbox.y2]
+                confidence = getattr(face, "confidence", 0.9)
+            elif isinstance(face, dict):
+                bbox = face.get("bbox", [0, 0, 0, 0])
+                confidence = face.get("confidence", 0.9)
+            else:
+                continue
+
+            face_list.append({
+                "confidence": float(confidence),
+                "bbox": {
+                    "x1": float(bbox[0]) if len(bbox) > 0 else 0.0,
+                    "y1": float(bbox[1]) if len(bbox) > 1 else 0.0,
+                    "x2": float(bbox[2]) if len(bbox) > 2 else 0.0,
+                    "y2": float(bbox[3]) if len(bbox) > 3 else 0.0,
+                }
+            })
+
+        msg = String()
+        msg.data = json.dumps({
+            "type": "faces",
+            "frame_shape": frame_shape,
+            "faces": face_list
+        })
+        self.faces_pub.publish(msg)
+
+    def publish_gestures(self, gestures: List[Any]) -> None:
+        """Publish gesture recognition results as JSON string."""
+        if not gestures:
+            return
+
+        msg = String()
+        gesture_list = []
+        for gesture in gestures:
+            if hasattr(gesture, "gesture_type"):
+                gesture_list.append({
+                    "gesture": gesture.gesture_type,
+                    "hand": getattr(gesture, "handedness", "unknown"),
+                    "confidence": getattr(gesture, "confidence", 0.0)
+                })
+            elif isinstance(gesture, dict):
+                gesture_list.append(gesture)
+
+        msg.data = json.dumps(gesture_list)
+        self.gestures_pub.publish(msg)
+
+    def publish_poses(self, pose_data: Any, frame_shape: tuple = (480, 640)) -> None:
+        """Publish body pose estimation results."""
+        if not hasattr(pose_data, "detected") or not pose_data.detected:
+            return
+
+        if self.vision_msgs_available:
+            self._publish_poses_vision_msg(pose_data, frame_shape)
+        else:
+            self._publish_poses_json(pose_data, frame_shape)
+
+    def _publish_poses_vision_msg(self, pose_data: Any, frame_shape: tuple) -> None:
+        """Publish poses using vision_msgs format."""
+        msg = Detection2DArray()
+        msg.header = self._create_header()
+        msg.detections = []
+
+        detection = Detection2D()
+
+        if hasattr(pose_data, "bbox") and pose_data.bbox:
+            bbox = [pose_data.bbox.x1, pose_data.bbox.y1, pose_data.bbox.x2, pose_data.bbox.y2]
+            if len(bbox) >= 4:
+                x1, y1, x2, y2 = bbox[:4]
+                cx = (x1 + x2) / 2
+                cy = (y1 + y2) / 2
+                w = x2 - x1
+                h = y2 - y1
+                detection.bbox.center.position.x = float(cx)
+                detection.bbox.center.position.y = float(cy)
+                detection.bbox.size_x = float(w)
+                detection.bbox.size_y = float(h)
+
+        pose_info = {}
+        if hasattr(pose_data, "keypoints"):
+            kp_dict = {}
+            for name, kp in pose_data.keypoints.items():
+                kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            pose_info["keypoints"] = kp_dict
+
+        if hasattr(pose_data, "landmarks"):
+            landmarks = []
+            for lm in pose_data.landmarks:
+                landmarks.append({"x": float(lm.x), "y": float(lm.y), "z": float(lm.z)})
+            pose_info["landmarks"] = landmarks
+
+        hypothesis = ObjectHypothesis()
+        hypothesis.class_id = "person_pose"
+        hypothesis.score = 0.95
+        hypothesis.id = json.dumps(pose_info)
+        detection.results.append(hypothesis)
+        msg.detections.append(detection)
+
+        self.poses_pub.publish(msg)
+
+    def _publish_poses_json(self, pose_data: Any, frame_shape: tuple) -> None:
+        """Publish poses using JSON format."""
+        pose_info = {"detected": True}
+
+        if hasattr(pose_data, "bbox") and pose_data.bbox:
+            bbox = [pose_data.bbox.x1, pose_data.bbox.y1, pose_data.bbox.x2, pose_data.bbox.y2]
+            pose_info["bbox"] = {
+                "x1": float(bbox[0]) if len(bbox) > 0 else 0.0,
+                "y1": float(bbox[1]) if len(bbox) > 1 else 0.0,
+                "x2": float(bbox[2]) if len(bbox) > 2 else 0.0,
+                "y2": float(bbox[3]) if len(bbox) > 3 else 0.0,
+            }
+
+        if hasattr(pose_data, "keypoints"):
+            kp_dict = {}
+            for name, kp in pose_data.keypoints.items():
+                kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            pose_info["keypoints"] = kp_dict
+
+        if hasattr(pose_data, "landmarks"):
+            landmarks = []
+            for lm in pose_data.landmarks:
+                landmarks.append({"x": float(lm.x), "y": float(lm.y), "z": float(lm.z)})
+            pose_info["landmarks"] = landmarks
+
+        msg = String()
+        msg.data = json.dumps({
+            "type": "poses",
+            "frame_shape": frame_shape,
+            "pose": pose_info
+        })
+        self.poses_pub.publish(msg)
+
+    def publish_status(self, fps: float, num_objects: int, num_faces: int = 0, num_gestures: int = 0) -> None:
         """Publish vision system status."""
         current_time = self.get_clock().now()
         time_diff = (current_time - self._last_status_time).nanoseconds / 1e9
 
         if time_diff >= 1.0:
             msg = String()
-            msg.data = f"FPS: {fps:.1f} | Objects: {num_objects} | Detections: {self._detection_count}"
+            msg.data = f"FPS: {fps:.1f} | Objects: {num_objects} | Faces: {num_faces} | Gestures: {num_gestures} | Cmd: {self._current_cmd}"
             self.status_pub.publish(msg)
             self._last_status_time = current_time
             self._detection_count = 0
