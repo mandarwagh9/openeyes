@@ -11,6 +11,12 @@
 pip install -r requirements.txt
 python src/main.py --camera 0 --debug
 
+# Run with ROS2 publishing
+python src/main.py --ros2
+
+# Show version
+python src/main.py --version
+
 # Testing
 pytest tests/                          # All tests
 pytest tests/test_camera.py -v        # Single file (verbose)
@@ -110,12 +116,13 @@ src/
 ├── camera/           # CameraHandler, types
 ├── models/           # ObjectDetector, depth_estimator, etc.
 ├── output/           # json_formatter, udp_sender
-├── utils/            # config, logger
+├── ros2/             # VisionPublisher, services
+├── utils/            # config, logger, frame_skipper
 └── main.py           # Entry point
 ```
 
 ### Data Flow
-Camera → ObjectDetector → JSON Formatter → UDP Sender
+Camera → ObjectDetector → JSON Formatter → UDP Sender + ROS2 Publisher
 
 ---
 

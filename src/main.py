@@ -623,7 +623,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.0.4",
+        version="OpenEyes v0.1.0",
     )
 
     args = parser.parse_args()

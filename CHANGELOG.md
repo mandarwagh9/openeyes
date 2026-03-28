@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.0.3  
-> **Last Updated**: 2026-03-26
+> **Version**: v0.1.0  
+> **Last Updated**: 2026-03-28
 
 ---
 
@@ -9,6 +9,58 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.1.0] - 2026-03-28
+
+### Added
+
+- **ROS2 Configuration**
+  - New `ros2` section in config.yaml
+  - Configurable topics: detections, depth, faces, gestures, poses, cmd, status
+  - Frame ID and confidence threshold settings
+
+- **CSI Camera Improvements**
+  - Device detection via `/dev/video*` check
+  - Queue element added to GStreamer pipeline for stability
+  - 1080p native resolution preferred
+  - Retry logic with initialization delays
+
+- **PoseData Enhancements**
+  - Added `bbox` field for bounding box
+  - Added `landmarks` field for pose landmarks
+
+- **YOLO Path Resolution**
+  - Fixed to use absolute path resolution from config directory
+
+- **Complete ROS2 Vision Integration**
+  - VisionPublisher with all vision modality publishers
+  - Detections, depth, faces, gestures, poses topics
+  - JSON fallback mode using std_msgs/String (avoids vision_msgs issues)
+
+- **Command Subscription**
+  - New `/vision/cmd` topic for robot commands
+  - Valid commands: forward, backward, stop, left, right, follow
+  - Command callback system for robot control integration
+
+- **Parameter Validation**
+  - Camera parameter validation in constructor
+  - VisionPublisher parameter validation
+  - Meaningful error messages for invalid inputs
+
+- **Status Message Enhancement**
+  - Timestamps added to vision status messages
+
+- **CLI Enhancements**
+  - `--ros2` flag to enable ROS2 publishing
+  - `--version` flag to display version
+
+### Changed
+
+- Updated default version to v0.1.0
+- Vision status now includes face and gesture counts
+- Command field added to status output
 
 ---
 

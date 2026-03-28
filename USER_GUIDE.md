@@ -1,6 +1,6 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.0.3  
+> **Version**: v0.1.0  
 > **Last Updated**: 2026-03-26
 
 ---
@@ -65,7 +65,7 @@ python src/main.py --help
 usage: main.py [-h] [--camera CAMERA] [--width WIDTH] [--height HEIGHT]
                [--fps FPS] [--host HOST] [--port PORT] [--debug]
                [--config CONFIG] [--no-face] [--no-gesture] [--no-pose]
-               [--no-parallel] [--pose-every POSE_EVERY]
+               [--no-parallel] [--pose-every POSE_EVERY] [--ros2] [--version]
 
 optional arguments:
   --camera CAMERA       Camera index (0, 1...) or RTSP URL
@@ -81,6 +81,8 @@ optional arguments:
   --no-pose             Disable pose estimation
   --no-parallel         Disable parallel processing (more stable)
   --pose-every POSE_EVERY  Run pose estimation every N frames (default: 2)
+  --ros2                Enable ROS2 publishing (requires ROS2 installation)
+  --version             Show version number and exit
 ```
 
 ### 3.2 Config File
@@ -281,6 +283,76 @@ tegrastats
 
 # View logs
 tail -f logs/openeyes.log
+```
+
+---
+
+## 7. ROS2 Integration
+
+### 7.1 Enabling ROS2
+
+```bash
+python src/main.py --ros2
+```
+
+### 7.2 ROS2 Topics
+
+| Topic | Type | Description |
+|:------|:-----|:-----------|
+| `/vision/detections` | `std_msgs/String` (JSON) | Object detections |
+| `/vision/depth` | `sensor_msgs/Image` | Depth map (32FC1, 0-1 meters) |
+| `/vision/faces` | `std_msgs/String` (JSON) | Face detections |
+| `/vision/gestures` | `std_msgs/String` (JSON) | Gesture recognition results |
+| `/vision/poses` | `std_msgs/String` (JSON) | Body pose estimations |
+| `/vision/cmd` | `std_msgs/String` | Robot commands (subscribe) |
+| `/vision/status` | `std_msgs/String` | System status (FPS, counts) |
+
+### 7.3 Command Subscription
+
+Send commands to `/vision/cmd` topic:
+
+```bash
+# Send a command
+ros2 topic pub /vision/cmd std_msgs/String "data: 'forward'" -1
+
+# Valid commands: forward, backward, stop, left, right, follow
+ros2 topic pub /vision/cmd std_msgs/String "data: 'stop'" -1
+ros2 topic pub /vision/cmd std_msgs/String "data: 'left'" -1
+ros2 topic pub /vision/cmd std_msgs/String "data: 'right'" -1
+```
+
+### 7.4 ROS2 Configuration
+
+Edit `config.yaml`:
+
+```yaml
+ros2:
+  enabled: false
+  node_name: "openeyes_vision"
+  topics:
+    detections: "/vision/detections"
+    depth: "/vision/depth"
+    faces: "/vision/faces"
+    gestures: "/vision/gestures"
+    poses: "/vision/poses"
+    cmd: "/vision/cmd"
+    status: "/vision/status"
+  frame_id: "camera_link"
+  confidence_threshold: 0.5
+  max_depth_range: 5.0
+```
+
+### 7.5 Testing ROS2
+
+```bash
+# Check available topics
+ros2 topic list
+
+# Monitor detections
+ros2 topic echo /vision/detections
+
+# Monitor status
+ros2 topic echo /vision/status
 ```
 
 ---

@@ -1,7 +1,7 @@
 # TROUBLESHOOTING.md - Common Issues and Solutions for OpenEyes
 
-> **Version**: v0.0.3  
-> **Last Updated**: 2026-03-26
+> **Version**: v0.1.0  
+> **Last Updated**: 2026-03-28
 
 ---
 
@@ -10,11 +10,10 @@
 1. [Camera Issues](#1-camera-issues)
 2. [Model Issues](#2-model-issues)
 3. [Performance Issues](#3-performance-issues)
-4. [Display Issues](#4-display-issues)
-5. [OpenCV Issues](#5-opencv-issues)
-6. [MediaPipe Issues](#6-mediapipe-issues)
-7. [Installation Issues](#7-installation-issues)
-8. [Hardware Issues](#8-hardware-issues)
+4. [Output Issues](#4-output-issues)
+5. [Installation Issues](#5-installation-issues)
+6. [Hardware Issues](#6-hardware-issues)
+7. [ROS2 Issues](#7-ros2-issues)
 
 ---
 
@@ -622,3 +621,78 @@ When reporting issues, include:
 3. Full error message
 4. Steps to reproduce
 5. Debug output
+
+---
+
+## 7. ROS2 Issues
+
+### Issue: ROS2 Not Available
+
+**Symptoms:**
+```
+WARNING: ROS2 requested but not available. Install ros-humble-vision-msgs
+```
+
+**Solutions:**
+
+1. Install ROS2 Humble:
+   ```bash
+   sudo apt update
+   sudo apt install ros-humble-rclpy ros-humble-vision-msgs ros-humble-std-msgs
+   ```
+
+2. Source ROS2 environment:
+   ```bash
+   source /opt/ros/humble/setup.bash
+   ```
+
+3. Verify installation:
+   ```bash
+   ros2 topic list
+   ```
+
+### Issue: Topics Not Appearing
+
+**Symptoms:**
+```
+ROS2 initialized but topics don't appear in ros2 topic list
+```
+
+**Solutions:**
+
+1. Add delay after initialization (already handled with 0.5s sleep)
+
+2. Check ROS2 is running:
+   ```bash
+   ros2 node list
+   ```
+
+3. Use MultiThreadedExecutor (already configured)
+
+### Issue: Invalid Command Warning
+
+**Symptoms:**
+```
+Invalid command received: unknown_command
+```
+
+**Solutions:**
+
+Valid commands are:
+- `forward` - Move robot forward
+- `backward` - Move robot backward
+- `stop` - Stop all movement
+- `left` - Turn left
+- `right` - Turn right
+- `follow` - Follow detected person
+
+### Issue: vision_msgs Compatibility
+
+**Symptoms:**
+```
+Assertion failure when using vision_msgs
+```
+
+**Solutions:**
+
+The system automatically falls back to JSON mode using std_msgs/String. This is expected behavior and provides full functionality.

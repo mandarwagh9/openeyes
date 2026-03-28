@@ -62,10 +62,11 @@ Welcome to the OpenEyes documentation. This index helps you find the right docum
 
 ## Version Information
 
-### Current Version: v0.0.3
+### Current Version: v0.1.0
 
 | Version | Release Date | Key Changes |
 |:--------|:-------------|:------------|
+| v0.1.0 | 2026-03-28 | Command subscription, full ROS2, validation |
 | v0.0.3 | 2026-03-26 | YOLO11n, frame skipping, ROS2 |
 | v0.0.2 | 2026-03-25 | Depth, face, gesture, pose |
 | v0.0.1 | 2026-03-15 | Initial release |

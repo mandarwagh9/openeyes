@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="#about">
-    <img src="https://img.shields.io/badge/Version-v0.0.3-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
+    <img src="https://img.shields.io/badge/Version-v0.1.0-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-Apache_2.0-1a1a2e?style=for-the-badge" alt="License" />
@@ -43,6 +43,7 @@
 - ⚡ **Real-time Performance** - 15+ FPS with adaptive frame skipping
 - 🔒 **Privacy-first** - All processing done locally, no cloud required
 - 🤖 **ROS2 Ready** - Vision data publishing for robot control
+- 📟 **Command Subscription** - Subscribe to `/vision/cmd` for robot commands (forward, backward, stop, left, right, follow)
 
 ---
 
@@ -115,6 +116,9 @@ sudo jetson_clocks
 
 # Run the vision system
 python src/main.py --debug
+
+# Run with ROS2 publishing
+python src/main.py --ros2
 ```
 
 See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
@@ -179,6 +183,7 @@ openeyes/
 | v0.0.1 | Object Detection | Complete |
 | v0.0.2 | Depth, Face, Gesture, Pose | Complete |
 | v0.0.3 | YOLO11n, Frame Skipping, ROS2 | Complete |
+| v0.1.0 | Command Subscription, Full ROS2 | Complete |
 | v1.0.0 | Production Integration | In Progress |
 
 ---

@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.0.3  
+> **Version**: v0.1.0  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -80,8 +80,14 @@ python3 -c "import cv2; cap = cv2.VideoCapture(0); print('Camera OK' if cap.isOp
 # Run with debug/display output
 python src/main.py --debug
 
-# Or run headless (no display)
+# Run headless (no display)
 python src/main.py
+
+# Run with ROS2 publishing
+python src/main.py --ros2
+
+# Show version
+python src/main.py --version
 ```
 
 You should see:
