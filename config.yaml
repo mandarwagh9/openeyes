@@ -46,6 +46,13 @@ performance:
     stats_interval_sec: 5
     log_performance: true
 
+tracking:
+  enabled: true
+  max_age: 30
+  min_hits: 3
+  iou_threshold: 0.3
+  follow_enabled: false
+
 ros2:
   enabled: false
   node_name: "openeyes_vision"

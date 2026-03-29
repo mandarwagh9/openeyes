@@ -24,6 +24,11 @@ python src/main.py --info
 python src/main.py --precision int8 --batch-size 2
 python src/main.py --dla
 
+# Tracking options (v0.2.1)
+python src/main.py --follow
+python src/main.py --no-tracking
+python src/main.py --follow --track-max-age 60
+
 # Disable models for speed
 python src/main.py --no-face --no-gesture --no-pose --no-depth
 

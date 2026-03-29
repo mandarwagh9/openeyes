@@ -60,6 +60,16 @@ class PoseData:
 
 
 @dataclass
+class TrackData:
+    track_id: int
+    class_name: str
+    bbox: BoundingBox
+    confidence: float
+    centroid: tuple
+    age: int
+
+
+@dataclass
 class VisionResult:
     timestamp: float
     frame_id: int
@@ -68,6 +78,11 @@ class VisionResult:
     faces: List[FaceDetection]
     gestures: List[Gesture]
     pose: PoseData
+    tracks: List[TrackData] = None
+    
+    def __post_init__(self):
+        if self.tracks is None:
+            self.tracks = []
 
 
 class CameraInterface(Protocol):

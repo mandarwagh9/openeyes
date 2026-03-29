@@ -27,7 +27,7 @@ for p in ros2_python_paths:
         sys.path.insert(0, p)
 
 from src.camera.camera_handler import CameraHandler
-from src.camera.types import DepthData, FaceDetection, Gesture, PoseData, VisionResult
+from src.camera.types import DepthData, FaceDetection, Gesture, PoseData, VisionResult, TrackData
 from src.exceptions import CameraError, ModelError
 from src.models.object_detector import ObjectDetector
 from src.models.depth_estimator import DepthEstimator
@@ -40,6 +40,7 @@ from src.utils.config import Config
 from src.utils.logger import setup_logger
 from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
 from src.utils.performance_monitor import PerformanceMonitor
+from src.utils.tracker import ObjectTracker
 import platform
 
 
@@ -48,7 +49,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.2.0")
+    print(f"  Version: v0.2.1")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -134,6 +135,21 @@ class VisionSystem:
             stats_interval=config.performance_stats_interval,
             log_performance=config.log_performance,
         )
+
+        self._use_tracking = config.tracking_enabled
+        if self._use_tracking:
+            self._tracker = ObjectTracker(
+                max_age=config.tracking_max_age,
+                min_hits=config.tracking_min_hits,
+                iou_threshold=config.tracking_iou_threshold,
+            )
+            self._logger.info(f"Object tracking enabled (max_age={config.tracking_max_age}, min_hits={config.tracking_min_hits})")
+        else:
+            self._tracker = None
+
+        self._follow_target = config.follow_enabled
+        if self._follow_target:
+            self._logger.info("Person following enabled")
 
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
@@ -486,6 +502,7 @@ class VisionSystem:
                     faces=last_faces if last_faces else [],
                     gestures=last_gestures if last_gestures else [],
                     pose=last_pose if last_pose else PoseData(detected=False),
+                    tracks=[],
                 )
 
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -538,11 +555,32 @@ class VisionSystem:
         if depth_map is not None:
             self._last_depth = depth_map
 
+        tracks = []
+        if self._tracker and detections:
+            tracks = self._tracker.update(detections, (frame.shape[1], frame.shape[0]))
+
+            if self._follow_target and frame.shape:
+                frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
+                follow_cmd = self._tracker.get_follow_command(frame_center)
+                if follow_cmd:
+                    self._logger.info(f"Follow command: {follow_cmd}")
+
         if self._frame_scheduler:
             self._frame_scheduler.update('face', faces)
             self._frame_scheduler.update('gesture', gestures)
             self._frame_scheduler.update('pose', pose)
             self._frame_scheduler.next_frame()
+
+        track_data_list = []
+        for track in tracks:
+            track_data_list.append(TrackData(
+                track_id=track.track_id,
+                class_name=track.class_name,
+                bbox=track.bbox,
+                confidence=track.confidence,
+                centroid=track.centroid,
+                age=track.age,
+            ))
 
         result = VisionResult(
             timestamp=timestamp,
@@ -552,6 +590,7 @@ class VisionSystem:
             faces=faces,
             gestures=gestures,
             pose=pose,
+            tracks=track_data_list,
         )
 
         return result
@@ -816,6 +855,22 @@ def main() -> None:
         help="Disable performance monitoring",
     )
     parser.add_argument(
+        "--no-tracking",
+        action="store_true",
+        help="Disable object tracking",
+    )
+    parser.add_argument(
+        "--follow",
+        action="store_true",
+        help="Enable person following (requires tracking)",
+    )
+    parser.add_argument(
+        "--track-max-age",
+        type=int,
+        default=30,
+        help="Max frames to keep lost track (default: 30)",
+    )
+    parser.add_argument(
         "--pose-every",
         type=int,
         default=2,
@@ -829,7 +884,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.2.0",
+        version="OpenEyes v0.2.1",
     )
     parser.add_argument(
         "--info",
@@ -880,6 +935,22 @@ def main() -> None:
             system._use_depth = False
         if args.no_monitoring:
             system._perf_monitor.enabled = False
+
+        if args.no_tracking:
+            system._use_tracking = False
+            system._tracker = None
+
+        if args.follow:
+            config._config["tracking"]["follow_enabled"] = True
+            system._follow_target = True
+            if not system._tracker:
+                system._use_tracking = True
+                from src.utils.tracker import ObjectTracker
+                system._tracker = ObjectTracker(
+                    max_age=args.track_max_age,
+                    min_hits=3,
+                    iou_threshold=0.3,
+                )
 
         if args.batch_size > 1:
             config._config["performance"]["batch_inference"]["enabled"] = True

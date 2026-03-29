@@ -156,6 +156,26 @@ class Config:
         return self.get("performance", "monitoring", "log_performance", default=True)
 
     @property
+    def tracking_enabled(self) -> bool:
+        return self.get("tracking", "enabled", default=True)
+
+    @property
+    def tracking_max_age(self) -> int:
+        return self.get("tracking", "max_age", default=30)
+
+    @property
+    def tracking_min_hits(self) -> int:
+        return self.get("tracking", "min_hits", default=3)
+
+    @property
+    def tracking_iou_threshold(self) -> float:
+        return self.get("tracking", "iou_threshold", default=0.3)
+
+    @property
+    def follow_enabled(self) -> bool:
+        return self.get("tracking", "follow_enabled", default=False)
+
+    @property
     def debug(self) -> bool:
         return self.get("debug", default=False)
 

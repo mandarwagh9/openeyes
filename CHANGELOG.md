@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.2.0  
+> **Version**: v0.2.1  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,39 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.2.1] - 2026-03-29
+
+### Added
+
+- **Object Tracking**
+  - New `ObjectTracker` class in `src/utils/tracker.py`
+  - IoU-based multi-object tracking
+  - Tracks objects across frames with unique IDs
+  - Configurable max_age, min_hits, IoU threshold
+
+- **Person Following**
+  - Automatic person selection based on frame center
+  - Generates movement commands (forward, backward, left, right, stop)
+  - Tracks follow target across frames
+
+- **Track Data in Output**
+  - Added `TrackData` to `VisionResult`
+  - Includes track_id, class_name, bbox, centroid, age
+
+- **New CLI Flags**
+  - `--no-tracking` - Disable object tracking
+  - `--follow` - Enable person following
+  - `--track-max-age` - Configure tracking max age
+
+### Changed
+
+- **Config Updates**
+  - Added `tracking` section with enabled, max_age, min_hits, iou_threshold, follow_enabled
+
+- **Version Bump**: v0.2.0 → v0.2.1
 
 ---
 

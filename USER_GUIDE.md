@@ -1,6 +1,6 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.2.0  
+> **Version**: v0.2.1  
 > **Last Updated**: 2026-03-29
 
 ---
