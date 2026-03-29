@@ -12,13 +12,14 @@ from src.utils.logger import get_logger
 class GestureRecognizer:
     def __init__(
         self,
-        min_confidence: float = 0.5,
+        min_confidence: float = 0.3,
     ):
         self._min_confidence = min_confidence
         self._logger = get_logger(__name__)
         self._hands = None
         self._mp_hands = None
         self._mp_drawing = None
+        self._debug = False
 
     def load(self) -> None:
         try:
@@ -38,12 +39,17 @@ class GestureRecognizer:
         if self._hands is None:
             raise ModelError("Model not loaded. Call load() first.")
 
+        if self._debug:
+            self._logger.info(f"[GESTURE] Processing frame shape: {frame.shape}")
+
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self._hands.process(frame_rgb)
 
         gestures = []
 
         if results.multi_hand_landmarks:
+            if self._debug:
+                self._logger.info(f"[GESTURE] Found {len(results.multi_hand_landmarks)} hand(s)")
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
                 handedness = "right"
                 if results.multi_handedness and idx < len(results.multi_handedness):
@@ -52,12 +58,16 @@ class GestureRecognizer:
 
                 gesture_type = self._classify_gesture(hand_landmarks.landmark)
 
+                gesture_confidence = 0.5 + (0.3 * (1.0 - idx * 0.1))
+
                 gesture = GestureType(
                     gesture_type=gesture_type,
                     handedness=handedness,
-                    confidence=0.85,
+                    confidence=gesture_confidence,
                 )
                 gestures.append(gesture)
+        elif self._debug:
+            self._logger.debug("No hands detected in frame")
 
         return gestures
 
