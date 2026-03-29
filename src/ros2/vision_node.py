@@ -468,10 +468,14 @@ class VisionPublisher(Node):
                 detection.bbox.size_y = float(h)
 
         pose_info = {}
-        if hasattr(pose_data, "keypoints"):
+        if hasattr(pose_data, "keypoints") and pose_data.keypoints:
             kp_dict = {}
-            for name, kp in pose_data.keypoints.items():
-                kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            if isinstance(pose_data.keypoints, dict):
+                for name, kp in pose_data.keypoints.items():
+                    kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            elif isinstance(pose_data.keypoints, list):
+                for idx, kp in enumerate(pose_data.keypoints):
+                    kp_dict[f"keypoint_{idx}"] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(getattr(kp, "confidence", 0.0))}
             pose_info["keypoints"] = kp_dict
 
         if hasattr(pose_data, "landmarks"):
@@ -502,10 +506,14 @@ class VisionPublisher(Node):
                 "y2": float(bbox[3]) if len(bbox) > 3 else 0.0,
             }
 
-        if hasattr(pose_data, "keypoints"):
+        if hasattr(pose_data, "keypoints") and pose_data.keypoints:
             kp_dict = {}
-            for name, kp in pose_data.keypoints.items():
-                kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            if isinstance(pose_data.keypoints, dict):
+                for name, kp in pose_data.keypoints.items():
+                    kp_dict[name] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(kp.confidence)}
+            elif isinstance(pose_data.keypoints, list):
+                for idx, kp in enumerate(pose_data.keypoints):
+                    kp_dict[f"keypoint_{idx}"] = {"x": float(kp.x), "y": float(kp.y), "confidence": float(getattr(kp, "confidence", 0.0))}
             pose_info["keypoints"] = kp_dict
 
         if hasattr(pose_data, "landmarks"):
