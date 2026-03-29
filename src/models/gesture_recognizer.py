@@ -72,61 +72,44 @@ class GestureRecognizer:
         return gestures
 
     def _classify_gesture(self, landmarks) -> str:
-        thumb_tip = landmarks[4]
-        index_tip = landmarks[8]
-        middle_tip = landmarks[12]
-        ring_tip = landmarks[16]
-        pinky_tip = landmarks[20]
-
-        index_pip = landmarks[6]
-        middle_pip = landmarks[10]
-        ring_pip = landmarks[14]
-        pinky_pip = landmarks[18]
-
-        index_mcp = landmarks[5]
-        middle_mcp = landmarks[9]
-        ring_mcp = landmarks[13]
-        pinky_mcp = landmarks[17]
-
-        is_extended = [
-            index_tip.y < index_pip.y,
-            middle_tip.y < middle_pip.y,
-            ring_tip.y < ring_pip.y,
-            pinky_tip.y < pinky_pip.y,
+        fingertips = [
+            landmarks[8].y,   # index
+            landmarks[12].y,  # middle
+            landmarks[16].y,  # ring
+            landmarks[20].y,  # pinky
+        ]
+        finger_pips = [
+            landmarks[6].y,   # index
+            landmarks[10].y,  # middle
+            landmarks[14].y,  # ring
+            landmarks[18].y,  # pinky
         ]
 
-        fingers_count = sum(is_extended)
+        fingers_up = sum(1 for tip, pip in zip(fingertips, finger_pips) if tip < pip)
 
-        thumb_extended = (
-            thumb_tip.y < landmarks[3].y and
-            thumb_tip.y < index_mcp.y
-        )
+        thumb_tip = landmarks[4]
+        index_base = landmarks[5]
+        thumb_up = thumb_tip.y < index_base.y
 
-        index_middle_extended = is_extended[0] and is_extended[1]
-        ring_pinky_curled = not is_extended[2] and not is_extended[3]
+        if self._debug:
+            self._logger.debug(f"Gesture: {fingers_up} fingers up, thumb_up={thumb_up}")
 
-        if fingers_count == 4 and not thumb_extended:
-            return "open_palm"
-        elif fingers_count == 0 or (fingers_count == 0 and thumb_extended):
+        if fingers_up == 0 and not thumb_up:
             return "fist"
-        elif index_middle_extended and ring_pinky_curled:
-            return "victory"
-        elif is_extended[0] and not is_extended[1] and not is_extended[2] and not is_extended[3]:
-            return "point"
-        elif thumb_extended and not any(is_extended[:3]) and not is_extended[3]:
-            return "thumbs_up"
-        elif thumb_extended and is_extended[0] and not any(is_extended[1:3]):
-            return "ok_sign"
-        elif fingers_count == 3 and is_extended[0] and is_extended[1] and is_extended[2]:
-            return "three"
-        elif fingers_count == 2 and is_extended[0] and is_extended[1]:
-            return "two"
-        elif fingers_count == 1 and is_extended[0]:
-            return "one"
-        elif fingers_count == 0 and thumb_extended:
+        elif fingers_up == 0 and thumb_up:
             return "thumbs_down"
+        elif fingers_up == 1:
+            return "point"
+        elif fingers_up == 2:
+            return "peace"
+        elif fingers_up == 3:
+            return "three"
+        elif fingers_up == 4 and not thumb_up:
+            return "open_palm"
+        elif fingers_up == 4 and thumb_up:
+            return "thumbs_up"
         else:
-            return f"unknown_{fingers_count}"
+            return f"fingers_{fingers_up}"
 
     def draw_gestures(self, frame: np.ndarray, gestures: List[GestureType]) -> np.ndarray:
         for gesture in gestures:

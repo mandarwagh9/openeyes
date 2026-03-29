@@ -1,6 +1,6 @@
 # OpenEyes
 
-**v0.4.2**
+**v0.4.3**
 
 ## We Give Robots Vision
 

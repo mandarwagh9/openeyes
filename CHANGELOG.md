@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.4.2  
+> **Version**: v0.4.3  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.4.3] - 2026-03-29
+
+### Fixed
+
+- **Gesture Detection** (`src/models/gesture_recognizer.py`)
+  - Simplified classification logic
+  - Added debug logging for troubleshooting
+
+### Enhanced
+
+- **Debug Display** (`src/main.py`)
+  - All bounding boxes now same color (green)
+  - Solid black background behind all text overlays
+  - Removed track ID unique colors
+  - Simplified pose display (keypoints only)
 
 ---
 
