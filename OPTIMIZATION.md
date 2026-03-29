@@ -36,15 +36,15 @@ yolo export model=yolo11n.pt format=engine int8=True
 
 The system includes adaptive frame skipping that automatically adjusts based on motion:
 
-### Default Intervals
+### Default Intervals (v0.1.1)
 
 ```python
 skip_intervals = {
-    'detector': 1,   # Process every frame
-    'depth': 2,      # Process every 2nd frame
-    'face': 2,       # Process every 2nd frame
-    'gesture': 2,    # Process every 2nd frame
-    'pose': 2        # Process every 2nd frame
+    'detector': 1,   # Process every frame (most important)
+    'depth': 8,       # Process every 8th frame (expensive)
+    'face': 6,       # Process every 6th frame
+    'gesture': 6,    # Process every 6th frame
+    'pose': 6        # Process every 6th frame
 }
 ```
 
@@ -60,12 +60,43 @@ Edit `src/main.py` to customize:
 
 ```python
 self._adaptive_skipper = AdaptiveFrameSkipper(
-    base_skip=2,           # Default skip interval
+    base_skip=2,           # Default skip interval (v0.1.1: was 3)
     motion_threshold=5000, # Motion detection threshold
-    min_skip=1,            # Minimum skip (1 = every frame)
-    max_skip=4             # Maximum skip
+    min_skip=1,            # Minimum skip (1 = every frame) (v0.1.1: was 2)
+    max_skip=4             # Maximum skip (v0.1.1: was 5)
 )
 ```
+
+## Disable Models for Speed
+
+The fastest way to increase FPS is to disable models you don't need:
+
+```bash
+# Disable face detection (~+2 FPS)
+python src/main.py --no-face
+
+# Disable gesture recognition (~+2 FPS)
+python src/main.py --no-gesture
+
+# Disable pose estimation (~+2 FPS)
+python src/main.py --no-pose
+
+# Disable depth estimation (~+2 FPS, NEW in v0.1.1)
+python src/main.py --no-depth
+
+# Maximum speed - disable all extra models
+python src/main.py --no-face --no-gesture --no-pose --no-depth
+```
+
+### Model Combinations
+
+| Command | Expected FPS |
+|:--------|:------------|
+| All models (default) | ~10-12 |
+| --no-face | ~12-14 |
+| --no-face --no-gesture --no-pose | ~18-22 |
+| --no-face --no-gesture --no-pose --no-depth | ~22-25 |
+| + Jetson max performance | +20-30% |
 
 ## Memory Management
 
@@ -111,9 +142,11 @@ camera:
 
 | Configuration | All Models FPS | Object Only FPS |
 |--------------|----------------|-----------------|
-| YOLOv10n + No skipping | 7-10 | 25-35 |
-| YOLO11n + Adaptive skip | 15-25 | 50-70 |
-| YOLO11n + INT8 + Skip | 25-35 | 80-100 |
+| YOLO11n + Default (v0.1.1) | 10-12 | 25-35 |
+| YOLO11n + --no-face/gesture/pose | 18-22 | 40-50 |
+| YOLO11n + All disabled | 22-25 | 50-60 |
+| YOLO11n + INT8 + All disabled | 30-40 | 80-100 |
+| YOLO11n + Jetson max + INT8 | 40-50 | 100-120 |
 
 ## Troubleshooting
 

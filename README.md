@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="#about">
-    <img src="https://img.shields.io/badge/Version-v0.1.0-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
+    <img src="https://img.shields.io/badge/Version-v0.1.1-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-Apache_2.0-1a1a2e?style=for-the-badge" alt="License" />
@@ -40,10 +40,11 @@
 - 👤 **Face Detection** - Locate and track faces
 - 🖐️ **Gesture Recognition** - Understand human hand signals
 - 🦵 **Pose Estimation** - Detect human body poses
-- ⚡ **Real-time Performance** - 15+ FPS with adaptive frame skipping
+- ⚡ **Real-time Performance** - 10-25 FPS (configurable via --no-* flags)
 - 🔒 **Privacy-first** - All processing done locally, no cloud required
 - 🤖 **ROS2 Ready** - Vision data publishing for robot control
 - 📟 **Command Subscription** - Subscribe to `/vision/cmd` for robot commands (forward, backward, stop, left, right, follow)
+- 🎛️ **Model Control** - Disable unused models with --no-face, --no-gesture, --no-pose, --no-depth flags
 
 ---
 
@@ -73,12 +74,12 @@ A humanoid robot needs vision like humans need eyes. OpenEyes provides:
 
 ### Performance Targets
 
-| Metric | Target |
-|:-------|:-------|
-| FPS | 15-25 FPS (all models), 50+ FPS (object only) |
-| Latency | <50ms |
-| Detection Range | 0.5m - 5m |
-| Model Size | <10MB |
+| Metric | Target | v0.1.1 Actual |
+|:-------|:-------|:--------------|
+| FPS | 20-30 FPS | 10-12 (all), 22-25 (minimal) |
+| Latency | <50ms | ~40ms |
+| Detection Range | 0.5m - 5m | 0.5m - 5m |
+| Model Size | <10MB | 5.4MB |
 
 ---
 

@@ -1,6 +1,6 @@
 # AGENTS.md - Developer Guidelines for OpenEyes
 
-> AI agent guidelines for OpenEyes - vision system for humanoid robots.
+> AI agent guidelines for OpenEyes - vision system for humanoid robots running on Jetson Orin Nano with full ROS2 integration.
 
 ---
 
@@ -16,6 +16,12 @@ python src/main.py --ros2
 
 # Show version
 python src/main.py --version
+
+# Disable models for speed (NEW in v0.1.1)
+python src/main.py --no-face --no-gesture --no-pose --no-depth
+
+# Run with ROS2 launch file
+ros2 launch openeyes openeyes.launch.py device:=cuda camera:=0 ros2:=true
 
 # Testing
 pytest tests/                          # All tests
@@ -113,16 +119,94 @@ logger.info(f"Detected {len(detections)} objects")
 
 ```
 src/
-├── camera/           # CameraHandler, types
+├── camera/           # CameraHandler, types, CSI device detection
 ├── models/           # ObjectDetector, depth_estimator, etc.
 ├── output/           # json_formatter, udp_sender
-├── ros2/             # VisionPublisher, services
-├── utils/            # config, logger, frame_skipper
-└── main.py           # Entry point
+├── ros2/             # VisionPublisher with MultiThreadedExecutor, JSON fallback
+├── utils/            # config (absolute path resolution), logger
+└── main.py           # Entry point with --ros2 and --version flags
 ```
 
 ### Data Flow
 Camera → ObjectDetector → JSON Formatter → UDP Sender + ROS2 Publisher
+
+### Vision Pipeline
+1. CSI Camera capture (IMX219 at 1920x1080)
+2. YOLO11n object detection
+3. MiDaS depth estimation (now wired to pipeline)
+4. Face detection (MediaPipe - confidence lowered to 0.3)
+5. Gesture recognition (MediaPipe - confidence lowered to 0.3)
+6. Pose estimation
+7. Output via UDP + ROS2 (7 topics + command subscription)
+
+---
+
+## Key Discoveries & Solutions
+
+### CSI Camera Issues
+- **Problem**: Camera not available
+- **Solution**: Add `_check_csi_available()` method to check `/dev/video0`, add queue to GStreamer pipeline, reboot Jetson
+- **File**: `src/camera/camera_handler.py`
+
+### ROS2 vision_msgs Bug
+- **Problem**: vision_msgs caused assertion failure
+- **Solution**: Use JSON/std_msgs fallback mode, force `VISION_MSGS_AVAILABLE = False`
+- **File**: `src/ros2/vision_node.py`
+
+### ROS2 Not Publishing
+- **Problem**: Topics weren't appearing
+- **Solution**: Add MultiThreadedExecutor in separate thread, add `time.sleep(0.5)` after initialization
+- **File**: `src/ros2/vision_node.py`
+
+### Model Path Issue
+- **Problem**: config.yaml model path was relative
+- **Solution**: Make `yolo_path` property resolve absolute paths
+- **File**: `src/utils/config.py`
+
+### Parameter Validation
+- Added validation for camera constructor parameters and VisionPublisher parameters
+
+### Face/Gesture Detection Issues
+- **Problem**: MediaPipe face/gesture detection returning empty results
+- **Solution**: Lower confidence threshold from 0.5 to 0.3, added debug logging
+- **Files**: `src/models/face_detector.py`, `src/models/gesture_recognizer.py`
+
+### Depth Estimation Not Publishing
+- **Problem**: DepthEstimator loaded but never called, no depth_map in DepthData
+- **Solution**: Added depth_map field to DepthData, wired estimator in pipeline, tracks last depth for frame skipping
+- **Files**: `src/camera/types.py`, `src/main.py`
+
+---
+
+## ROS2 Integration
+
+### Publishers (7 Topics)
+| Topic | Type | Description |
+|:------|:-----|:------------|
+| `/vision/detections` | JSON | Object detections |
+| `/vision/depth` | JSON | Depth map data |
+| `/vision/faces` | JSON | Face detections |
+| `/vision/gestures` | JSON | Gesture recognitions |
+| `/vision/pose` | JSON | Body pose landmarks |
+| `/vision/status` | JSON | System status with timestamp |
+| `/vision/image/debug` | JSON | Debug image (annotated frame) |
+
+### Command Subscription
+| Command | Action |
+|:--------|:-------|
+| `forward` | Move forward |
+| `backward` | Move backward |
+| `stop` | Stop all motion |
+| `left` | Turn left |
+| `right` | Turn right |
+| `follow` | Follow detected person |
+
+**Note**: Commands currently print to console (not motor control)
+
+### ROS2 Message Format
+- Use JSON format for all messages (vision_msgs compatibility issues)
+- Depth normalized to 0-1 meters (32FC1)
+- Timestamp included in status messages
 
 ---
 
@@ -177,13 +261,53 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ---
 
+## Modified Files Reference
+
+### Core Code Files
+| File | Changes |
+|:-----|:--------|
+| `src/main.py` | Entry point with ROS2 integration, --ros2 and --version flags, depth estimator wired |
+| `src/ros2/vision_node.py` | VisionPublisher with all publishers, command callback, JSON fallback |
+| `src/ros2/__init__.py` | Try/except for services import |
+| `src/ros2/services.py` | Try/except for std_srvs import |
+| `src/camera/camera_handler.py` | CSI device detection, queue in pipeline, validation |
+| `src/camera/types.py` | Added bbox, landmarks to PoseData, depth_map to DepthData |
+| `src/models/face_detector.py` | Lowered confidence to 0.3, added debug logging |
+| `src/models/gesture_recognizer.py` | Lowered confidence to 0.3, added debug logging |
+| `src/utils/config.py` | YOLO path resolution, logger added |
+| `config.yaml` | ROS2 configuration section |
+| `launch/openeyes.launch.py` | ROS2 launch file (NEW) |
+| `package.xml` | ROS2 package manifest (NEW) |
+
+### Documentation Files
+| File | Changes |
+|:-----|:--------|
+| `CHANGELOG.md` | v0.1.0 with all changes |
+| `README.md` | Version badge, command subscription feature |
+| `USER_GUIDE.md` | ROS2 Integration section, CLI options |
+| `QUICKSTART.md` | --ros2/--version examples |
+| `TROUBLESHOOTING.md` | ROS2 Issues section |
+| `AGENTS.md` | Architecture, CLI commands, launch file (this file) |
+| `ROADMAP.md` | Version history |
+| `INSTALL.md` | Version update |
+| `DOCUMENTATION.md` | Version table |
+
+---
+
 ## Performance Targets
 
-| Metric | Target |
-|:-------|:-------|
-| FPS | 20-30 |
-| Latency | <50ms |
-| Memory | <2GB |
+| Metric | Target | v0.1.1 |
+|:-------|:-------|:-------|
+| FPS | 20-30 | 10-12 (all), 22-25 (minimal) |
+| Latency | <50ms | ~40ms |
+| Memory | <2GB | ~1.2GB |
+
+---
+
+## Known Issues
+
+- Robot motor control not integrated (commands just print to console)
+- Performance needs optimization (target 20-30 FPS)
 
 ---
 

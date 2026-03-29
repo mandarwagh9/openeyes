@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.1.0  
+> **Version**: v0.1.1  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -124,6 +124,12 @@ python src/main.py --no-parallel
 
 # Run pose estimation every 3 frames (faster)
 python src/main.py --pose-every 3
+
+# Disable all extra models for maximum FPS
+python src/main.py --no-face --no-gesture --no-pose --no-depth
+
+# Enable max Jetson performance (recommended)
+sudo nvpmodel -m 0 && sudo jetson_clocks
 ```
 
 ### Change Output Target
@@ -139,10 +145,11 @@ python src/main.py --host 192.168.1.100 --port 5000
 
 | Configuration | Expected FPS |
 |:--------------|:------------|
-| All models enabled | 15-25 FPS |
-| Object detection only | 50-70 FPS |
+| All models enabled (default) | 10-12 FPS |
+| Without face/gesture/pose | 18-22 FPS |
+| Without all extras + Jetson max | 22-28 FPS |
+| Object detection only | 40-60 FPS |
 | YOLO11n TensorRT INT8 | 80-100 FPS |
-| Without display | Slightly higher |
 
 > **Tip**: See [OPTIMIZATION.md](OPTIMIZATION.md) for more performance tuning options.
 

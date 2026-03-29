@@ -1,7 +1,7 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.1.0  
-> **Last Updated**: 2026-03-26
+> **Version**: v0.1.1  
+> **Last Updated**: 2026-03-29
 
 ---
 
@@ -65,7 +65,7 @@ python src/main.py --help
 usage: main.py [-h] [--camera CAMERA] [--width WIDTH] [--height HEIGHT]
                [--fps FPS] [--host HOST] [--port PORT] [--debug]
                [--config CONFIG] [--no-face] [--no-gesture] [--no-pose]
-               [--no-parallel] [--pose-every POSE_EVERY] [--ros2] [--version]
+               [--no-depth] [--no-parallel] [--pose-every POSE_EVERY] [--ros2] [--version]
 
 optional arguments:
   --camera CAMERA       Camera index (0, 1...) or RTSP URL
@@ -79,6 +79,7 @@ optional arguments:
   --no-face             Disable face detection
   --no-gesture          Disable gesture recognition
   --no-pose             Disable pose estimation
+  --no-depth            Disable depth estimation (NEW - saves ~2 FPS)
   --no-parallel         Disable parallel processing (more stable)
   --pose-every POSE_EVERY  Run pose estimation every N frames (default: 2)
   --ros2                Enable ROS2 publishing (requires ROS2 installation)
@@ -252,11 +253,15 @@ python src/main.py --no-face --no-gesture --no-pose
 
 | Command | Expected FPS |
 |:--------|:------------|
-| `python src/main.py` | 7-10 FPS |
-| `python src/main.py --debug` | 7-10 FPS |
+| `python src/main.py` | ~10-12 FPS (all models) |
+| `python src/main.py --debug` | ~10-12 FPS |
 | `python src/main.py --no-parallel` | 4-6 FPS (more stable) |
-| `python src/main.py --pose-every 3` | 8-12 FPS |
-| `python src/main.py --no-face --no-gesture --no-pose` | 25-35 FPS |
+| `python src/main.py --pose-every 3` | ~12-14 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose` | ~18-22 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose --no-depth` | ~22-25 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose` + `sudo nvpmodel -m 0 && sudo jetson_clocks` | ~22-28 FPS |
+
+> **Tip**: Run `sudo nvpmodel -m 0 && sudo jetson_clocks` for maximum Jetson performance!
 
 ---
 
