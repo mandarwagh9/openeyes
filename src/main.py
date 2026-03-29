@@ -4,8 +4,10 @@ import os
 import signal
 import sys
 import time
+import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from queue import Queue, Empty
 from typing import Optional
 
 import cv2
@@ -75,12 +77,22 @@ class VisionSystem:
         self._last_pose = None
         self._last_faces = []
         self._last_gestures = []
+        self._last_depth = None
 
         self._use_parallel = True
         self._pose_skip_frames = 1
 
+        self._use_face = True
+        self._use_gesture = True
+        self._use_pose = True
+        self._use_depth = True
+
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
+
+        self._ros2_queue: Optional[Queue] = None
+        self._ros2_thread: Optional[threading.Thread] = None
+        self._executor = ThreadPoolExecutor(max_workers=5)
 
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
@@ -93,17 +105,17 @@ class VisionSystem:
     def _init_frame_scheduler(self) -> None:
         skip_intervals = {
             'detector': 1,
-            'depth': 4,
-            'face': 4,
-            'gesture': 4,
-            'pose': 4
+            'depth': 8,
+            'face': 6,
+            'gesture': 6,
+            'pose': 6
         }
         self._frame_scheduler = MultiModelFrameScheduler(skip_intervals)
         self._adaptive_skipper = AdaptiveFrameSkipper(
-            base_skip=3,
+            base_skip=2,
             motion_threshold=5000.0,
-            min_skip=2,
-            max_skip=5
+            min_skip=1,
+            max_skip=4
         )
         self._logger.info(f"Frame scheduler initialized: {skip_intervals}")
 
@@ -111,6 +123,47 @@ class VisionSystem:
         self._logger.info("Starting OpenEyes Vision System (Optimized)")
         self._logger.info(f"Parallel processing: {self._use_parallel}")
         self._logger.info(f"Pose skip frames: {self._pose_skip_frames + 1}")
+
+        enabled_models = []
+        disabled_models = []
+        if self._detector:
+            enabled_models.append("detector")
+        if self._use_depth and self._depth_estimator:
+            enabled_models.append("depth")
+        elif self._use_depth:
+            enabled_models.append("depth")
+        else:
+            disabled_models.append("depth")
+        if self._use_face and self._face_detector:
+            enabled_models.append("face")
+        elif self._use_face:
+            enabled_models.append("face")
+        else:
+            disabled_models.append("face")
+        if self._use_gesture and self._gesture_recognizer:
+            enabled_models.append("gesture")
+        elif self._use_gesture:
+            enabled_models.append("gesture")
+        else:
+            disabled_models.append("gesture")
+        if self._use_pose and self._pose_estimator:
+            enabled_models.append("pose")
+        elif self._use_pose:
+            enabled_models.append("pose")
+        else:
+            disabled_models.append("pose")
+
+        self._logger.info(f"Enabled models: {', '.join(enabled_models) if enabled_models else 'none'}")
+        if disabled_models:
+            self._logger.info(f"Disabled models: {', '.join(disabled_models)}")
+
+        try:
+            with open("/proc/device-tree/model", "r") as f:
+                model = f.read().lower()
+                if "jetson" in model or "tegra" in model:
+                    self._logger.info("Jetson detected. Run 'sudo nvpmodel -m 0 && sudo jetson_clocks' for max performance")
+        except Exception:
+            pass
 
         self._init_frame_scheduler()
         self._init_camera()
@@ -159,36 +212,44 @@ class VisionSystem:
             self._logger.error(f"Detector initialization failed: {e}")
             raise
 
-        try:
-            self._depth_estimator = DepthEstimator()
-            self._depth_estimator.load()
-            if self._depth_estimator.is_loaded:
-                self._logger.info("Depth Estimator loaded")
-            else:
-                self._logger.warning("Depth Estimator using fallback")
-        except ModelError as e:
-            self._logger.warning(f"Depth Estimator not available: {e}")
+        if self._use_depth:
+            try:
+                self._depth_estimator = DepthEstimator()
+                self._depth_estimator.load()
+                if self._depth_estimator.is_loaded:
+                    self._logger.info("Depth Estimator loaded")
+                else:
+                    self._logger.warning("Depth Estimator using fallback")
+            except ModelError as e:
+                self._logger.warning(f"Depth Estimator not available: {e}")
 
-        try:
-            self._face_detector = FaceDetector()
-            self._face_detector.load()
-            self._logger.info("Face Detector loaded")
-        except ModelError as e:
-            self._logger.warning(f"Face Detector not available: {e}")
+        if self._use_face:
+            try:
+                self._face_detector = FaceDetector()
+                self._face_detector.load()
+                if self._config.debug:
+                    self._face_detector._debug = True
+                self._logger.info("Face Detector loaded")
+            except ModelError as e:
+                self._logger.warning(f"Face Detector not available: {e}")
 
-        try:
-            self._gesture_recognizer = GestureRecognizer()
-            self._gesture_recognizer.load()
-            self._logger.info("Gesture Recognizer loaded")
-        except ModelError as e:
-            self._logger.warning(f"Gesture Recognizer not available: {e}")
+        if self._use_gesture:
+            try:
+                self._gesture_recognizer = GestureRecognizer()
+                self._gesture_recognizer.load()
+                if self._config.debug:
+                    self._gesture_recognizer._debug = True
+                self._logger.info("Gesture Recognizer loaded")
+            except ModelError as e:
+                self._logger.warning(f"Gesture Recognizer not available: {e}")
 
-        try:
-            self._pose_estimator = PoseEstimator()
-            self._pose_estimator.load()
-            self._logger.info("Pose Estimator loaded")
-        except ModelError as e:
-            self._logger.warning(f"Pose Estimator not available: {e}")
+        if self._use_pose:
+            try:
+                self._pose_estimator = PoseEstimator()
+                self._pose_estimator.load()
+                self._logger.info("Pose Estimator loaded")
+            except ModelError as e:
+                self._logger.warning(f"Pose Estimator not available: {e}")
 
     def _init_output(self) -> None:
         self._udp_sender = UDPSender(
@@ -235,7 +296,21 @@ class VisionSystem:
             self._ros2_executor = rclpy.executors.MultiThreadedExecutor(num_threads=2)
             self._ros2_executor.add_node(self._ros2_pub)
             
-            import threading
+            self._ros2_queue = Queue(maxsize=2)
+            
+            def ros2_queue_processor():
+                while self._running:
+                    try:
+                        result, frame_shape = self._ros2_queue.get(timeout=0.05)
+                        self._publish_ros2(result, frame_shape)
+                    except Empty:
+                        continue
+                    except Exception as e:
+                        self._logger.warning(f"ROS2 queue error: {e}")
+            
+            self._ros2_queue_thread = threading.Thread(target=ros2_queue_processor, daemon=True)
+            self._ros2_queue_thread.start()
+            
             self._ros2_thread = threading.Thread(target=self._ros2_executor.spin, daemon=True)
             self._ros2_thread.start()
             
@@ -270,8 +345,11 @@ class VisionSystem:
             json_output = format_vision_result(result)
             self._udp_sender.send(json_output)
 
-            if self._ros2_pub:
-                self._publish_ros2(result, frame_shape)
+            if self._ros2_pub and self._ros2_queue:
+                try:
+                    self._ros2_queue.put_nowait((result, frame_shape))
+                except:
+                    pass
 
             if self._config.debug:
                 self._debug_display(frame, result)
@@ -343,28 +421,69 @@ class VisionSystem:
                 last_gestures = self._frame_scheduler.get_last('gesture')
                 last_pose = self._frame_scheduler.get_last('pose')
 
+                last_depth_data = DepthData(
+                    enabled=self._last_depth is not None,
+                    depth_map=self._last_depth
+                )
                 return VisionResult(
                     timestamp=timestamp,
                     frame_id=self._frame_id,
                     objects=last_objects if last_objects else [],
-                    depth=DepthData(enabled=False),
+                    depth=last_depth_data,
                     faces=last_faces if last_faces else [],
                     gestures=last_gestures if last_gestures else [],
                     pose=last_pose if last_pose else PoseData(detected=False),
                 )
 
-        detections = []
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        futures = {}
+        
         if self._detector:
-            detections = self._detector.detect(frame)
-            if self._frame_scheduler:
-                self._frame_scheduler.update('detector', detections)
+            futures['detector'] = self._executor.submit(self._detector.detect, frame)
+        
+        if self._depth_estimator and self._depth_estimator.is_loaded:
+            futures['depth'] = self._executor.submit(self._depth_estimator.estimate, frame)
+        
+        if self._face_detector:
+            futures['face'] = self._executor.submit(self._face_detector.detect, frame_rgb)
+        
+        if self._gesture_recognizer:
+            futures['gesture'] = self._executor.submit(self._gesture_recognizer.recognize, frame_rgb)
+        
+        if self._pose_estimator:
+            futures['pose'] = self._executor.submit(self._pose_estimator.estimate, frame_rgb)
 
-        depth = DepthData(enabled=False)
+        detections = []
+        depth_map = None
+        depth_enabled = False
+        faces = []
+        gestures = []
+        pose = PoseData(detected=False)
 
-        if self._use_parallel:
-            faces, gestures, pose = self._process_models_parallel(frame)
-        else:
-            faces, gestures, pose = self._process_models_sequential(frame)
+        for key, future in futures.items():
+            try:
+                result = future.result()
+                if key == 'detector':
+                    detections = result
+                    if self._frame_scheduler:
+                        self._frame_scheduler.update('detector', detections)
+                elif key == 'depth':
+                    depth_map = result
+                    depth_enabled = True
+                elif key == 'face':
+                    faces = result
+                elif key == 'gesture':
+                    gestures = result
+                elif key == 'pose':
+                    pose = result
+            except Exception as e:
+                self._logger.warning(f"Model {key} failed: {e}")
+
+        depth = DepthData(enabled=depth_enabled, depth_map=depth_map)
+
+        if depth_map is not None:
+            self._last_depth = depth_map
 
         if self._frame_scheduler:
             self._frame_scheduler.update('face', faces)
@@ -392,9 +511,9 @@ class VisionSystem:
         gestures = []
         pose = PoseData(detected=False)
 
-        skip_face = (self._frame_id % 4 != 0)
-        skip_gesture = (self._frame_id % 4 != 0)
-        skip_pose = (self._frame_id % 4 != 0)
+        skip_face = False
+        skip_gesture = False
+        skip_pose = False
 
         if skip_face and self._last_faces:
             return self._last_faces, self._last_gestures, self._last_pose if self._last_pose else PoseData(detected=False)
@@ -536,7 +655,8 @@ class VisionSystem:
                 2,
             )
 
-        cv2.imshow("OpenEyes Debug", frame)
+        display_frame = cv2.resize(frame, (640, 360))
+        cv2.imshow("OpenEyes Debug", display_frame)
         cv2.waitKey(1)
 
 
@@ -605,6 +725,11 @@ def main() -> None:
         help="Disable pose estimation",
     )
     parser.add_argument(
+        "--no-depth",
+        action="store_true",
+        help="Disable depth estimation",
+    )
+    parser.add_argument(
         "--no-parallel",
         action="store_true",
         help="Disable parallel processing",
@@ -623,7 +748,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.1.0",
+        version="OpenEyes v0.1.1",
     )
 
     args = parser.parse_args()
@@ -649,6 +774,14 @@ def main() -> None:
             system._use_parallel = False
         if args.pose_every:
             system._pose_skip_frames = args.pose_every - 1
+        if args.no_face:
+            system._use_face = False
+        if args.no_gesture:
+            system._use_gesture = False
+        if args.no_pose:
+            system._use_pose = False
+        if args.no_depth:
+            system._use_depth = False
 
         system.start()
     except Exception as e:
