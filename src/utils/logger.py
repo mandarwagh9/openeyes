@@ -1,13 +1,16 @@
 import logging
 import sys
 from pathlib import Path
+from logging.handlers import RotatingFileHandler
 from typing import Optional
 
 
 def setup_logger(
     name: str = "openeyes",
     level: int = logging.INFO,
-    log_file: Optional[Path] = None,
+    log_file: Optional[str] = None,
+    max_bytes: int = 5 * 1024 * 1024,
+    backup_count: int = 3,
 ) -> logging.Logger:
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -26,8 +29,13 @@ def setup_logger(
     logger.addHandler(console_handler)
 
     if log_file:
-        log_file.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(log_file)
+        log_path = Path(log_file)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        file_handler = RotatingFileHandler(
+            log_path,
+            maxBytes=max_bytes,
+            backupCount=backup_count,
+        )
         file_handler.setLevel(level)
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)

@@ -17,8 +17,18 @@ python src/main.py --ros2
 # Show version
 python src/main.py --version
 
-# Disable models for speed (NEW in v0.1.1)
+# Show system info (NEW in v0.1.2)
+python src/main.py --info
+
+# Disable models for speed
 python src/main.py --no-face --no-gesture --no-pose --no-depth
+
+# Enable file logging with rotation
+python src/main.py --log-file logs/openeyes.log
+
+# Jetson optimization (requires sudo)
+sudo bash scripts/jetson_perf.sh
+python3 scripts/jetson_helper.py --check
 
 # Run with ROS2 launch file
 ros2 launch openeyes openeyes.launch.py device:=cuda camera:=0 ros2:=true

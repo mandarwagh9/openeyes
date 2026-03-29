@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.1.1  
+> **Version**: v0.1.2  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -43,10 +43,11 @@ pip install -r requirements.txt
 For best performance on Jetson Orin Nano:
 
 ```bash
-# Enable 15W power mode
-sudo nvpmodel -m 0
+# One-command optimization (recommended)
+sudo bash scripts/jetson_perf.sh
 
-# Lock CPU/GPU clocks to maximum
+# Or manually:
+sudo nvpmodel -m 0
 sudo jetson_clocks
 ```
 

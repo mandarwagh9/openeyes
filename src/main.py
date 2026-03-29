@@ -39,6 +39,46 @@ from src.output.udp_sender import UDPSender
 from src.utils.config import Config
 from src.utils.logger import setup_logger
 from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
+import platform
+
+
+def show_system_info() -> None:
+    """Display system information and OpenEyes recommendations."""
+    print("=" * 50)
+    print("OpenEyes System Information")
+    print("=" * 50)
+    print(f"  Version: v0.1.2")
+    print(f"  Python: {platform.python_version()}")
+    print(f"  Platform: {platform.system()} {platform.machine()}")
+
+    is_jetson = False
+    try:
+        with open("/proc/device-tree/model", "r") as f:
+            model = f.read().strip()
+            if "jetson" in model.lower() or "tegra" in model.lower():
+                is_jetson = True
+                print(f"  Device: {model}")
+                print("\n[Jetson Optimization]")
+                print("  Run: sudo bash scripts/jetson_perf.sh")
+                print("  Info: bash scripts/jetson_info.sh")
+    except Exception:
+        print(f"  Device: {platform.machine()}")
+
+    print("\n[OpenEyes Recommendations]")
+    print("  Minimal (fastest): --no-face --no-gesture --no-pose --no-depth")
+    print("  Balanced:         --no-depth")
+    print("  Full:             (all models enabled)")
+    print("  With ROS2:        --ros2")
+    print("\n[Performance Tips]")
+    if is_jetson:
+        print("  - Run sudo jetson_clocks for max performance")
+        print("  - Use TensorRT models (.engine) for 2x speedup")
+        print("  - Consider disabling depth for >25 FPS")
+    else:
+        print("  - Use GPU-accelerated models when available")
+        print("  - Lower resolution: --width 480 --height 360")
+        print("  - Lower target FPS: --fps 20")
+    print("=" * 50)
 
 ROS2_AVAILABLE = False
 try:
@@ -53,12 +93,13 @@ except ImportError:
 class VisionSystem:
     """Optimized vision system with parallel processing."""
 
-    def __init__(self, config: Config, use_ros2: bool = False):
+    def __init__(self, config: Config, use_ros2: bool = False, log_file: Optional[str] = None):
         self._config = config
         self._use_ros2 = use_ros2
         self._logger = setup_logger(
             "openeyes",
-            level=logging.DEBUG if config.debug else logging.INFO
+            level=logging.DEBUG if config.debug else logging.INFO,
+            log_file=log_file,
         )
         self._camera: Optional[CameraHandler] = None
         self._detector: Optional[ObjectDetector] = None
@@ -748,10 +789,25 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.1.1",
+        version="OpenEyes v0.1.2",
+    )
+    parser.add_argument(
+        "--info",
+        action="store_true",
+        help="Show system information and OpenEyes recommendations",
+    )
+    parser.add_argument(
+        "--log-file",
+        type=str,
+        default=None,
+        help="Path to log file (with rotation, 5MB max by default)",
     )
 
     args = parser.parse_args()
+
+    if args.info:
+        show_system_info()
+        sys.exit(0)
 
     config = Config()
     if args.camera is not None:
@@ -768,7 +824,7 @@ def main() -> None:
         config._config["camera"]["fps"] = args.fps
 
     try:
-        system = VisionSystem(config, use_ros2=args.ros2)
+        system = VisionSystem(config, use_ros2=args.ros2, log_file=args.log_file)
 
         if args.no_parallel:
             system._use_parallel = False

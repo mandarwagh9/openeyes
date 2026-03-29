@@ -1,6 +1,6 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.1.1  
+> **Version**: v0.1.2  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -13,6 +13,7 @@
 4. [Running Modes](#4-running-modes)
 5. [Interpreting Output](#5-interpreting-output)
 6. [Advanced Features](#6-advanced-features)
+7. [Jetson Optimization](#7-jetson-optimization)
 
 ---
 
@@ -65,7 +66,8 @@ python src/main.py --help
 usage: main.py [-h] [--camera CAMERA] [--width WIDTH] [--height HEIGHT]
                [--fps FPS] [--host HOST] [--port PORT] [--debug]
                [--config CONFIG] [--no-face] [--no-gesture] [--no-pose]
-               [--no-depth] [--no-parallel] [--pose-every POSE_EVERY] [--ros2] [--version]
+               [--no-depth] [--no-parallel] [--pose-every POSE_EVERY] [--ros2]
+               [--version] [--info] [--log-file LOG_FILE]
 
 optional arguments:
   --camera CAMERA       Camera index (0, 1...) or RTSP URL
@@ -75,9 +77,17 @@ optional arguments:
   --host HOST           Output host IP (default: 127.0.0.1)
   --port PORT           Output port (default: 5000)
   --debug               Enable debug mode (shows video window)
-  --config CONFIG        Config file path
+  --config CONFIG       Config file path
   --no-face             Disable face detection
   --no-gesture          Disable gesture recognition
+  --no-pose             Disable pose estimation
+  --no-depth            Disable depth estimation
+  --no-parallel         Disable parallel processing
+  --pose-every N        Run pose every N frames (default: 2)
+  --ros2                Enable ROS2 publishing
+  --version             Show version
+  --info                Show system info and recommendations
+  --log-file PATH       Log file path (with rotation)
   --no-pose             Disable pose estimation
   --no-depth            Disable depth estimation (NEW - saves ~2 FPS)
   --no-parallel         Disable parallel processing (more stable)
@@ -365,6 +375,69 @@ ros2 topic echo /vision/status
 ## 8. Troubleshooting
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
+
+---
+
+## 7. Jetson Optimization
+
+### Quick Optimization
+
+```bash
+# One-command optimization (requires sudo)
+sudo bash scripts/jetson_perf.sh
+```
+
+### Manual Optimization
+
+```bash
+# Set MAX power mode
+sudo nvpmodel -m 0
+sudo jetson_clocks
+```
+
+### Check System Status
+
+```bash
+# Using shell script
+bash scripts/jetson_info.sh
+
+# Using Python helper
+python3 scripts/jetson_helper.py
+
+# Check optimization status
+python3 scripts/jetson_helper.py --check
+
+# Run optimization (requires sudo)
+sudo python3 scripts/jetson_helper.py --optimize
+```
+
+### System Info Command
+
+```bash
+# Shows device info and recommendations
+python src/main.py --info
+```
+
+---
+
+## 8. Logging
+
+### Enable File Logging
+
+```bash
+# Log to file with rotation (5MB max, 3 backups)
+python src/main.py --log-file logs/openeyes.log
+```
+
+### View Logs
+
+```bash
+# View current log
+cat logs/openeyes.log
+
+# Follow log in real-time
+tail -f logs/openeyes.log
+```
 
 ---
 
