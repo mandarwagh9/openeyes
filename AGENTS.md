@@ -29,6 +29,11 @@ python src/main.py --follow
 python src/main.py --no-tracking
 python src/main.py --follow --track-max-age 60
 
+# Model selection (v0.3.0)
+python src/main.py --list-models
+python src/main.py --model yolo12n
+python src/main.py --model rtmdet_nano
+
 # Disable models for speed
 python src/main.py --no-face --no-gesture --no-pose --no-depth
 

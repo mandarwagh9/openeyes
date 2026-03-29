@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="#about">
-    <img src="https://img.shields.io/badge/Version-v0.2.2-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
+    <img src="https://img.shields.io/badge/Version-v0.3.0-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-Apache_2.0-1a1a2e?style=for-the-badge" alt="License" />

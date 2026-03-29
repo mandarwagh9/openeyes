@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.2.2  
+> **Version**: v0.3.0  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,35 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.3.0] - 2026-03-29
+
+### Added
+
+- **Model Registry**
+  - New `ModelRegistry` class in `src/models/model_registry.py`
+  - Supports YOLO11, YOLO12, RTMDet models
+  - Lists available models with descriptions
+  - `suggest_model()` for FPS-based recommendations
+
+- **Specialized Models**
+  - `GraspDetector` for robot manipulation
+  - `FallDetector` for safety monitoring (pose-based fallback)
+  - Located in `src/models/specialized.py`
+
+- **New CLI Flags**
+  - `--model` - Select detection model (yolo11n, yolo12n, rtmdet_nano)
+  - `--list-models` - List all available models
+
+### Changed
+
+- **Model Options**
+  - Added model selection support
+  - Added specialized models (grasp, fall detection)
+
+- **Version Bump**: v0.2.2 → v0.3.0
 
 ---
 

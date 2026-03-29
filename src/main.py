@@ -49,7 +49,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.2.2")
+    print(f"  Version: v0.3.0")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -850,6 +850,17 @@ def main() -> None:
         help="Use DLA for inference (Jetson only)",
     )
     parser.add_argument(
+        "--model",
+        type=str,
+        default="yolo11n",
+        help="Model to use (yolo11n, yolo12n, rtmdet_nano, grasp_detector)",
+    )
+    parser.add_argument(
+        "--list-models",
+        action="store_true",
+        help="List available models",
+    )
+    parser.add_argument(
         "--no-monitoring",
         action="store_true",
         help="Disable performance monitoring",
@@ -908,7 +919,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.2.2",
+        version="OpenEyes v0.3.0",
     )
     parser.add_argument(
         "--info",
@@ -923,6 +934,22 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+
+    if args.list_models:
+        from src.models.model_registry import ModelRegistry
+        print("=" * 50)
+        print("Available Models")
+        print("=" * 50)
+        print("\n[Detection Models]")
+        for model in ModelRegistry.get_detection_models():
+            info = ModelRegistry.get_model_info(model)
+            print(f"  {model}: {info['description']}")
+        print("\n[Specialized Models]")
+        for model in ModelRegistry.get_specialized_models():
+            info = ModelRegistry.get_model_info(model)
+            print(f"  {model}: {info['description']}")
+        print("=" * 50)
+        sys.exit(0)
 
     if args.info:
         show_system_info()
