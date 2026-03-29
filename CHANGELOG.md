@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.4.0  
+> **Version**: v0.4.1  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,22 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.4.1] - 2026-03-29
+
+### Enhanced
+
+- **Debug Display Overhaul** (`src/main.py`)
+  - Added real-time FPS counter overlay (top-left)
+  - Added latency display (avg/min/max in ms)
+  - Added memory usage (used/total in MB)
+  - Added frame and detection counters
+  - Added per-model inference timing (top-right)
+  - Added track ID visualization with unique colors
+  - Added pose skeleton overlay
+  - Gesture labels now shown at bottom of frame
 
 ---
 

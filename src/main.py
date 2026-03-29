@@ -717,6 +717,69 @@ class VisionSystem:
         return faces, gestures, pose
 
     def _debug_display(self, frame, result: VisionResult) -> None:
+        h, w = frame.shape[:2]
+        
+        stats = self._perf_monitor.get_stats()
+        
+        overlay_y = 30
+        line_height = 25
+        
+        stats_lines = [
+            f"FPS: {stats.fps:.1f}",
+            f"Latency: {stats.avg_latency_ms:.1f}ms (min: {stats.min_latency_ms:.1f}, max: {stats.max_latency_ms:.1f})",
+            f"Memory: {stats.memory_used_mb:.0f}MB / {stats.memory_total_mb:.0f}MB",
+            f"Frame: {stats.frame_count} | Detections: {stats.detection_count}",
+        ]
+        
+        for line in stats_lines:
+            cv2.putText(
+                frame,
+                line,
+                (10, overlay_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 255, 0),
+                2,
+            )
+            cv2.putText(
+                frame,
+                line,
+                (10, overlay_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (0, 0, 0),
+                1,
+            )
+            overlay_y += line_height
+        
+        if stats.model_times:
+            model_y = 30
+            model_lines = [f"Model Times:"]
+            for model_name, model_time in stats.model_times.items():
+                model_lines.append(f"  {model_name}: {model_time:.1f}ms")
+            
+            for line in model_lines:
+                text_size = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+                cv2.putText(
+                    frame,
+                    line,
+                    (w - text_size[0] - 10, model_y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 0),
+                    2,
+                )
+                cv2.putText(
+                    frame,
+                    line,
+                    (w - text_size[0] - 10, model_y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (0, 0, 0),
+                    1,
+                )
+                model_y += line_height
+        
         for det in result.objects:
             bbox = det.bbox
             cv2.rectangle(
@@ -746,6 +809,76 @@ class VisionSystem:
                 (255, 0, 0),
                 2,
             )
+            cv2.putText(
+                frame,
+                f"Face {face.confidence:.2f}",
+                (int(bbox.x1), int(bbox.y1) - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                (255, 0, 0),
+                2,
+            )
+
+        for track in result.tracks:
+            bbox = track.bbox
+            color = ((track.track_id * 37) % 255, (track.track_id * 73) % 255, (track.track_id * 151) % 255)
+            cv2.rectangle(
+                frame,
+                (int(bbox.x1), int(bbox.y1)),
+                (int(bbox.x2), int(bbox.y2)),
+                color,
+                2,
+            )
+            label = f"ID:{track.track_id} {track.class_name}"
+            cv2.putText(
+                frame,
+                label,
+                (int(bbox.x1), int(bbox.y1) - 10),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.5,
+                color,
+                2,
+            )
+
+        gesture_y = h - 30
+        for gesture in result.gestures:
+            label = f"{gesture.gesture_type} ({gesture.handedness}) {gesture.confidence:.2f}"
+            cv2.putText(
+                frame,
+                label,
+                (10, gesture_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 255, 255),
+                2,
+            )
+            gesture_y -= 25
+
+        if result.pose and result.pose.detected and result.pose.landmarks:
+            pose_connections = [
+                (0, 1), (1, 2), (2, 3), (3, 7),
+                (0, 4), (4, 5), (5, 6), (6, 8),
+                (9, 10), (11, 12), (11, 13), (13, 15),
+                (12, 14), (14, 16), (11, 23), (12, 24),
+                (23, 24), (23, 25), (25, 27), (24, 26), (26, 28),
+            ]
+            
+            for lm in result.pose.landmarks:
+                cx, cy = int(lm.x * w), int(lm.y * h)
+                cv2.circle(frame, (cx, cy), 4, (0, 0, 255), -1)
+            
+            for start_idx, end_idx in pose_connections:
+                if (start_idx < len(result.pose.landmarks) and 
+                    end_idx < len(result.pose.landmarks)):
+                    start = result.pose.landmarks[start_idx]
+                    end = result.pose.landmarks[end_idx]
+                    cv2.line(
+                        frame,
+                        (int(start.x * w), int(start.y * h)),
+                        (int(end.x * w), int(end.y * h)),
+                        (0, 0, 255),
+                        2,
+                    )
 
         display_frame = cv2.resize(frame, (640, 360))
         cv2.imshow("OpenEyes Debug", display_frame)
@@ -934,7 +1067,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.4.0",
+        version="OpenEyes v0.4.1",
     )
     parser.add_argument(
         "--info",
