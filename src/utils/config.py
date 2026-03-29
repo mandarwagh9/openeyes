@@ -176,6 +176,26 @@ class Config:
         return self.get("tracking", "follow_enabled", default=False)
 
     @property
+    def ros2_qos_profile(self) -> str:
+        return self.get("ros2", "qos_profile", default="default")
+
+    @property
+    def ros2_actions_enabled(self) -> bool:
+        return self.get("ros2", "actions_enabled", default=False)
+
+    @property
+    def ros2_time_sync(self) -> bool:
+        return self.get("ros2", "time_sync", default=False)
+
+    @property
+    def multi_camera_enabled(self) -> bool:
+        return self.get("multi_camera", "enabled", default=False)
+
+    @property
+    def multi_camera_sources(self) -> list:
+        return self.get("multi_camera", "sources", default=[0])
+
+    @property
     def debug(self) -> bool:
         return self.get("debug", default=False)
 

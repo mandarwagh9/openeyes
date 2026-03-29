@@ -56,6 +56,9 @@ tracking:
 ros2:
   enabled: false
   node_name: "openeyes_vision"
+  qos_profile: "default"  # default, sensor, command, best_effort, reliable
+  actions_enabled: false
+  time_sync: false
   topics:
     detections: "/vision/detections"
     depth: "/vision/depth"
@@ -67,5 +70,9 @@ ros2:
   frame_id: "camera_link"
   confidence_threshold: 0.5
   max_depth_range: 5.0
+
+multi_camera:
+  enabled: false
+  sources: [0]  # List of camera indices
 
 debug: false

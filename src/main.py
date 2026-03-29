@@ -49,7 +49,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.2.1")
+    print(f"  Version: v0.2.2")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -882,9 +882,33 @@ def main() -> None:
         help="Enable ROS2 publishing (requires ros-humble-vision-msgs)",
     )
     parser.add_argument(
+        "--ros2-qos",
+        type=str,
+        default="default",
+        choices=["default", "sensor", "command", "best_effort", "reliable"],
+        help="ROS2 QoS profile (default, sensor, command, best_effort, reliable)",
+    )
+    parser.add_argument(
+        "--ros2-actions",
+        action="store_true",
+        help="Enable ROS2 action server for robot control",
+    )
+    parser.add_argument(
+        "--multi-camera",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Enable multi-camera mode (list camera indices)",
+    )
+    parser.add_argument(
+        "--ros2-time-sync",
+        action="store_true",
+        help="Use ROS2 time for synchronization",
+    )
+    parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.2.1",
+        version="OpenEyes v0.2.2",
     )
     parser.add_argument(
         "--info",

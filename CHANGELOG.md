@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.2.1  
+> **Version**: v0.2.2  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,45 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.2.2] - 2026-03-29
+
+### Added
+
+- **ROS2 Action Server**
+  - New `VisionActionServer` class in `src/ros2/actions.py`
+  - Support for follow, detect, track actions
+  - Publishes to `/cmd_vel` for robot control
+
+- **ROS2 QoS Configuration**
+  - New `--ros2-qos` CLI flag
+  - Configurable profiles: default, sensor, command, best_effort, reliable
+  - `QoSConfig` helper class
+
+- **Multi-Camera Support**
+  - New `--multi-camera` CLI flag
+  - `MultiCameraManager` for handling multiple cameras
+  - Configurable in config.yaml under `multi_camera` section
+
+- **Time Synchronization**
+  - New `--ros2-time-sync` CLI flag
+  - `TimeSyncManager` for synchronized timestamps
+
+- **New CLI Flags**
+  - `--ros2-qos` - QoS profile selection
+  - `--ros2-actions` - Enable action server
+  - `--multi-camera` - Multi-camera mode
+  - `--ros2-time-sync` - Use ROS2 time sync
+
+### Changed
+
+- **Config Updates**
+  - Added `ros2.qos_profile`, `ros2.actions_enabled`, `ros2.time_sync`
+  - Added `multi_camera` section with enabled, sources
+
+- **Version Bump**: v0.2.1 → v0.2.2
 
 ---
 

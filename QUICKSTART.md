@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.2.1  
+> **Version**: v0.2.2  
 > **Estimated Time**: 5 minutes
 
 ---
