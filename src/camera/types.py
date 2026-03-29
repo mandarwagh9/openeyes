@@ -1,5 +1,8 @@
 from dataclasses import dataclass
-from typing import List, Optional, Protocol
+from typing import List, Optional, Protocol, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 @dataclass
@@ -23,6 +26,7 @@ class Detection:
 @dataclass
 class DepthData:
     enabled: bool
+    depth_map: Optional["np.ndarray"] = None
     min_distance: Optional[float] = None
     max_distance: Optional[float] = None
 
