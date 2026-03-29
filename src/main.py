@@ -49,7 +49,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.3.0")
+    print(f"  Version: v0.4.0")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -861,6 +861,21 @@ def main() -> None:
         help="List available models",
     )
     parser.add_argument(
+        "--vla",
+        action="store_true",
+        help="Enable VLA (Vision-Language-Action) for intelligent control",
+    )
+    parser.add_argument(
+        "--event-camera",
+        action="store_true",
+        help="Enable event camera processing",
+    )
+    parser.add_argument(
+        "--advanced-ai",
+        action="store_true",
+        help="Enable all advanced AI features (VLA + event camera)",
+    )
+    parser.add_argument(
         "--no-monitoring",
         action="store_true",
         help="Disable performance monitoring",
@@ -919,7 +934,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.3.0",
+        version="OpenEyes v0.4.0",
     )
     parser.add_argument(
         "--info",

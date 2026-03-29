@@ -34,6 +34,11 @@ python src/main.py --list-models
 python src/main.py --model yolo12n
 python src/main.py --model rtmdet_nano
 
+# Advanced AI (v0.4.0)
+python src/main.py --vla
+python src/main.py --event-camera
+python src/main.py --advanced-ai
+
 # Disable models for speed
 python src/main.py --no-face --no-gesture --no-pose --no-depth
 
