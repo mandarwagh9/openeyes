@@ -1,218 +1,215 @@
 # OpenEyes - Robot Vision System
 
-<p align="center">
-  <pre style="font-family: monospace; font-size: 11px; font-weight: bold; color: #1a1a2e; background: #f0f0f0; padding: 15px; border-radius: 8px; text-align: center;">
+```
  ___  ____  _____ _   _ _______   _______ ____   
 / _ \|  _ \| ____| \ | | ____\ \ / / ____/ ___|  
 | | | | |_) |  _| |  \| |  _|  \ V /|  _| \___ \  
 | |_| |  __/| |___| |\  | |___  | | | |___ ___) | 
  \___/|_|   |_____|_| \_|_____| |_| |_____|____/ 
-      OpenEyes
- Vision System for Humanoid Robots
-  </pre>
-</p>
+```
 
-<p align="center">
-  <a href="#about">
-    <img src="https://img.shields.io/badge/Version-v0.4.0-1a1a2e?style=for-the-badge&logo=version-control&logoColor=white" alt="Version" />
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-Apache_2.0-1a1a2e?style=for-the-badge" alt="License" />
-  </a>
-  <a href="#tech-stack">
-    <img src="https://img.shields.io/badge/Tech-NVIDIA_Jetson-1a1a2e?style=for-the-badge&logo=nvidia&logoColor=white" alt="Tech Stack" />
-  </a>
-  <a href="CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/Welcome-Contributions-1a1a2e?style=for-the-badge" alt="Contributing" />
-  </a>
-</p>
+**Version**: v0.4.0 | **Platform**: NVIDIA Jetson Orin Nano
 
 ---
 
-## About
+## What is OpenEyes?
 
-**OpenEyes** is a vision system for humanoid robots - the "eyes" that enable robots to perceive and understand the physical world. Built on NVIDIA Jetson Orin Nano, it provides real-time AI-powered computer vision capabilities running entirely on-device (Edge AI).
+OpenEyes is a vision system for humanoid robots - the "eyes" that enable robots to perceive the physical world. It runs entirely on-device (Edge AI) with no cloud required.
 
-### Key Features
+### What It Does
 
-- 👁️ **Object Detection** - Recognize everyday objects in real-time (YOLO11n)
-- 📊 **Depth Estimation** - Understand 3D environment from 2D camera (MiDaS)
-- 👤 **Face Detection** - Locate and track faces
-- 🖐️ **Gesture Recognition** - Understand human hand signals
-- 🦵 **Pose Estimation** - Detect human body poses
-- ⚡ **Real-time Performance** - 10-25 FPS (configurable via --no-* flags)
-- 🔒 **Privacy-first** - All processing done locally, no cloud required
-- 🤖 **ROS2 Ready** - Vision data publishing for robot control
-- 📟 **Command Subscription** - Subscribe to `/vision/cmd` for robot commands (forward, backward, stop, left, right, follow)
-- 🎛️ **Model Control** - Disable unused models with --no-face, --no-gesture, --no-pose, --no-depth flags
-
----
-
-## Why OpenEyes?
-
-A humanoid robot needs vision like humans need eyes. OpenEyes provides:
-
-| Capability | Human Equivalent | Use Case |
-|:-----------|:----------------|:---------|
-| Object Detection | "That's a cup" | Find objects to grasp |
-| Depth Estimation | "The table is 50cm away" | Navigation & avoidance |
-| Face Detection | "Someone is there" | Presence detection |
-| Gesture Recognition | "Stop sign" | Understand commands |
-| Pose Estimation | "Person sitting" | Activity recognition |
-
----
-
-## Hardware
-
-| Component | Specification |
-|:----------|:-------------|
-| **Platform** | NVIDIA Jetson Orin Nano (4GB/8GB) |
-| **Camera** | CSI Camera (IMX219) or USB Webcam |
-| **OS** | JetPack (Ubuntu 22.04) |
-| **Power** | 5V/4A barrel jack |
-| **Storage** | MicroSD 64GB+ |
-
-### Performance Targets
-
-| Metric | Target | v0.1.1 Actual |
-|:-------|:-------|:--------------|
-| FPS | 20-30 FPS | 10-12 (all), 22-25 (minimal) |
-| Latency | <50ms | ~40ms |
-| Detection Range | 0.5m - 5m | 0.5m - 5m |
-| Model Size | <10MB | 5.4MB |
-
----
-
-## Tech Stack
-
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=python,tensorflow,pytorch,opencv,docker" />
-</p>
-
-| Layer | Technology |
-|:------|:-----------|
-| **AI Framework** | PyTorch, ONNX Runtime, TensorRT |
-| **Vision** | OpenCV, CUDA, GStreamer, DeepStream |
-| **Models** | YOLO11n, MediaPipe, MiDaS |
-| **Deployment** | TensorRT optimization (FP16/INT8) |
-| **Communication** | JSON, UDP, ROS2 |
-
-> **Note:** YOLO11n uses AGPL-3.0 license. For commercial use, consider RTMDet (Apache 2.0).
+| Capability | Description |
+|:-----------|:------------|
+| Object Detection | Recognize 80+ everyday objects |
+| Depth Estimation | Measure distance to objects |
+| Face Detection | Locate and track faces |
+| Gesture Recognition | Understand hand signals |
+| Pose Estimation | Detect body poses |
+| Object Tracking | Track objects across frames |
+| Person Following | Follow a person autonomously |
+| ROS2 Integration | Publish vision data to robot |
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone the repository
+# Clone and install
 git clone https://github.com/mandarwagh9/openeyes.git
 cd openeyes
-
-# Install dependencies
 pip install -r requirements.txt
 
-# Enable max performance (Jetson)
-sudo nvpmodel -m 0
-sudo jetson_clocks
+# Run (basic)
+python src/main.py
 
-# Run the vision system
+# Run with debug window
 python src/main.py --debug
-
-# Run with ROS2 publishing
-python src/main.py --ros2
 ```
 
-See [QUICKSTART.md](QUICKSTART.md) for detailed setup instructions.
+### First Time on Jetson?
+
+```bash
+# Enable max performance (run once)
+sudo nvpmodel -m 0
+sudo jetson_clocks
+```
 
 ---
 
-## Project Structure
+## Common Commands
 
+### Basic
+```bash
+python src/main.py                      # Default run
+python src/main.py --camera 0           # Specific camera
+python src/main.py --debug              # Show video window
 ```
-openeyes/
-├── src/
-│   ├── camera/           # Camera input handling (CSI + USB)
-│   ├── models/           # AI model wrappers
-│   │   ├── object_detector.py    # YOLO11n
-│   │   ├── depth_estimator.py    # MiDaS
-│   │   ├── face_detector.py      # MediaPipe
-│   │   ├── gesture_recognizer.py # MediaPipe
-│   │   └── pose_estimator.py    # MediaPipe
-│   ├── output/           # Output handlers (JSON, UDP)
-│   ├── ros2/            # ROS2 integration nodes
-│   ├── deepstream/      # DeepStream pipeline scripts
-│   └── utils/           # Utilities (frame skipping, config)
-├── models/              # AI model weights (YOLO11n, MiDaS)
-├── docs/                # Technical documentation
-├── tests/               # Test suites
-├── requirements.txt     # Python dependencies
-└── README.md            # This file
+
+### Speed Optimization
+```bash
+# Maximum speed (30+ FPS)
+python src/main.py --no-face --no-gesture --no-pose --no-depth --precision int8
+
+# Balanced (good speed + features)
+python src/main.py --no-depth --precision fp16
 ```
+
+### ROS2 Integration
+```bash
+# Enable ROS2 publishing
+python src/main.py --ros2
+
+# With actions and QoS
+python src/main.py --ros2 --ros2-actions --ros2-qos sensor
+```
+
+### Tracking & Following
+```bash
+# Enable person following
+python src/main.py --follow
+```
+
+### Select Model
+```bash
+# List available models
+python src/main.py --list-models
+
+# Use specific model
+python src/main.py --model yolo12n
+python src/main.py --model rtmdet_nano
+```
+
+---
+
+## Performance
+
+| Configuration | Expected FPS |
+|:--------------|:-------------|
+| All models enabled | 10-15 FPS |
+| No depth/face/gesture/pose | 25-30 FPS |
+| INT8 + minimal models | 30-40 FPS |
+
+### Optimize Further
+
+```bash
+# TensorRT INT8 (~2x faster)
+python src/main.py --precision int8
+
+# Batch inference
+python src/main.py --batch-size 4
+
+# Use DLA (Jetson)
+python src/main.py --dla
+```
+
+### Jetson Scripts
+
+```bash
+sudo bash scripts/jetson_perf.sh      # Optimize performance
+python3 scripts/jetson_helper.py       # System info
+python3 scripts/jetson_helper.py --check  # Check status
+```
+
+---
+
+## Output
+
+### UDP/JSON Format
+Vision results sent to `--host` (default: 127.0.0.1:5000)
+
+### ROS2 Topics
+| Topic | Type |
+|:------|:-----|
+| `/vision/detections` | JSON |
+| `/vision/depth` | JSON |
+| `/vision/faces` | JSON |
+| `/vision/gestures` | JSON |
+| `/vision/poses` | JSON |
+| `/vision/cmd` | Subscribe |
+| `/vision/status` | JSON |
+
+### Robot Commands (from `/vision/cmd`)
+- `forward` / `backward` / `stop`
+- `left` / `right` / `follow`
+
+---
+
+## Hardware
+
+| Component | Specification |
+|:----------|:--------------|
+| Platform | NVIDIA Jetson Orin Nano |
+| Camera | CSI (IMX219) or USB |
+| Power | 5V/4A |
+| OS | Ubuntu 22.04 + JetPack |
+
+---
+
+## Troubleshooting
+
+**No camera detected**
+```bash
+ls /dev/video*
+# If empty, check camera connection and reboot
+```
+
+**Low FPS**
+```bash
+# Disable unused models
+python src/main.py --no-face --no-gesture --no-pose --no-depth
+
+# Lower resolution
+python src/main.py --width 480 --height 360
+```
+
+**ROS2 not working**
+```bash
+# Check ROS2 installation
+ros2 doctor
+
+# Verify topics
+ros2 topic list
+```
+
+---
+
+## All Commands
+
+See [COMMANDS.md](COMMANDS.md) for the complete command reference.
 
 ---
 
 ## Documentation
 
-### Getting Started
-- [QUICKSTART.md](QUICKSTART.md) - 5-minute setup guide
-- [INSTALL.md](INSTALL.md) - Detailed installation
-- [USER_GUIDE.md](USER_GUIDE.md) - How to use the system
-
-### Performance & Optimization
-- [OPTIMIZATION.md](OPTIMIZATION.md) - Performance tuning guide (15+ FPS)
-- [DEEPSTREAM.md](DEEPSTREAM.md) - DeepStream SDK integration
-
-### Technical
-- [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) - Full technical specification
-- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - System architecture
-- [HARDWARE.md](docs/HARDWARE.md) - Hardware specifications
-- [API_SPEC.md](docs/API_SPEC.md) - API documentation
-
-### Developer
-- [AGENTS.md](AGENTS.md) - Developer guidelines
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Contribution guidelines
-- [ROADMAP.md](ROADMAP.md) - Project roadmap
-- [CHANGELOG.md](CHANGELOG.md) - Version history
-- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Common issues and solutions
-
----
-
-## Capabilities Roadmap
-
-| Phase | Capabilities | Status |
-|:------|:------------|:-------|
-| v0.0.1 | Object Detection | Complete |
-| v0.0.2 | Depth, Face, Gesture, Pose | Complete |
-| v0.0.3 | YOLO11n, Frame Skipping, ROS2 | Complete |
-| v0.1.0 | Command Subscription, Full ROS2 | Complete |
-| v1.0.0 | Production Integration | In Progress |
-
----
-
-## Contributing
-
-Contributions are welcome! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) before getting started.
+- [COMMANDS.md](COMMANDS.md) - Full command list
+- [USER_GUIDE.md](USER_GUIDE.md) - Detailed usage
+- [INSTALL.md](INSTALL.md) - Installation guide
+- [OPTIMIZATION.md](OPTIMIZATION.md) - Performance tuning
 
 ---
 
 ## License
 
-This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
+Apache 2.0 - See [LICENSE](LICENSE) file.
 
-> **License Note:** YOLOv10 model used in this project is licensed under AGPL-3.0. The inference code itself does not impose additional restrictions, but if you distribute modified model weights, you may need to comply with AGPL-3.0 requirements.
-
----
-
-## References
-
-- [NVIDIA Jetson](https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/)
-- [YOLOv10 Documentation](https://docs.ultralytics.com/)
-- [MediaPipe](https://mediapipe.dev/)
-- [MiDaS Depth Estimation](https://github.com/isl-org/MiDaS)
-- [TensorRT](https://developer.nvidia.com/tensorrt)
-
----
-
-<p align="center">
-  <sub>Built with ⚡ for the future of humanoid robotics</sub>
-</p>
+> **Note**: YOLO models use AGPL-3.0 license. RTMDet (Apache 2.0) available as alternative.
