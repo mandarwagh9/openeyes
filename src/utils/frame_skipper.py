@@ -52,16 +52,20 @@ class AdaptiveFrameSkipper:
         self.previous_frame: Optional[np.ndarray] = None
 
     def compute_motion(self, frame: np.ndarray) -> float:
+        h, w = frame.shape[:2]
+        
         if self.previous_frame is None:
-            self.previous_frame = frame.copy()
+            self.previous_frame = np.empty((h, w), dtype=np.uint8)
+            cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY, dst=self.previous_frame)
             return 0.0
 
-        gray1 = cv2.cvtColor(self.previous_frame, cv2.COLOR_BGR2GRAY)
-        gray2 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        diff = cv2.absdiff(gray1, gray2)
+        gray = np.empty((h, w), dtype=np.uint8)
+        cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY, dst=gray)
+        
+        diff = cv2.absdiff(self.previous_frame, gray)
         motion_score = float(cv2.countNonZero(diff))
 
-        self.previous_frame = frame.copy()
+        self.previous_frame = gray
         return motion_score
 
     def should_process(self, frame: np.ndarray) -> bool:
