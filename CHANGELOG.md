@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.1.0  
-> **Last Updated**: 2026-03-28
+> **Version**: v0.1.1  
+> **Last Updated**: 2026-03-29
 
 ---
 
@@ -9,6 +9,63 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.1.1] - 2026-03-29
+
+### Added
+
+- **--no-depth CLI Flag**
+  - New flag to disable depth estimation for maximum FPS
+  - Depth estimation is computationally expensive
+
+- **Model Enable/Disable Flags Now Working**
+  - `--no-face`, `--no-gesture`, `--no-pose` were defined but not wired
+  - Now properly skip model initialization when specified
+
+- **Jetson Optimization Hint**
+  - Startup message: "Run 'sudo nvpmodel -m 0 && sudo jetson_clocks' for max performance"
+  - Auto-detects Jetson platform via `/proc/device-tree/model`
+
+- **Model Status Logging**
+  - Startup logs show which models are enabled/disabled
+  - Helps verify configuration at startup
+
+### Changed
+
+- **More Aggressive Frame Skipping (Default)**
+  - depth: 4 → 8 (every 8th frame)
+  - face: 4 → 6 (every 6th frame)
+  - gesture: 4 → 6 (every 6th frame)
+  - pose: 4 → 6 (every 6th frame)
+
+- **Adaptive Skipper Parameters**
+  - base_skip: 3 → 2
+  - min_skip: 2 → 1
+  - max_skip: 5 → 4
+
+### Performance
+
+| Configuration | Expected FPS |
+|:-------------|:------------|
+| All models enabled (default) | ~10-12 |
+| --no-face --no-gesture --no-pose | ~18-22 |
+| --no-face --no-gesture --no-pose --no-depth | ~22-25 |
+| + Jetson max performance (sudo nvpmodel -m 0 && sudo jetson_clocks) | +20-30% |
+
+### CLI New Flags
+
+```bash
+# Disable specific models for speed
+python src/main.py --no-face              # Skip face detection
+python src/main.py --no-gesture           # Skip gesture recognition  
+python src/main.py --no-pose              # Skip pose estimation
+python src/main.py --no-depth             # Skip depth estimation (NEW)
+
+# Disable multiple models
+python src/main.py --no-face --no-gesture --no-pose --no-depth
+```
 
 ---
 
@@ -236,10 +293,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned for v1.0.0
 
-- [ ] Performance optimization (target: 15+ FPS)
-- [ ] ROS2 integration
 - [ ] Multi-camera support
 - [ ] Production hardening
+- [ ] Motor control integration
+- [ ] Further FPS optimization (target: 25-30 FPS)
 
 ### Planned for v1.1.0
 
