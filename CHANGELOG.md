@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.4.1  
+> **Version**: v0.4.2  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.4.2] - 2026-03-29
+
+### Fixed
+
+- **Gesture Detection** (`src/models/gesture_recognizer.py`)
+  - Rewrote `_classify_gesture()` with correct MediaPipe landmark interpretation
+  - Added "victory" gesture (index + middle extended)
+  - Fixed "thumbs_up" detection (thumb above other fingers)
+  - Added "ok_sign", "three", "two", "one", "thumbs_down" gestures
+  - Fixed finger detection logic (Y increases downward in image coords)
+
+### Enhanced
+
+- **Debug Display** (`src/main.py`)
+  - Increased display size from 640x360 to 1280x720
 
 ---
 

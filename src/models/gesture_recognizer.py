@@ -78,33 +78,53 @@ class GestureRecognizer:
         ring_tip = landmarks[16]
         pinky_tip = landmarks[20]
 
-        thumb_ip = landmarks[3]
         index_pip = landmarks[6]
         middle_pip = landmarks[10]
         ring_pip = landmarks[14]
         pinky_pip = landmarks[18]
 
-        fingers = []
-        fingers.append(thumb_tip.x > thumb_ip.x)
-        fingers.append(index_tip.y < index_pip.y)
-        fingers.append(middle_tip.y < middle_pip.y)
-        fingers.append(ring_tip.y < ring_pip.y)
-        fingers.append(pinky_tip.y < pinky_pip.y)
+        index_mcp = landmarks[5]
+        middle_mcp = landmarks[9]
+        ring_mcp = landmarks[13]
+        pinky_mcp = landmarks[17]
 
-        fingers_count = sum(fingers)
+        is_extended = [
+            index_tip.y < index_pip.y,
+            middle_tip.y < middle_pip.y,
+            ring_tip.y < ring_pip.y,
+            pinky_tip.y < pinky_pip.y,
+        ]
 
-        if fingers_count == 5:
+        fingers_count = sum(is_extended)
+
+        thumb_extended = (
+            thumb_tip.y < landmarks[3].y and
+            thumb_tip.y < index_mcp.y
+        )
+
+        index_middle_extended = is_extended[0] and is_extended[1]
+        ring_pinky_curled = not is_extended[2] and not is_extended[3]
+
+        if fingers_count == 4 and not thumb_extended:
             return "open_palm"
-        elif fingers_count == 0:
+        elif fingers_count == 0 or (fingers_count == 0 and thumb_extended):
             return "fist"
-        elif fingers[1] and fingers[2] and not fingers[3] and not fingers[4]:
-            return "peace"
-        elif fingers[1] and not fingers[2]:
+        elif index_middle_extended and ring_pinky_curled:
+            return "victory"
+        elif is_extended[0] and not is_extended[1] and not is_extended[2] and not is_extended[3]:
             return "point"
-        elif fingers[0] and fingers[1] and fingers[2] and not fingers[3] and not fingers[4]:
+        elif thumb_extended and not any(is_extended[:3]) and not is_extended[3]:
             return "thumbs_up"
-        elif fingers[0] and not fingers[1]:
+        elif thumb_extended and is_extended[0] and not any(is_extended[1:3]):
             return "ok_sign"
+        elif fingers_count == 3 and is_extended[0] and is_extended[1] and is_extended[2]:
+            return "three"
+        elif fingers_count == 2 and is_extended[0] and is_extended[1]:
+            return "two"
+        elif fingers_count == 1 and is_extended[0]:
+            return "one"
+        elif fingers_count == 0 and thumb_extended:
+            return "thumbs_down"
         else:
             return f"unknown_{fingers_count}"
 

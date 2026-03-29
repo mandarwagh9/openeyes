@@ -880,7 +880,7 @@ class VisionSystem:
                         2,
                     )
 
-        display_frame = cv2.resize(frame, (640, 360))
+        display_frame = cv2.resize(frame, (1280, 720))
         cv2.imshow("OpenEyes Debug", display_frame)
         cv2.waitKey(1)
 
@@ -1067,7 +1067,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.4.1",
+        version="OpenEyes v0.4.2",
     )
     parser.add_argument(
         "--info",
