@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.1.2  
+> **Version**: v0.2.0  
 > **Last Updated**: 2026-03-29
 
 ---
@@ -9,6 +9,48 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.2.0] - 2026-03-29
+
+### Added
+
+- **Performance Monitoring**
+  - New `PerformanceMonitor` class in `src/utils/performance_monitor.py`
+  - Tracks FPS, latency, memory usage, per-model inference times
+  - Configurable via config.yaml `performance.monitoring` section
+
+- **TensorRT INT8 Support**
+  - Added `--precision` CLI flag (fp32, fp16, int8)
+  - Configurable via `performance.tensorrt.precision`
+  - INT8 provides ~2x speedup over FP16 on Jetson
+
+- **DLA Offloading Support**
+  - Added `--dla` CLI flag for Deep Learning Accelerator
+  - Configurable via `performance.tensorrt.dla_enabled`
+  - Offloads inference to Jetson DLA for even lower latency
+
+- **Batch Inference**
+  - Added `--batch-size` CLI flag
+  - Configurable via `performance.batch_inference` section
+  - Supports dynamic batching for throughput optimization
+
+- **New CLI Flags**
+  - `--deepstream` - Use DeepStream pipeline
+  - `--precision` - TensorRT precision (fp32/fp16/int8)
+  - `--dla` - Use DLA for inference
+  - `--batch-size` - Batch size for inference
+  - `--no-monitoring` - Disable performance monitoring
+
+### Changed
+
+- **Config Updates**
+  - Added `performance.tensorrt` section for precision, DLA settings
+  - Added `performance.batch_inference` section for batching
+  - Added `performance.monitoring` section for stats
+
+- **Version Bump**: v0.1.2 → v0.2.0
 
 ---
 

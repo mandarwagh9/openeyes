@@ -116,6 +116,46 @@ class Config:
         return self.get("performance", "target_fps", default=30)
 
     @property
+    def use_tensorrt(self) -> bool:
+        return self.get("performance", "use_tensorrt", default=True)
+
+    @property
+    def tensorrt_precision(self) -> str:
+        return self.get("performance", "tensorrt", "precision", default="fp16")
+
+    @property
+    def tensorrt_dla_enabled(self) -> bool:
+        return self.get("performance", "tensorrt", "dla_enabled", default=False)
+
+    @property
+    def tensorrt_dla_core(self) -> int:
+        return self.get("performance", "tensorrt", "dla_core", default=0)
+
+    @property
+    def batch_inference_enabled(self) -> bool:
+        return self.get("performance", "batch_inference", "enabled", default=False)
+
+    @property
+    def batch_size(self) -> int:
+        return self.get("performance", "batch_inference", "batch_size", default=1)
+
+    @property
+    def max_batch_size(self) -> int:
+        return self.get("performance", "batch_inference", "max_batch_size", default=4)
+
+    @property
+    def performance_monitoring_enabled(self) -> bool:
+        return self.get("performance", "monitoring", "enabled", default=True)
+
+    @property
+    def performance_stats_interval(self) -> int:
+        return self.get("performance", "monitoring", "stats_interval_sec", default=5)
+
+    @property
+    def log_performance(self) -> bool:
+        return self.get("performance", "monitoring", "log_performance", default=True)
+
+    @property
     def debug(self) -> bool:
         return self.get("debug", default=False)
 

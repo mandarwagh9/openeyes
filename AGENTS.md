@@ -17,8 +17,12 @@ python src/main.py --ros2
 # Show version
 python src/main.py --version
 
-# Show system info (NEW in v0.1.2)
+# Show system info
 python src/main.py --info
+
+# Performance options (v0.2.0)
+python src/main.py --precision int8 --batch-size 2
+python src/main.py --dla
 
 # Disable models for speed
 python src/main.py --no-face --no-gesture --no-pose --no-depth

@@ -39,6 +39,7 @@ from src.output.udp_sender import UDPSender
 from src.utils.config import Config
 from src.utils.logger import setup_logger
 from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
+from src.utils.performance_monitor import PerformanceMonitor
 import platform
 
 
@@ -47,7 +48,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.1.2")
+    print(f"  Version: v0.2.0")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -127,6 +128,12 @@ class VisionSystem:
         self._use_gesture = True
         self._use_pose = True
         self._use_depth = True
+
+        self._perf_monitor = PerformanceMonitor(
+            enabled=config.performance_monitoring_enabled,
+            stats_interval=config.performance_stats_interval,
+            log_performance=config.log_performance,
+        )
 
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
@@ -395,14 +402,19 @@ class VisionSystem:
             if self._config.debug:
                 self._debug_display(frame, result)
 
+            self._perf_monitor.record_frame(len(result.objects))
+
             self._fps_counter += 1
             elapsed_total = time.time() - self._fps_start_time
             if elapsed_total >= 1.0:
                 fps = self._fps_counter / elapsed_total
+                stats = self._perf_monitor.get_stats()
                 self._logger.info(
                     f"FPS: {fps:.1f} | Objects: {len(result.objects)} | "
-                    f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)}"
+                    f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)} | "
+                    f"Mem: {stats.memory_used_mb:.0f}MB"
                 )
+                self._perf_monitor.log_stats()
                 if self._ros2_pub:
                     self._ros2_pub.publish_status(
                         fps,
@@ -776,6 +788,34 @@ def main() -> None:
         help="Disable parallel processing",
     )
     parser.add_argument(
+        "--deepstream",
+        action="store_true",
+        help="Use DeepStream pipeline for inference",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=1,
+        help="Batch size for inference (default: 1)",
+    )
+    parser.add_argument(
+        "--precision",
+        type=str,
+        default="fp16",
+        choices=["fp32", "fp16", "int8"],
+        help="TensorRT precision (fp32, fp16, int8)",
+    )
+    parser.add_argument(
+        "--dla",
+        action="store_true",
+        help="Use DLA for inference (Jetson only)",
+    )
+    parser.add_argument(
+        "--no-monitoring",
+        action="store_true",
+        help="Disable performance monitoring",
+    )
+    parser.add_argument(
         "--pose-every",
         type=int,
         default=2,
@@ -789,7 +829,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.1.2",
+        version="OpenEyes v0.2.0",
     )
     parser.add_argument(
         "--info",
@@ -838,6 +878,18 @@ def main() -> None:
             system._use_pose = False
         if args.no_depth:
             system._use_depth = False
+        if args.no_monitoring:
+            system._perf_monitor.enabled = False
+
+        if args.batch_size > 1:
+            config._config["performance"]["batch_inference"]["enabled"] = True
+            config._config["performance"]["batch_inference"]["batch_size"] = args.batch_size
+
+        if args.precision:
+            config._config["performance"]["tensorrt"]["precision"] = args.precision
+
+        if args.dla:
+            config._config["performance"]["tensorrt"]["dla_enabled"] = True
 
         system.start()
     except Exception as e:

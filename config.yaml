@@ -31,6 +31,20 @@ performance:
   max_latency_ms: 50
   use_tensorrt: true
   parallel_models: true
+  tensorrt:
+    precision: fp16  # fp16, int8, fp32
+    dla_enabled: false
+    dla_core: 0
+    workspace_size_gb: 1
+    dla_batch_size: 1
+  batch_inference:
+    enabled: false
+    batch_size: 1
+    max_batch_size: 4
+  monitoring:
+    enabled: true
+    stats_interval_sec: 5
+    log_performance: true
 
 ros2:
   enabled: false
