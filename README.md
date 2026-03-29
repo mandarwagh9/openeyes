@@ -1,5 +1,7 @@
 # OpenEyes
 
+**v0.4.0**
+
 ## We Give Robots Vision
 
 A humanoid robot needs to see the world like a human does. Not just pixels - but understanding. Distance. Intent. Action.
