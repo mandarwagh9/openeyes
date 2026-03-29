@@ -13,7 +13,7 @@ class FaceDetector:
     def __init__(
         self,
         model_selection: int = 0,
-        min_confidence: float = 0.5,
+        min_confidence: float = 0.3,
     ):
         self._model_selection = model_selection
         self._min_confidence = min_confidence
@@ -21,6 +21,7 @@ class FaceDetector:
         self._face_mesh = None
         self._mp_drawing = None
         self._mp_face_mesh = None
+        self._debug = False
 
     def load(self) -> None:
         try:
@@ -41,14 +42,19 @@ class FaceDetector:
         if self._face_mesh is None:
             raise ModelError("Model not loaded. Call load() first.")
 
+        if self._debug:
+            self._logger.info(f"[FACE] Processing frame shape: {frame.shape}")
+
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self._face_mesh.process(frame_rgb)
 
         faces = []
 
         if results.multi_face_landmarks:
+            if self._debug:
+                self._logger.info(f"[FACE] Found {len(results.multi_face_landmarks)} face(s)")
             h, w = frame.shape[:2]
-            for face_landmarks in results.multi_face_landmarks:
+            for idx, face_landmarks in enumerate(results.multi_face_landmarks):
                 x_coords = [lm.x * w for lm in face_landmarks.landmark]
                 y_coords = [lm.y * h for lm in face_landmarks.landmark]
 
@@ -57,11 +63,15 @@ class FaceDetector:
                 x2 = min(w, max(x_coords))
                 y2 = min(h, max(y_coords))
 
+                face_confidence = 0.5 + (0.4 * (1.0 - idx * 0.1))
+
                 face = FaceDetection(
                     bbox=BoundingBox(x1=x1, y1=y1, x2=x2, y2=y2),
-                    confidence=0.9,
+                    confidence=face_confidence,
                 )
                 faces.append(face)
+        elif self._debug:
+            self._logger.debug("No faces detected in frame")
 
         return faces
 
