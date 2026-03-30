@@ -205,6 +205,24 @@ Camera → ObjectDetector → JSON Formatter → UDP Sender + ROS2 Publisher
 - **Solution**: Added depth_map field to DepthData, wired estimator in pipeline, tracks last depth for frame skipping
 - **Files**: `src/camera/types.py`, `src/main.py`
 
+### Gesture Detection Not Working (v0.4.4)
+- **Problem**: MediaPipe Hands wasn't detecting hands at high resolution
+- **Solution**: Added image resizing to 640x480, lowered confidence to 0.1
+- **File**: `src/models/gesture_recognizer.py`
+
+### Person Following Distance Issues (v0.4.4)
+- **Problem**: System used bbox size for distance, relied on tracking continuity
+- **Solution**: Use bounding box HEIGHT RATIO (% of frame) for distance:
+  - forward: < 60% (person small = far away)
+  - stop: 60-95% (person medium = just right)
+  - backward: > 95% (person large = too close)
+- **File**: `src/utils/tracker.py`
+
+### Gesture-Based Owner Selection (v0.4.4)
+- **Problem**: Needed way to designate who robot should follow
+- **Solution**: Show open_palm gesture to become "owner", robot follows that person
+- **File**: `src/utils/tracker.py`
+
 ---
 
 ## ROS2 Integration
