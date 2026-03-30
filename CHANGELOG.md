@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.4.3  
-> **Last Updated**: 2026-03-29
+> **Version**: v0.4.4  
+> **Last Updated**: 2026-03-30
 
 ---
 
@@ -9,6 +9,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.4.4] - 2026-03-30
+
+### Fixed
+
+- **Gesture Detection** (`src/models/gesture_recognizer.py`)
+  - Lowered min_detection_confidence to 0.1
+  - Lowered min_tracking_confidence to 0.1
+  - Added image resizing to 640x480 for better MediaPipe detection
+
+### Enhanced
+
+- **Person Following** (`src/utils/tracker.py`)
+  - Added `get_follow_command_with_depth()` using bbox height ratio
+  - Added `set_owner_from_gesture()` for gesture-based owner selection
+  - Added `owner_track_id` property and `clear_owner()` method
+  - Distance zones: forward (<60%), stop (60-95%), backward (>95%)
+
+- **Configuration** (`config.yaml`, `src/utils/config.py`)
+  - Added `gesture.confidence` parameter
+  - Added `follow_distance_min` and `follow_distance_max` parameters
+
+- **Documentation** (`manifesto.md`)
+  - Complete rewrite for v0.4.4
+  - Vision system philosophy and architecture
+  - All 7 vision modalities documented
 
 ---
 
