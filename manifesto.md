@@ -1,14 +1,41 @@
-# AI + Embedded Systems: A Deep Systems-Level Explanation
+# OpenEyes Manifesto
 
-## 1. The Core Definition
+## v0.4.4
 
-At its most fundamental level:
+## We Give Robots Vision
 
-**AI + Embedded Systems = intelligence running directly inside physical devices.**
+A humanoid robot needs to see the world like a human does. Not just pixels - but understanding. Distance. Intent. Action.
 
-Instead of AI running only in large cloud servers, **AI models are embedded inside hardware devices that interact with the real world**.
+OpenEyes is an open-source vision system built for humanoid robots. It runs entirely on NVIDIA Jetson - no cloud, no lag, no dependencies.
 
-This means the device itself can:
+---
+
+## The Problem
+
+Every day, millions of robots are deployed to help humans. But most of them are blind. Or dependent on cloud services that fail. Or so expensive only big companies can afford them.
+
+We wanted to change that.
+
+---
+
+## Our Philosophy
+
+| Principle | What It Means |
+|:----------|:--------------|
+| **Edge First** | All processing happens on the robot. No round-trip to cloud. No latency. |
+| **Privacy First** | No data leaves the device. What the robot sees, stays with the robot. |
+| **Real-time** | 30 FPS isn't a dream - it's what we optimize for. |
+| **Open** | Built by the community, for the community. Anyone can use. Anyone can contribute. |
+
+---
+
+## Core Technical Vision
+
+### AI + Embedded Systems = Intelligence Running Directly on the Robot
+
+Instead of AI running only in large cloud servers, **AI models are embedded inside the robot** that interacts with the real world.
+
+This means the robot itself can:
 
 - perceive its environment
 - interpret data
@@ -17,22 +44,12 @@ This means the device itself can:
 
 without relying on a remote server.
 
-This concept is often called:
+### Why This Matters
 
-- **Embedded AI**
-- **Edge AI**
-- **On-device AI**
-
-All refer to the same paradigm: **AI inference happening locally on devices** rather than centralized infrastructure.
-
----
-
-## 2. Why This Paradigm Exists
-
-Traditional AI architecture looks like this:
+Traditional AI architecture for robots looks like this:
 
 ```
-Sensors → Internet → Cloud AI → Decision → Device
+Sensors → Internet → Cloud AI → Decision → Robot
 ```
 
 **Problems:**
@@ -42,13 +59,13 @@ Sensors → Internet → Cloud AI → Decision → Device
 - privacy concerns
 - dependency on internet
 
-Edge/embedded AI changes the architecture to:
+OpenEyes changes the architecture to:
 
 ```
-Sensors → Device AI → Decision → Actuator
+Camera → On-device AI → Decision → Actuator
 ```
 
-Now the device **thinks locally**.
+Now the robot **thinks locally**.
 
 This allows:
 
@@ -57,432 +74,177 @@ This allows:
 - improved privacy
 - lower network load
 
-These benefits are why **AI is moving from the cloud into devices**.
+---
+
+## What OpenEyes Sees
+
+```
+The robot looks at a room and understands:
+
+- "There's a cup on the table, 40cm away"
+- "A person is standing to my left"
+- "They're waving at me - that's a greeting"
+- "The person is sitting down - they might need help"
+- "That's a stair - don't step there"
+```
+
+### Vision Modalities
+
+| Modality | Technology | Purpose |
+|:---------|:-----------|:--------|
+| **Object Detection** | YOLO11n | What objects exist in the scene |
+| **Depth Estimation** | MiDaS | How far away is everything |
+| **Face Detection** | MediaPipe | Who's in the room |
+| **Gesture Recognition** | MediaPipe Hands | What commands are being given |
+| **Pose Estimation** | MediaPipe Pose | What positions are bodies in |
+| **Object Tracking** | Custom tracker | Follow that object |
+| **Person Following** | Bbox height ratio | Follow a person autonomously |
 
 ---
 
-## 3. The Three Technological Domains That Converged
+## Technical Architecture
 
-AI + embedded systems exists because **three industries merged**.
+### Layer 1: Hardware (Physical)
 
-### 1. Embedded Systems
+- **Platform**: NVIDIA Jetson Orin Nano
+- **Camera**: CSI (IMX219) or USB webcam at 1920x1080
+- **AI Accelerator**: Integrated GPU
 
-Specialized computing systems designed for specific tasks with limited power and memory.
+### Layer 2: Edge Processing
 
-**Examples:**
+All AI inference happens locally on the Jetson:
 
-- car ECUs
-- washing machines
-- drones
-- medical devices
+- YOLO11n for object detection
+- MiDaS for depth estimation
+- MediaPipe for face/gesture/pose
 
-### 2. Artificial Intelligence
+### Layer 3: ROS2 Integration
 
-Algorithms capable of recognizing patterns, predicting outcomes, and making decisions.
+The robot communicates via ROS2:
 
-**Examples:**
+| Topic | Type | Description |
+|:------|:-----|:------------|
+| `/vision/detections` | JSON | Object detections |
+| `/vision/depth` | JSON | Depth map data |
+| `/vision/faces` | JSON | Face detections |
+| `/vision/gestures` | JSON | Gesture recognitions |
+| `/vision/pose` | JSON | Body pose landmarks |
+| `/vision/status` | JSON | System status with timestamp |
+| `/vision/image/debug` | JSON | Debug image |
 
-- computer vision
-- speech recognition
-- reinforcement learning
-- large language models
+**Commands:**
 
-### 3. Edge Computing
-
-Processing data **close to where it is generated** instead of sending it to centralized servers.
-
-When these three combine:
-
-```
-Embedded Systems
-+ Artificial Intelligence
-+ Edge Computing
--------------------------
-Embedded AI
-```
-
----
-
-## 4. The Architectural Structure of AI Embedded Systems
-
-Most AI embedded systems follow a layered architecture.
-
-### Layer 1: Physical Layer
-
-Hardware interacting with the real world.
-
-**Components:**
-
-- sensors (camera, lidar, temperature)
-- actuators (motors, displays)
-- microcontrollers
-- AI accelerators
-
-### Layer 2: Edge Processing Layer
-
-This is where **AI inference happens locally**.
-
-**Hardware examples:**
-
-- GPU
-- TPU
-- NPU
-- FPGA
-- AI microcontrollers
-
-These chips run trained models.
-
-### Layer 3: AI Model Layer
-
-Models running on the device:
-
-**Examples:**
-
-- object detection
-- speech recognition
-- anomaly detection
-
-### Layer 4: Control Logic
-
-AI output triggers physical actions.
-
-**Example:**
-
-```
-camera → object detection model → robot moves arm
-```
-
-A typical architecture includes **hardware for data capture, AI software for analysis, and communication layers** that coordinate the system.
+| Command | Action |
+|:--------|:-------|
+| `forward` | Move forward |
+| `backward` | Move backward |
+| `stop` | Stop all motion |
+| `left` | Turn left |
+| `right` | Turn right |
+| `follow` | Follow detected person |
 
 ---
 
-## 5. The Embedded AI Pipeline
+## Key Technical Decisions
 
-The lifecycle of an embedded AI system typically follows:
+### Bounding Box Height Ratio for Distance
 
-### Step 1: Data Collection
+Instead of relying on depth maps or tracking continuity, OpenEyes uses **bounding box height ratio** (% of frame) to determine distance:
 
-Sensors collect data.
+| Zone | Height Ratio | Action |
+|:-----|:-------------|:-------|
+| Forward | < 60% | Move forward (person is far) |
+| Stop | 60-95% | Stay still (person at ideal distance) |
+| Backward | > 95% | Move backward (person too close) |
 
-**Example:**
+This is more reliable for monocular cameras where depth estimates can be noisy.
 
-- camera frames
-- vibration signals
-- temperature readings
+### Gesture-Based Owner Selection
 
-### Step 2: Model Training
+To designate who the robot should follow:
 
-Training occurs on powerful GPUs in the cloud.
+1. Show **open_palm** gesture to the camera
+2. Robot recognizes the gesture
+3. That person becomes the "owner" - the robot will follow them
 
-**Example:**
+This provides intuitive control without needing external interfaces.
 
-```
-image dataset → neural network training
-```
+### Image Resolution for MediaPipe
 
-### Step 3: Model Compression
+MediaPipe models work better with lower resolution:
 
-Models must be optimized for small devices.
+- Input: 1920x1080 (camera)
+- Processed: 640x480 (MediaPipe)
+- This improves detection confidence significantly
 
-**Techniques:**
+### Depth Normalization
 
-- quantization
-- pruning
-- knowledge distillation
+MiDaS outputs normalized depth (0-1 where 1.0 = closest). For display and processing:
 
-### Step 4: Edge Deployment
+- Normalize to 0-1 meters
+- 1.0 = closest point
+- 0.0 = farthest point
 
-The optimized model runs on the device.
+---
 
-**Example:**
+## Performance
 
-```
-TensorFlow Lite
-ONNX
-TinyML
-```
+| Configuration | FPS |
+|:--------------|:----|
+| All models | 10-15 |
+| Minimal (no depth/face/gesture/pose) | 25-30 |
+| Optimized (INT8 + minimal) | 30-40 |
 
-### Step 5: Real-time Inference
+---
 
-The device continuously processes data locally.
+## Quick Start
 
-**Example:**
+```bash
+# Clone and install
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
+pip install -r requirements.txt
 
-```
-camera → AI → detect human → unlock door
+# Run
+python src/main.py
+
+# With debug window
+python src/main.py --debug
+
+# With person following
+python src/main.py --follow
+
+# With ROS2
+python src/main.py --ros2
 ```
 
 ---
 
-## 6. The Hardware Revolution That Enabled This
+## The Journey
 
-AI on embedded devices only became possible because of **new chip architectures**.
+OpenEyes started with a simple question: *Why can't robots see like we do?*
 
-Major advances include:
+We've come far. But there's more to do.
 
-### Neural Processing Units (NPUs)
-
-Dedicated chips optimized for neural networks.
-
-**Used in:**
-
-- smartphones
-- cameras
-- robots
-
-### AI Microcontrollers
-
-Microcontrollers capable of running ML models.
-
-**Examples:**
-
-- ARM Cortex-M with ML acceleration
-- TinyML devices
-
-### Edge GPUs
-
-Small GPUs for edge devices.
-
-**Examples:**
-
-- NVIDIA Jetson
-- Apple Neural Engine
-- Qualcomm Hexagon DSP
-
-These chips allow **AI inference in small devices with low power consumption**.
+| Version | Milestone |
+|:--------|:----------|
+| v0.1.x | Core vision (detection, depth, face, gesture, pose) |
+| v0.2.x | Tracking, performance, ROS2 |
+| v0.3.x | Model selection, specialized models |
+| v0.4.x | Person following, gesture owner selection |
 
 ---
 
-## 7. The Core Scientific Concept: Embodied Intelligence
+## Contribute
 
-The deeper idea behind AI + embedded systems is **embodied intelligence**.
+OpenEyes is built by people like you. Developers, researchers, hobbyists, dreamers.
 
-Meaning:
-
-Intelligence is not just software.
-
-It exists **inside physical systems interacting with the world**.
-
-**Components:**
-
-```
-Perception
-+ Decision
-+ Action
-```
-
-**Example - Robot:**
-
-```
-camera → detect object → pick object
-```
-
-**Example - Phone:**
-
-```
-microphone → speech recognition → assistant response
-```
-
-**Example - Car:**
-
-```
-camera + radar → detect obstacle → brake
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) to join us.
 
 ---
 
-## 8. Major Application Domains
+## License
 
-Embedded AI is transforming many sectors.
+Apache 2.0 - See [LICENSE](LICENSE).
 
-### Autonomous Vehicles
-
-Cars interpret sensor data locally to drive safely.
-
-Real-time processing is critical because cloud latency would be dangerous.
-
-### Smart Consumer Devices
-
-**Examples:**
-
-- phones
-- smart speakers
-- cameras
-- wearables
-
-AI performs tasks like:
-
-- face recognition
-- voice assistants
-- scene detection
-
-### Robotics
-
-Robots rely heavily on embedded AI for:
-
-- navigation
-- object manipulation
-- environment mapping
-
-### Industrial Automation
-
-AI embedded systems detect anomalies in machinery and predict failures.
-
-### Healthcare Devices
-
-**Examples:**
-
-- AI ultrasound
-- wearable heart monitors
-- portable diagnostic systems
-
----
-
-## 9. The Key Technical Challenges
-
-Running AI on embedded systems is difficult because of **resource constraints**.
-
-Embedded devices have:
-
-- limited memory
-- limited compute
-- limited energy
-
-This means engineers must optimize AI heavily.
-
-**Challenges include:**
-
-### 1. Model Size
-
-LLMs can be gigabytes.
-
-Embedded devices may have **only a few MB of RAM**.
-
-### 2. Power Consumption
-
-Battery devices require extremely efficient computation.
-
-### 3. Real-time Requirements
-
-Robots or vehicles must respond instantly.
-
-### 4. Security
-
-Edge devices can be attacked physically.
-
----
-
-## 10. Why This Field Is Exploding Now
-
-Three forces converged around **2020-2030**.
-
-### 1. Cheap AI hardware
-
-AI accelerators are now embedded in consumer chips.
-
-### 2. Model compression techniques
-
-TinyML and efficient neural networks allow models to run on small devices.
-
-### 3. IoT explosion
-
-Billions of devices generate data that must be processed locally.
-
-Researchers highlight that **Edge AI integrates IoT devices, embedded systems, and AI models to enable local decision making**.
-
----
-
-## 11. The Long-Term Vision
-
-The ultimate direction is **intelligence distributed throughout the physical world**.
-
-Future computing architecture may look like:
-
-```
-Cloud AI (training)
-        ↓
-Edge AI (coordination)
-        ↓
-Embedded AI (real-time decisions)
-```
-
-This leads to a world where:
-
-- every device can sense
-- every device can reason
-- every device can act
-
----
-
-## 12. The Deep Conceptual Shift
-
-The biggest conceptual change is this:
-
-**Old computing paradigm:**
-
-```
-Human → Computer → Internet
-```
-
-**New paradigm:**
-
-```
-Environment → Sensors → AI → Physical Action
-```
-
-Computers are no longer just tools.
-
-They become **autonomous agents embedded in the environment**.
-
----
-
-## 13. Why This Matters Historically
-
-If you zoom out historically:
-
-| Era   | Computing model        |
-| ----- | ---------------------- |
-| 1960s | Mainframes             |
-| 1990s | Personal computers     |
-| 2010s | Cloud computing        |
-| 2020s | AI assistants          |
-| 2030s | Embedded AI everywhere |
-
-The next stage is sometimes called:
-
-**Ambient Intelligence**
-
-Meaning intelligence embedded into everyday objects.
-
----
-
-## 14. The Ultimate Form
-
-The ultimate version of AI + embedded systems is:
-
-```
-Embodied AI
-```
-
-Which includes:
-
-- robots
-- drones
-- autonomous vehicles
-- smart environments
-- intelligent wearables
-
-AI becomes **part of the physical world itself**.
-
----
-
-## References
-
-- [IBM - What Is Edge AI?](https://www.ibm.com/think/topics/edge-ai)
-- [Synopsys - What is Edge AI?](https://www.synopsys.com/glossary/what-is-edge-ai.html)
-- [MDPI - Embedded Artificial Intelligence: A Comprehensive](https://www.mdpi.com/2079-9292/14/17/3468)
-- [Red Hat - What is IoT Edge computing?](https://www.redhat.com/en/topics/edge-computing/iot-edge-computing-need-to-work-together)
-- [Milvus - What is a typical architecture for an edge AI system?](https://milvus.io/ai-quick-reference/what-is-a-typical-architecture-for-an-edge-ai-system)
-- [Syslogic - AI Embedded Systems for Real-Time Industrial Use](https://www.syslogic.com/blog/ai-embedded-systems)
-- [Sysgo - AI vs. Embedded AI](https://www.sysgo.com/blog/article/ai-vs-embedded-ai)
-- [F5 - What Is Edge AI?](https://www.f5.com/glossary/what-is-edge-ai)
+> The future of robotics is open. Let's build it together.
