@@ -16,6 +16,7 @@ models:
     skip_frames: 3
   gesture:
     skip_frames: 3
+    confidence: 0.1
   pose:
     skip_frames: 3
 
@@ -52,6 +53,8 @@ tracking:
   min_hits: 3
   iou_threshold: 0.3
   follow_enabled: false
+  follow_distance_min: 0.75  # arm length (stops if closer)
+  follow_distance_max: 1.25  # follows if farther
 
 ros2:
   enabled: false
