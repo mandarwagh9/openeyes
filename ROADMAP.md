@@ -1,7 +1,7 @@
 # ROADMAP.md - Project Roadmap for OpenEyes
 
-> **Version**: v0.1.0  
-> **Last Updated**: 2026-03-28
+> **Version**: v0.4.4  
+> **Last Updated**: 2026-03-30
 
 ---
 
@@ -15,7 +15,12 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.1.0 | Current | 2026-03-28 | Command Subscription + Full ROS2 |
+| v0.4.4 | Current | 2026-03-30 | Person Following + Gesture Owner |
+| v0.4.3 | Released | 2026-03-29 | Gesture Detection Fix |
+| v0.4.0 | Released | 2026-03-28 | VLA + Event Camera |
+| v0.3.0 | Released | 2026-03-27 | Model Selection |
+| v0.2.x | Released | 2026-03-26 | Tracking + ROS2 |
+| v0.1.0 | Released | 2026-03-28 | Command Subscription + Full ROS2 |
 | v0.0.3 | Released | 2026-03-26 | Performance + ROS2 |
 | v0.0.2 | Released | 2026-03-25 | Full Vision Pipeline |
 | v0.0.1 | Released | 2026-03-15 | Object Detection |
