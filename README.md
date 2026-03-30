@@ -107,7 +107,7 @@ python src/main.py --no-face --no-gesture --no-pose --no-depth --precision int8
 # With ROS2
 python src/main.py --ros2
 
-# Person following
+# Person following (show open_palm to become owner)
 python src/main.py --follow
 
 # List models
