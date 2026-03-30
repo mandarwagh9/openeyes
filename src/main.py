@@ -142,14 +142,16 @@ class VisionSystem:
                 max_age=config.tracking_max_age,
                 min_hits=config.tracking_min_hits,
                 iou_threshold=config.tracking_iou_threshold,
+                follow_distance_min=config.follow_distance_min,
+                follow_distance_max=config.follow_distance_max,
             )
-            self._logger.info(f"Object tracking enabled (max_age={config.tracking_max_age}, min_hits={config.tracking_min_hits})")
+            self._logger.info(f"Object tracking enabled (max_age={config.tracking_max_age}, min_hits={config.tracking_min_hits}, follow_dist={config.follow_distance_min}-{config.follow_distance_max}m)")
         else:
             self._tracker = None
 
         self._follow_target = config.follow_enabled
         if self._follow_target:
-            self._logger.info("Person following enabled")
+            self._logger.info(f"Person following enabled (distance: {config.follow_distance_min}-{config.follow_distance_max}m)")
 
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
@@ -299,7 +301,9 @@ class VisionSystem:
 
         if self._use_gesture:
             try:
-                self._gesture_recognizer = GestureRecognizer()
+                self._gesture_recognizer = GestureRecognizer(
+                    min_confidence=self._config.gesture_confidence
+                )
                 self._gesture_recognizer.load()
                 if self._config.debug:
                     self._gesture_recognizer._debug = True
@@ -560,8 +564,30 @@ class VisionSystem:
             tracks = self._tracker.update(detections, (frame.shape[1], frame.shape[0]))
 
             if self._follow_target and frame.shape:
-                frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
-                follow_cmd = self._tracker.get_follow_command(frame_center)
+                if gestures:
+                    gesture_positions = {}
+                    for g in gestures:
+                        if g.gesture_type == "open_palm":
+                            for det in detections:
+                                if det.class_name.lower() == "person":
+                                    cx = (det.bbox.x1 + det.bbox.x2) / 2
+                                    cy = (det.bbox.y1 + det.bbox.y2) / 2
+                                    gesture_positions[getattr(det, 'track_id', 0)] = (g.gesture_type, (cx, cy))
+                                    if self._tracker.owner_track_id is None:
+                                        self._tracker.set_owner_from_gesture(detections, gesture_positions)
+                
+                if self._depth_estimator and depth_map is not None:
+                    depth_for_tracking = depth_map
+                    follow_cmd = self._tracker.get_follow_command_with_depth(
+                        detections,
+                        depth_for_tracking,
+                        (frame.shape[1], frame.shape[0]),
+                    )
+                else:
+                    self._tracker.select_follow_target(frame.shape[1], frame.shape[0])
+                    frame_center = (frame.shape[1] // 2, frame.shape[0] // 2)
+                    follow_cmd = self._tracker.get_follow_command(frame_center)
+                
                 if follow_cmd:
                     self._logger.info(f"Follow command: {follow_cmd}")
 
