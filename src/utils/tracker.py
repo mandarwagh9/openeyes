@@ -29,6 +29,8 @@ class ObjectTracker:
         min_hits: int = 3,
         iou_threshold: float = 0.3,
         max_tracks: int = 50,
+        follow_distance_min: float = 1.5,
+        follow_distance_max: float = 2.5,
     ):
         self._logger = get_logger(__name__)
         self._max_age = max_age
@@ -36,12 +38,16 @@ class ObjectTracker:
         self._iou_threshold = iou_threshold
         self._max_tracks = max_tracks
 
+        self._follow_distance_min = follow_distance_min
+        self._follow_distance_max = follow_distance_max
+
         self._tracks: Dict[int, Track] = {}
         self._next_track_id = 1
         self._frame_count = 0
 
         self._tracked_person: Optional[Track] = None
         self._follow_target_id: Optional[int] = None
+        self._owner_track_id: Optional[int] = None
 
     def _compute_iou(self, bbox1: BoundingBox, bbox2: BoundingBox) -> float:
         """Compute IoU between two bounding boxes."""
@@ -216,7 +222,7 @@ class ObjectTracker:
         return None
 
     def get_follow_command(self, frame_center: Tuple[int, int]) -> Optional[str]:
-        """Get movement command based on tracked person position."""
+        """Get movement command based on tracked person position and distance."""
         target = self.get_follow_target()
 
         if not target:
@@ -225,19 +231,21 @@ class ObjectTracker:
         tx, ty = target.centroid
         fx, fy = frame_center
 
-        dx = tx - fx
-        dy = ty - fy
+        bbox = target.bbox
+        bbox_height = bbox.y2 - bbox.y1
 
-        threshold_x = fx * 0.3
-        threshold_y = fy * 0.3
+        ideal_height = fy * 0.5
+        height_diff = bbox_height - ideal_height
 
-        if abs(dx) < threshold_x and abs(dy) < threshold_y:
-            return "stop"
-
-        if dy < -threshold_y:
-            return "forward"
-        elif dy > threshold_y:
+        if abs(height_diff) < fy * 0.15:
+            pass
+        elif height_diff > 0:
             return "backward"
+        else:
+            return "forward"
+
+        dx = tx - fx
+        threshold_x = fx * 0.2
 
         if dx < -threshold_x:
             return "left"
@@ -245,6 +253,170 @@ class ObjectTracker:
             return "right"
 
         return "stop"
+
+    def get_follow_command_with_depth(
+        self,
+        detections: List[Detection],
+        depth_map: np.ndarray,
+        frame_shape: Tuple[int, int],
+    ) -> Optional[str]:
+        """Get follow command using actual depth from MiDaS.
+        
+        Args:
+            detections: Current frame detections from YOLO
+            depth_map: MiDaS depth map (normalized 0-1, where 1=closest)
+            frame_shape: (width, height) of the frame
+            
+        Returns:
+            Movement command: 'forward', 'backward', 'left', 'right', 'stop', or None
+        """
+        person_dets = [d for d in detections if d.class_name.lower() == "person"]
+        
+        if not person_dets:
+            if self._owner_track_id is not None:
+                self._logger.info("Owner lost - stopping")
+                self._tracked_person = None
+            return None
+        
+        target_detection = None
+        
+        if self._owner_track_id is not None:
+            for det in person_dets:
+                if hasattr(det, 'track_id') and det.track_id == self._owner_track_id:
+                    target_detection = det
+                    break
+            if target_detection is None:
+                self._logger.info("Owner not visible - waiting")
+        
+        if target_detection is None:
+            target_detection = max(person_dets, key=lambda d: d.confidence)
+            if self._owner_track_id is None:
+                self._logger.debug(f"Following person with confidence {target_detection.confidence:.2f}")
+        
+        bbox = target_detection.bbox
+        x1, y1 = int(bbox.x1), int(bbox.y1)
+        x2, y2 = int(bbox.x2), int(bbox.y2)
+        
+        fw, fh = frame_shape
+        x1 = max(0, min(x1, fw - 1))
+        x2 = max(0, min(x2, fw))
+        y1 = max(0, min(y1, fh - 1))
+        y2 = max(0, min(y2, fh))
+        
+        if x2 <= x1 or y2 <= y1:
+            return None
+        
+        depth_region = depth_map[y1:y2, x1:x2]
+        if depth_region.size == 0:
+            return None
+        
+        avg_depth = float(np.mean(depth_region))
+        
+        if avg_depth < 0.01:
+            return None
+        
+        closeness = avg_depth
+        
+        # print(f"[DEPTH] bbox_h={y2-y1} ({((y2-y1)/fh)*100:.0f}%), cmd={distance_cmd}")
+        
+        bbox_height = y2 - y1
+        height_ratio = bbox_height / fh
+        
+        # Distance zones:
+        # forward: < 60% (person small = far away)
+        # stop: 60-90% (person medium = just right)
+        # backward: > 95% (person large = too close)
+        if height_ratio > 0.95:
+            distance_cmd = "backward"
+        elif height_ratio < 0.60:
+            distance_cmd = "forward"
+        else:
+            distance_cmd = "stop"
+        
+        # print(f"[DEPTH] bbox_h={y2-y1} ({height_ratio*100:.0f}%), cmd={distance_cmd}")
+        
+        tx = (bbox.x1 + bbox.x2) / 2
+        ty = (bbox.y1 + bbox.y2) / 2
+        fx, fy = fw / 2, fh / 2
+        
+        dx = tx - fx
+        threshold_x = fw * 0.15
+        
+        if abs(dx) < threshold_x:
+            lateral_cmd = "stop"
+        elif dx < -threshold_x:
+            lateral_cmd = "left"
+        else:
+            lateral_cmd = "right"
+        
+        if distance_cmd == "stop":
+            return lateral_cmd
+        elif lateral_cmd == "stop":
+            return distance_cmd
+        else:
+            return distance_cmd
+
+    def set_owner_from_gesture(
+        self,
+        detections: List[Detection],
+        gesture_track_positions: Dict[int, Tuple[float, float]],
+    ) -> bool:
+        """Set the owner based on gesture recognition.
+        
+        When a person shows 'open_palm' gesture, that person becomes the owner.
+        
+        Args:
+            detections: Current detections
+            gesture_track_positions: Dict of {track_id: (gesture_type, centroid)}
+                                     If gesture_type == 'open_palm', that track becomes owner
+                                     
+        Returns:
+            True if owner was set, False otherwise
+        """
+        if not detections or not gesture_track_positions:
+            return False
+        
+        person_dets = [d for d in detections if d.class_name.lower() == "person"]
+        
+        for det in person_dets:
+            det_track_id = getattr(det, 'track_id', None)
+            if det_track_id is None:
+                for track_id, (gesture_type, centroid) in gesture_track_positions.items():
+                    if gesture_type == "open_palm":
+                        bbox = det.bbox
+                        cx = (bbox.x1 + bbox.x2) / 2
+                        cy = (bbox.y1 + bbox.y2) / 2
+                        dist = ((cx - centroid[0]) ** 2 + (cy - centroid[1]) ** 2) ** 0.5
+                        if dist < 100:
+                            self._owner_track_id = det_track_id
+                            self._logger.info(f"Owner set to track_id={det_track_id} (showed open_palm)")
+                            return True
+        
+        for track_id, (gesture_type, centroid) in gesture_track_positions.items():
+            if gesture_type == "open_palm":
+                for det in person_dets:
+                    bbox = det.bbox
+                    cx = (bbox.x1 + bbox.x2) / 2
+                    cy = (bbox.y1 + bbox.y2) / 2
+                    dist = ((cx - centroid[0]) ** 2 + (cy - centroid[1]) ** 2) ** 0.5
+                    if dist < 100:
+                        det_track_id = getattr(det, 'track_id', None)
+                        if det_track_id is not None:
+                            self._owner_track_id = det_track_id
+                            self._logger.info(f"Owner set to track_id={det_track_id} (showed open_palm)")
+                            return True
+        
+        return False
+
+    def clear_owner(self) -> None:
+        """Clear the owner - robot will follow any person again."""
+        self._owner_track_id = None
+        self._logger.info("Owner cleared - will follow any person")
+
+    @property
+    def owner_track_id(self) -> Optional[int]:
+        """Get the current owner's track ID."""
+        return self._owner_track_id
 
     def reset(self) -> None:
         """Reset all tracks."""
