@@ -104,6 +104,10 @@ class Config:
         return self.get("models", "yolo", "iou_threshold", default=0.45)
 
     @property
+    def gesture_confidence(self) -> float:
+        return self.get("models", "gesture", "confidence", default=0.2)
+
+    @property
     def output_host(self) -> str:
         return self.get("output", "host", default="127.0.0.1")
 
@@ -174,6 +178,14 @@ class Config:
     @property
     def follow_enabled(self) -> bool:
         return self.get("tracking", "follow_enabled", default=False)
+
+    @property
+    def follow_distance_min(self) -> float:
+        return self.get("tracking", "follow_distance_min", default=1.5)
+
+    @property
+    def follow_distance_max(self) -> float:
+        return self.get("tracking", "follow_distance_max", default=2.5)
 
     @property
     def ros2_qos_profile(self) -> str:
