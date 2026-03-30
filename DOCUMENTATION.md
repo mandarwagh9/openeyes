@@ -62,10 +62,15 @@ Welcome to the OpenEyes documentation. This index helps you find the right docum
 
 ## Version Information
 
-### Current Version: v0.1.0
+### Current Version: v0.4.4
 
 | Version | Release Date | Key Changes |
 |:--------|:-------------|:------------|
+| v0.4.4 | 2026-03-30 | Person following, gesture owner, bbox height ratio |
+| v0.4.3 | 2026-03-29 | Gesture detection fix |
+| v0.4.0 | 2026-03-28 | VLA models, event camera |
+| v0.3.0 | 2026-03-27 | Model selection |
+| v0.2.x | 2026-03-26 | Tracking, ROS2, performance |
 | v0.1.0 | 2026-03-28 | Command subscription, full ROS2, validation |
 | v0.0.3 | 2026-03-26 | YOLO11n, frame skipping, ROS2 |
 | v0.0.2 | 2026-03-25 | Depth, face, gesture, pose |
