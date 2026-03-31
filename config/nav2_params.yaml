@@ -1,0 +1,208 @@
+amcl:
+  ros__parameters:
+    use_map_topic: true
+    alpha1: 0.2
+    alpha2: 0.2
+    alpha3: 0.2
+    alpha4: 0.2
+    alpha5: 0.2
+    base_frame_id: "base_link"
+    global_frame_id: "map"
+    initial_pose_x: 0.0
+    initial_pose_y: 0.0
+    initial_pose_a: 0.0
+    max_beams: 60
+    max_particles: 2000
+    min_particles: 500
+    pf_err: 0.05
+    pf_z: 0.99
+    resample_interval: 1
+    transform_tolerance: 0.5
+    update_min_a: 0.2
+    update_min_d: 0.25
+    z_hit: 0.5
+    z_max: 0.65
+    z_rand: 0.5
+    scan_topic: "/scan"
+
+bt_navigator:
+  ros__parameters:
+    use_sim_time: false
+    enable_navigate_to_pose: true
+    enable_navigate_through_poses: true
+    enable_compute_path_through_poses: true
+    enable_compute_path_to_pose: true
+    global_frame: "map"
+    robot_base_frame: "base_link"
+    param_file: ""
+
+controller_server:
+  ros__parameters:
+    use_sim_time: false
+    controller_frequency: 20.0
+    min_x_velocity_threshold: 0.01
+    min_y_velocity_threshold: 0.01
+    min_theta_velocity_threshold: 0.01
+    max_x_velocity_threshold: 1.0
+    max_y_velocity_threshold: 1.0
+    max_theta_velocity_threshold: 2.0
+    failure_tolerance: 0.3
+    time_allowance: 10.0
+    max_robot_pose_search_dist: 10000.0
+    FollowPath:
+      plugin: "nav2_controller::DwbController"
+      debug_trajectory_details: true
+      min_vel_x: 0.05
+      min_vel_y: 0.0
+      min_vel_theta: -1.0
+      max_vel_x: 0.5
+      max_vel_y: 0.0
+      max_vel_theta: 1.0
+      acc_lim_x: 2.5
+      acc_lim_y: 0.0
+      acc_lim_theta: 3.2
+      decel_lim_x: 2.5
+      decel_lim_y: 0.0
+      decel_lim_theta: 3.2
+      vx_samples: 20
+      vy_samples: 5
+      vtheta_samples: 20
+      sim_time: 2.0
+      dwa: true
+      GoalChecker:
+        plugin: "nav2_controller::SimpleGoalChecker"
+        xy_goal_tolerance: 0.25
+        yaw_goal_tolerance: 0.25
+        check_time_allowance: true
+
+planner_server:
+  ros__parameters:
+    use_sim_time: false
+    planner_plugin_types: ["nav2_smac_planner/SmacPlanner2D"]
+    planner_plugins: ["grid_search"]
+
+    grid_search:
+      plugin: "nav2_smac_planner/SmacPlanner2D"
+      tolerance: 0.5
+      downsample_costmap: 2
+      downsampling_factor: 1
+      max_iterations: 10000
+      max_on_approach_iterations: 1000
+      allow_unknown: true
+      use_lattice: true
+      use_quadratic_cost_factor: true
+      neutral_cost: 50
+      cost_penalty: 1.0
+      scale_loop_cmds: true
+      analytic_expansion_ratio: 1.5
+      minimum_denominator: 0.7
+      lattice_fine_turning: 1.0
+      lattice_termination_duration: 1.0
+      minimum_turning_radius: 0.2
+      reverse_if_narrow: true
+
+behavior_server:
+  ros__parameters:
+    use_sim_time: false
+    costmap_topic: "/local_costmap/costmap_raw"
+    footprint_topic: "/local_costmap/published_footprint"
+    cycle_frequency: 10.0
+    behavior_plugins: ["spin", "backup", "wait"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+      sim_duration: 2.0
+      angular_vel: 1.0
+      rotate_angle: 180
+      max_angular_accel: 3.2
+      max_angular_vel: 1.0
+      min_angular_vel: 0.0
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+      sim_duration: 3.0
+      max_backup_vel: -0.1
+      min_backup_vel: -0.35
+      min_rad_accel: -0.5
+      approach_while_backup: true
+      use_approach_while_backup: true
+      min_approach_x_distance: 0.15
+      min_approach_y_distance: 0.15
+      min_approach_theta_distance: 0.15
+    wait:
+      plugin: "nav2_behaviors/Wait"
+      sim_duration: 2.0
+
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: "map"
+      robot_base_frame: "base_link"
+      update_frequency: 1.0
+      publish_frequency: 1.0
+      width: 10.0
+      height: 10.0
+      origin_x: -5.0
+      origin_y: -5.0
+      resolution: 0.05
+      footprint_padding: 0.03
+      footprint: "[[0.3, 0.3], [0.3, -0.3], [-0.3, -0.3], [-0.3, 0.3]]"
+      track_unknown_space: true
+      lethal_cost_threshold: 100
+      resolution_scale_costmap: 1.0
+      trinary_costmap: true
+      approximate_cell_footprint: true
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        max_obstacle_height: 2.0
+        observation_sources: "scan"
+        scan:
+          topic: "/scan"
+          sensor_frame: "laser_link"
+          data_type: "LaserScan"
+          marking: true
+          clearing: true
+          inf_is_valid: true
+          min_obstacle_height: 0.0
+          max_obstacle_height: 2.0
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: true
+        cost_scaling_factor: 1.0
+        inflation_radius: 0.55
+
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: "odom"
+      robot_base_frame: "base_link"
+      update_frequency: 10.0
+      publish_frequency: 10.0
+      width: 3.0
+      height: 3.0
+      origin_x: -1.5
+      origin_y: -1.5
+      resolution: 0.05
+      footprint_padding: 0.03
+      footprint: "[[0.3, 0.3], [0.3, -0.3], [-0.3, -0.3], [-0.3, 0.3]]"
+      lethal_cost_threshold: 100
+      plugins: ["obstacle_layer", "inflation_layer"]
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        max_obstacle_height: 2.0
+        observation_sources: "scan"
+        scan:
+          topic: "/scan"
+          sensor_frame: "laser_link"
+          data_type: "LaserScan"
+          marking: true
+          clearing: true
+          inf_is_valid: true
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        enabled: true
+        cost_scaling_factor: 1.0
+        inflation_radius: 0.55
