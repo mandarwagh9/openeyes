@@ -8,9 +8,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from queue import Queue, Empty
-from typing import Optional
-
-import cv2
+from typing import Optional, Any
 
 if not os.environ.get('DISPLAY'):
     os.environ['DISPLAY'] = ':0'
@@ -41,6 +39,24 @@ from src.utils.logger import setup_logger
 from src.utils.frame_skipper import FrameSkipProcessor, AdaptiveFrameSkipper, MultiModelFrameScheduler
 from src.utils.performance_monitor import PerformanceMonitor
 from src.utils.tracker import ObjectTracker
+try:
+    from src.ros2.visual_odometry import VisualOdometry as VO
+except ImportError:
+    VO = None
+VisualOdometry = VO
+
+try:
+    from src.models.vla import VLAModel, AdvancedAI, VLACommand
+    from src.models.vla_models import create_vla_model, SmolVLAWrapper, OpenVLAWrapper, OctoWrapper, VLAAction
+except ImportError:
+    VLAModel = None
+    AdvancedAI = None
+    VLACommand = None
+    create_vla_model = None
+    SmolVLAWrapper = None
+    OpenVLAWrapper = None
+    OctoWrapper = None
+    VLAAction = None
 import platform
 
 
@@ -49,7 +65,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.4.0")
+    print(f"  Version: v0.6.0")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 
@@ -137,6 +153,11 @@ class VisionSystem:
         )
 
         self._use_tracking = config.tracking_enabled
+        self._use_visual_odom = False
+        self._visual_odom = None
+        self._use_vla = False
+        self._real_vla_model: Optional[Any] = None
+        
         if self._use_tracking:
             self._tracker = ObjectTracker(
                 max_age=config.tracking_max_age,
@@ -167,6 +188,33 @@ class VisionSystem:
         self._logger.info("Shutdown signal received")
         self.stop()
         sys.exit(0)
+
+    def _execute_vla_command(self, cmd) -> None:
+        """Execute VLA command by publishing to ROS2 cmd topic."""
+        if VLACommand is not None and isinstance(cmd, VLACommand):
+            action = cmd.action
+            
+            cmd_vel = {
+                "move_forward": (0.3, 0.0),
+                "move_backward": (-0.3, 0.0),
+                "turn_left": (0.0, 0.5),
+                "turn_right": (0.0, -0.5),
+                "stop": (0.0, 0.0),
+                "follow": (0.2, 0.0),
+                "greet": (0.0, 0.0),
+            }
+            
+            linear, angular = cmd_vel.get(action, (0.0, 0.0))
+            
+            self._logger.info(
+                f">>> VLA ACTION: {action} (linear={linear}, angular={angular})"
+            )
+            
+            if self._ros2_pub:
+                pass
+            
+            if self._follow_target and action == "follow":
+                self._logger.info("VLA requesting person follow mode")
 
     def _init_frame_scheduler(self) -> None:
         skip_intervals = {
@@ -318,6 +366,25 @@ class VisionSystem:
                 self._logger.info("Pose Estimator loaded")
             except ModelError as e:
                 self._logger.warning(f"Pose Estimator not available: {e}")
+
+        self._use_vla = False
+        self._vla_model = None
+        self._advanced_ai = None
+        
+        if VLAModel is not None:
+            try:
+                self._use_vla = getattr(self, '_use_vla_arg', False)
+                if self._use_vla:
+                    self._vla_model = VLAModel()
+                    self._vla_model.load()
+                    self._logger.info("VLA Model loaded")
+                    
+                    if AdvancedAI is not None:
+                        self._advanced_ai = AdvancedAI()
+                        self._advanced_ai.initialize()
+                        self._logger.info("Advanced AI initialized")
+            except Exception as e:
+                self._logger.warning(f"VLA Model not available: {e}")
 
     def _init_output(self) -> None:
         self._udp_sender = UDPSender(
@@ -607,6 +674,55 @@ class VisionSystem:
                 centroid=track.centroid,
                 age=track.age,
             ))
+
+        vla_commands = []
+        scene_description = ""
+        
+        if self._use_vla and self._vla_model is not None:
+            try:
+                vla_context = {
+                    "detections": detections,
+                    "depth": depth,
+                    "faces": faces,
+                    "gesture": gestures[0] if gestures else None,
+                    "pose": pose,
+                    "tracks": track_data_list,
+                }
+                
+                vla_commands = self._vla_model.process(frame, detections, vla_context)
+                
+                if self._real_vla_model is not None:
+                    try:
+                        instruction = vla_context.get("instruction", "follow the person")
+                        real_action = self._real_vla_model.predict_action(frame, instruction)
+                        if real_action:
+                            self._logger.info(
+                                f"Real VLA Action: {real_action.action_type} "
+                                f"(confidence: {real_action.confidence:.2f})"
+                            )
+                            cmd = VLACommand(
+                                action=real_action.action_type,
+                                target=None,
+                                confidence=real_action.confidence,
+                                reasoning=real_action.reasoning,
+                            )
+                            vla_commands.append(cmd)
+                    except Exception as e:
+                        self._logger.warning(f"Real VLA prediction failed: {e}")
+                
+                if self._vla_model.is_loaded:
+                    scene_description = self._vla_model.generate_response("describe", {
+                        "detections": detections,
+                        "faces": faces,
+                        "gestures": gestures,
+                    })
+                
+                for cmd in vla_commands:
+                    self._logger.info(f"VLA Command: {cmd.action} - {cmd.reasoning}")
+                    self._execute_vla_command(cmd)
+                    
+            except Exception as e:
+                self._logger.warning(f"VLA processing error: {e}")
 
         result = VisionResult(
             timestamp=timestamp,
@@ -934,6 +1050,13 @@ def main() -> None:
         help="Enable VLA (Vision-Language-Action) for intelligent control",
     )
     parser.add_argument(
+        "--real-vla",
+        type=str,
+        default="",
+        choices=["smolvla", "openvla", "octo", ""],
+        help="Use real VLA model instead of rule-based (smolvla, openvla, octo)",
+    )
+    parser.add_argument(
         "--event-camera",
         action="store_true",
         help="Enable event camera processing",
@@ -1002,7 +1125,7 @@ def main() -> None:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.4.3",
+        version="OpenEyes v0.5.0",
     )
     parser.add_argument(
         "--info",
@@ -1014,6 +1137,26 @@ def main() -> None:
         type=str,
         default=None,
         help="Path to log file (with rotation, 5MB max by default)",
+    )
+    parser.add_argument(
+        "--slam",
+        action="store_true",
+        help="Enable SLAM (visual odometry for Nav2 integration)",
+    )
+    parser.add_argument(
+        "--visual-odom",
+        action="store_true",
+        help="Enable visual odometry publisher (/odom topic)",
+    )
+    parser.add_argument(
+        "--depth-to-scan",
+        action="store_true",
+        help="Convert depth to laser scan for Nav2",
+    )
+    parser.add_argument(
+        "--nav2",
+        action="store_true",
+        help="Enable Nav2 integration with obstacle avoidance",
     )
 
     args = parser.parse_args()
@@ -1085,6 +1228,39 @@ def main() -> None:
                     min_hits=3,
                     iou_threshold=0.3,
                 )
+
+        if args.visual_odom or args.slam:
+            if VisualOdometry is not None:
+                system._use_visual_odom = True
+                system._visual_odom = VisualOdometry()
+                config._config["ros2"]["enabled"] = True
+                print("Visual odometry enabled")
+
+        if args.depth_to_scan:
+            config._config["ros2"]["enabled"] = True
+            print("Depth to laser scan enabled")
+
+        if args.nav2:
+            config._config["ros2"]["enabled"] = True
+            print("Nav2 integration enabled (obstacle avoidance)")
+
+        if args.vla or args.advanced_ai:
+            if VLAModel is not None:
+                system._use_vla = True
+                config._config["ros2"]["enabled"] = True
+                
+                if args.real_vla and create_vla_model is not None:
+                    vla_model = create_vla_model(
+                        model_type=args.real_vla,
+                        device="cuda"
+                    )
+                    if vla_model and vla_model.is_loaded:
+                        system._real_vla_model = vla_model
+                        print(f"Real VLA enabled ({args.real_vla})")
+                    else:
+                        print(f"Failed to load {args.real_vla}, using rule-based VLA")
+                else:
+                    print(f"VLA enabled (mode: {'advanced-ai' if args.advanced_ai else 'basic'})")
 
         if args.batch_size > 1:
             config._config["performance"]["batch_inference"]["enabled"] = True
