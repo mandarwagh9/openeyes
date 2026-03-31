@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenEyes - Robot Vision System</title>
+  <meta name="description" content="Open-source vision system for humanoid robots on NVIDIA Jetson Orin Nano with full ROS2 integration">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        <span>OpenEyes</span>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#performance">Performance</a></li>
+        <li><a href="#hardware">Hardware</a></li>
+        <li><a href="#models">Models</a></li>
+        <li><a href="getting-started.html">Docs</a></li>
+        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
+      </ul>
+      <div class="navbar-toggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <img src="assets/images/logo.svg" alt="OpenEyes Logo" class="hero-logo">
+      <h1>🤖 We Give Robots Vision</h1>
+      <p class="hero-tagline">A humanoid robot needs to see the world like a human does. Not just pixels — but understanding. Distance. Intent. Action.</p>
+      <p class="hero-description">OpenEyes runs entirely on <strong>NVIDIA Jetson</strong> — no cloud, no lag, no dependencies.</p>
+      <div class="hero-buttons">
+        <a href="getting-started.html" class="btn btn-primary">🚀 Quick Start</a>
+        <a href="https://github.com/mandarwagh9/openeyes" class="btn btn-secondary">⭐ Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="section section-dark">
+    <h2 class="section-title">✨ Features</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <h3>Object Detection</h3>
+        <p>Real-time detection of 80+ object classes with YOLO</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📏</span>
+        <h3>Depth Estimation</h3>
+        <p>Measure distance to everything in the scene using MiDaS</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👤</span>
+        <h3>Face Detection</h3>
+        <p>Identify and track faces in real-time</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">👋</span>
+        <h3>Gesture Recognition</h3>
+        <p>Understand hand signals — stop, wave, point</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🦴</span>
+        <h3>Pose Estimation</h3>
+        <p>Detect body positions with MediaPipe</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🎯</span>
+        <h3>Object Tracking</h3>
+        <p>Follow specific objects across frames</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🚶</span>
+        <h3>Person Following</h3>
+        <p>Autonomous person tracking and following</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🗺️</span>
+        <h3>Visual SLAM</h3>
+        <p>Build maps and navigate autonomously</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Section -->
+  <section id="performance" class="section">
+    <h2 class="section-title">⚡ Performance</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Configuration</th>
+            <th>FPS</th>
+            <th>Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>All models enabled</td>
+            <td><span class="badge badge-purple">10-15</span></td>
+            <td>Full capability</td>
+          </tr>
+          <tr>
+            <td>Minimal (no depth/face/gesture/pose)</td>
+            <td><span class="badge badge-purple">25-30</span></td>
+            <td>Speed critical</td>
+          </tr>
+          <tr>
+            <td>Optimized INT8</td>
+            <td><span class="badge badge-purple">30-40</span></td>
+            <td>Production deployment</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Hardware Section -->
+  <section id="hardware" class="section section-dark">
+    <h2 class="section-title">💻 Hardware</h2>
+    <div class="hardware-grid">
+      <div class="hardware-card">
+        <h3>🟢 Jetson Orin Nano</h3>
+        <p>4GB or 8GB variants</p>
+      </div>
+      <div class="hardware-card">
+        <h3>📷 Camera</h3>
+        <p>CSI (IMX219) or USB Webcam</p>
+      </div>
+      <div class="hardware-card">
+        <h3>🖥️ OS</h3>
+        <p>Ubuntu 22.04 + JetPack 5.1+</p>
+      </div>
+      <div class="hardware-card">
+        <h3>⚡ Power</h3>
+        <p>7-15W consumption</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start Section -->
+  <section class="section">
+    <h2 class="section-title">🛠️ Quick Start</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># Clone and install
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
+pip install -r requirements.txt
+
+# Run with debug window
+python src/main.py --debug</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># Jetson Optimization
+sudo nvpmodel -m 0
+sudo jetson_clocks</code></pre>
+    </div>
+  </section>
+
+  <!-- Models Section -->
+  <section id="models" class="section section-dark">
+    <h2 class="section-title">📦 Supported Models</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Type</th>
+            <th>Size</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>YOLO11n</td>
+            <td>Object Detection</td>
+            <td>5.4MB</td>
+            <td>Real-time detection</td>
+          </tr>
+          <tr>
+            <td>MiDaS v2.1</td>
+            <td>Depth Estimation</td>
+            <td>350MB</td>
+            <td>Monocular depth</td>
+          </tr>
+          <tr>
+            <td>MediaPipe</td>
+            <td>Face/Gesture/Pose</td>
+            <td>~20MB</td>
+            <td>Multi-modal ML</td>
+          </tr>
+          <tr>
+            <td>SmolVLA</td>
+            <td>VLA</td>
+            <td>~450M params</td>
+            <td>Vision-Language-Action</td>
+          </tr>
+          <tr>
+            <td>OpenVLA</td>
+            <td>VLA</td>
+            <td>7B params</td>
+            <td>State-of-the-art VLA</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Version History -->
+  <section class="section">
+    <h2 class="section-title">📅 The Journey</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Version</th>
+            <th>Milestone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>v0.6.x</td>
+            <td>Real VLA models (SmolVLA, OpenVLA, Octo), Nav2, SLAM</td>
+          </tr>
+          <tr>
+            <td>v0.5.x</td>
+            <td>Visual odometry, SLAM, Nav2</td>
+          </tr>
+          <tr>
+            <td>v0.4.x</td>
+            <td>VLA, event camera</td>
+          </tr>
+          <tr>
+            <td>v0.3.x</td>
+            <td>Model selection</td>
+          </tr>
+          <tr>
+            <td>v0.2.x</td>
+            <td>Tracking, performance, ROS2</td>
+          </tr>
+          <tr>
+            <td>v0.1.x</td>
+            <td>Core vision (detection, depth, face, gesture, pose)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Contribute Section -->
+  <section class="section section-dark">
+    <h2 class="section-title">🤝 Contribute</h2>
+    <p style="text-align: center; color: var(--text-muted); max-width: 600px; margin: 0 auto 2rem;">
+      OpenEyes is built by people like you. Developers, researchers, hobbyists, dreamers.
+    </p>
+    <div style="text-align: center;">
+      <a href="contributing.html" class="btn btn-primary">Join the Project</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>🤖 The future of robotics is open. Let's build it together.</p>
+    <p><small>Apache 2.0 License</small></p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="getting-started.html">Documentation</a>
+      <a href="hardware.html">Hardware</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

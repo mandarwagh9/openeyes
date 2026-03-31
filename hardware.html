@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hardware - OpenEyes</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        <span>OpenEyes</span>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="commands.html">Commands</a></li>
+        <li><a href="ros2.html">ROS2</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="contributing.html">Contribute</a></li>
+        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
+      </ul>
+      <div class="navbar-toggle" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <h1>Hardware</h1>
+    <p>Hardware specifications and setup for OpenEyes</p>
+  </header>
+
+  <main class="content">
+    <h2 id="platform">Computing Platform: Jetson Orin Nano</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Specification</th><th>4GB Model</th><th>8GB Model</th></tr></thead>
+        <tbody>
+          <tr><td>GPU</td><td>512 CUDA cores, 16 Tensor cores</td><td>1024 CUDA cores, 32 Tensor cores</td></tr>
+          <tr><td>CPU</td><td colspan="2">6-core Arm Cortex-A78AE</td></tr>
+          <tr><td>Memory</td><td>4GB LPDDR5</td><td>8GB LPDDR5</td></tr>
+          <tr><td>Storage</td><td>16GB eMMC 5.1</td><td>32GB eMMC 5.1</td></tr>
+          <tr><td>Power</td><td colspan="2">7-15W</td></tr>
+          <tr><td>AI Performance</td><td>20 TOPS</td><td>40 TOPS</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: 1rem;"><strong>Recommended:</strong> 8GB model for better performance with multiple models.</p>
+
+    <h2 id="camera">Camera</h2>
+    <h3>Recommended Cameras</h3>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Camera</th><th>Resolution</th><th>FOV</th><th>Interface</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>Logitech C920</td><td>1080p @ 30fps</td><td>78°</td><td>USB 2.0</td><td>$50</td></tr>
+          <tr><td>Logitech C270</td><td>720p @ 30fps</td><td>60°</td><td>USB 2.0</td><td>$25</td></tr>
+          <tr><td>Razer Kiyo</td><td>1080p @ 30fps</td><td>90°</td><td>USB 2.0</td><td>$70</td></tr>
+          <tr><td>IMX219 (CSI)</td><td>1080p @ 30fps</td><td>-</td><td>CSI</td><td>$20</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Camera Requirements</h3>
+    <ul>
+      <li><strong>Interface:</strong> USB 2.0 or higher</li>
+      <li><strong>Resolution:</strong> 640x480 minimum, 1280x720 recommended</li>
+      <li><strong>Frame Rate:</strong> 30 fps minimum</li>
+      <li><strong>FOV:</strong> 60-90 degrees</li>
+      <li><strong>Driver:</strong> UVC (USB Video Class) compliant</li>
+    </ul>
+
+    <h2 id="power">Power Supply</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Specification</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Voltage</td><td>5V DC</td></tr>
+          <tr><td>Current</td><td>3A minimum, 4A recommended</td></tr>
+          <tr><td>Connector</td><td>Barrel jack 5.5mm x 2.1mm</td></tr>
+          <tr><td>Alternative</td><td>Micro-USB or USB-C PD</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="power-budget">Power Budget</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Component</th><th>Idle</th><th>Active (Typical)</th><th>Peak</th></tr></thead>
+        <tbody>
+          <tr><td>Jetson Orin Nano</td><td>5W</td><td>10W</td><td>15W</td></tr>
+          <tr><td>USB Camera</td><td>0.5W</td><td>1W</td><td>2W</td></tr>
+          <tr><td>USB Hub (if used)</td><td>0W</td><td>2.5W</td><td>5W</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>5.5W</strong></td><td><strong>13W</strong></td><td><strong>22W</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="thermal">Thermal</h2>
+    <ul>
+      <li><strong>Operating Temp:</strong> 0°C to 40°C</li>
+      <li><strong>Thermal Throttle:</strong> Starts at 85°C</li>
+      <li><strong>Max Sustained:</strong> 70°C with heatsink</li>
+    </ul>
+
+    <h3>Cooling Options</h3>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Solution</th><th>Cost</th><th>Effectiveness</th></tr></thead>
+        <tbody>
+          <tr><td>Passive (heatsink only)</td><td>$10</td><td>Basic</td></tr>
+          <tr><td>40mm Fan</td><td>$15</td><td>Good</td></tr>
+          <tr><td>Active Cooler (NVIDIA)</td><td>$25</td><td>Excellent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="storage">Storage</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Device</th><th>Speed</th><th>Capacity</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>microSD Card</td><td>UHS-I</td><td>32-256GB</td><td>$15-40</td></tr>
+          <tr><td>NVMe SSD (M.2)</td><td>PCIe Gen3</td><td>256GB-1TB</td><td>$30-80</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="network">Network</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Method</th><th>Speed</th><th>Use Case</th></tr></thead>
+        <tbody>
+          <tr><td>Ethernet (Gigabit)</td><td>1 Gbps</td><td>Fixed installation</td></tr>
+          <tr><td>WiFi (WiFi 6)</td><td>1.2 Gbps</td><td>Mobile robot</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="bom">Bill of Materials</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Item</th><th>Quantity</th><th>Unit Cost</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr><td>Jetson Orin Nano 8GB</td><td>1</td><td>$200</td><td>$200</td></tr>
+          <tr><td>USB Webcam 1080p</td><td>1</td><td>$50</td><td>$50</td></tr>
+          <tr><td>64GB microSD</td><td>1</td><td>$20</td><td>$20</td></tr>
+          <tr><td>5V/4A Power Supply</td><td>1</td><td>$15</td><td>$15</td></tr>
+          <tr><td><strong>Total</strong></td><td></td><td></td><td><strong>$285</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="upgrades">Future Hardware Upgrades</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Upgrade</th><th>Description</th><th>Benefit</th></tr></thead>
+        <tbody>
+          <tr><td>RealSense D435i</td><td>Stereo depth camera</td><td>Better depth estimation</td></tr>
+          <tr><td>OAK-D Lite</td><td>Spatial AI camera</td><td>Built-in AI processing</td></tr>
+          <tr><td>Lidar (RPLIDAR A1M8)</td><td>Laser scanner</td><td>Redundant obstacle detection</td></tr>
+          <tr><td>Coral TPU</td><td>Edge TPU</td><td>Additional AI acceleration</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>🤖 The future of robotics is open. Let's build it together.</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    function toggleMenu() { document.querySelector('.navbar-links').classList.toggle('active'); }
+    function copyCode(btn) {
+      const code = btn.closest('.code-block').querySelector('code').textContent;
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
+    }
+  </script>
+</body>
+</html>

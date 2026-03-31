@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROS2 - OpenEyes</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        <span>OpenEyes</span>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="commands.html">Commands</a></li>
+        <li><a href="ros2.html">ROS2</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="contributing.html">Contribute</a></li>
+        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
+      </ul>
+      <div class="navbar-toggle" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </nav>
+
+  <header class="page-header">
+    <h1>ROS2 Integration</h1>
+    <p>OpenEyes integrates with ROS2 for robot control and navigation</p>
+  </header>
+
+  <main class="content">
+    <h2 id="enable">Enabling ROS2</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --ros2</code></pre>
+    </div>
+
+    <h2 id="topics">ROS2 Topics</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Topic</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>/vision/detections</code></td><td>std_msgs/String (JSON)</td><td>Object detections</td></tr>
+          <tr><td><code>/vision/depth</code></td><td>sensor_msgs/Image</td><td>Depth map (32FC1)</td></tr>
+          <tr><td><code>/vision/faces</code></td><td>std_msgs/String (JSON)</td><td>Face detections</td></tr>
+          <tr><td><code>/vision/gestures</code></td><td>std_msgs/String (JSON)</td><td>Gesture recognitions</td></tr>
+          <tr><td><code>/vision/poses</code></td><td>std_msgs/String (JSON)</td><td>Body pose estimations</td></tr>
+          <tr><td><code>/vision/cmd</code></td><td>std_msgs/String</td><td>Robot commands (subscribe)</td></tr>
+          <tr><td><code>/vision/status</code></td><td>std_msgs/String</td><td>System status (FPS, counts)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="commands">Command Subscription</h2>
+    <p>Send commands to <code>/vision/cmd</code> topic:</p>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code># Send a command
+ros2 topic pub /vision/cmd std_msgs/String "data: 'forward'" -1
+
+# Valid commands: forward, backward, stop, left, right, follow
+ros2 topic pub /vision/cmd std_msgs/String "data: 'stop'" -1
+ros2 topic pub /vision/cmd std_msgs/String "data: 'left'" -1
+ros2 topic pub /vision/cmd std_msgs/String "data: 'right'" -1</code></pre>
+    </div>
+
+    <h2 id="testing">Testing ROS2</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code># Check available topics
+ros2 topic list
+
+# Monitor detections
+ros2 topic echo /vision/detections
+
+# Monitor status
+ros2 topic echo /vision/status</code></pre>
+    </div>
+
+    <h2 id="launch">Launch Files</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code># Basic launch
+ros2 launch openeyes openeyes.launch.py device:=cuda camera:=0 ros2:=true
+
+# SLAM launch
+ros2 launch openeyes cuvslam.launch.py
+
+# Navigation launch
+ros2 launch openeyes nav2.launch.py map:=/path/to/map.yaml
+
+# Unified launch (Full Autonomous)
+ros2 launch openeyes unified.launch.py</code></pre>
+    </div>
+
+    <h2 id="visual-odom">Visual Odometry</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code># Enable visual odometry
+python src/main.py --visual-odom --ros2
+
+# Convert depth to laser scan
+python src/main.py --depth-to-scan --ros2
+
+# Full SLAM mode
+python src/main.py --slam --ros2</code></pre>
+    </div>
+
+    <h2 id="nav2">Navigation</h2>
+    <h3>Enable Nav2</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --nav2 --ros2</code></pre>
+    </div>
+
+    <h3>Send Navigation Goals</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code># Publish goal: x, y, yaw
+ros2 topic pub /navigation/goal std_msgs/String "data: '2.0 1.0 0.0'"</code></pre>
+    </div>
+
+    <h2 id="json">JSON Message Format</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">json</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>{
+  "timestamp": 1699123456.123,
+  "frame_id": 1234,
+  "objects": [
+    {
+      "label": "person",
+      "confidence": 0.95,
+      "bbox": [100, 50, 300, 400]
+    }
+  ],
+  "depth": {
+    "enabled": true,
+    "min_distance": 1.2,
+    "max_distance": 5.0
+  },
+  "faces": [],
+  "gestures": [
+    {
+      "type": "thumbs_up",
+      "handedness": "right"
+    }
+  ],
+  "pose": null
+}</code></pre>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>🤖 The future of robotics is open. Let's build it together.</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    function toggleMenu() { document.querySelector('.navbar-links').classList.toggle('active'); }
+    function copyCode(btn) {
+      const code = btn.closest('.code-block').querySelector('code').textContent;
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
+    }
+  </script>
+</body>
+</html>
