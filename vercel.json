@@ -1,4 +1,5 @@
 {
-  "framework": "mkdocs",
-  "outputDirectory": "site"
+  "framework": "python",
+  "outputDirectory": "site",
+  "buildCommand": "pip install mkdocs-material && mkdocs build"
 }
