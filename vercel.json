@@ -1,6 +1,3 @@
 {
-  "build": {
-    "pip": "install mkdocs-material"
-  },
   "outputDirectory": "site"
 }
