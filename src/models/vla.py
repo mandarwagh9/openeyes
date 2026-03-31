@@ -16,7 +16,18 @@ class VLACommand:
 
 
 class VLAModel:
-    """Vision-Language-Action model for intelligent robot control."""
+    """Vision-Language-Action model for intelligent robot control.
+    
+    Current implementation uses rule-based processing with support for:
+    - Natural language instructions
+    - Gesture-based commands
+    - Detection-based fallback actions
+    
+    To integrate real VLA models:
+    - SmolVLA: Lightweight model for edge devices
+    - OpenVLA: Full 7B model (requires server or Jetson AGX)
+    - Octo: Stanford's open-source robot policy
+    """
 
     def __init__(
         self,
@@ -50,16 +61,140 @@ class VLAModel:
         detections: List[Detection],
         context: Optional[Dict[str, Any]] = None,
     ) -> List[VLACommand]:
-        """Process vision input and generate actions."""
+        """Process vision input and generate actions.
+        
+        Args:
+            frame: Input BGR frame
+            detections: List of object detections
+            context: Optional dict with keys:
+                - depth: DepthData with depth_map
+                - faces: List[FaceDetection]
+                - pose: PoseData
+                - tracks: List[TrackData]
+                - gesture: Gesture
+                - instruction: str (natural language command)
+        """
         if not self._is_loaded:
             return []
 
         commands = []
+        context = context or {}
+        
+        instruction = context.get("instruction", "")
+        gesture = context.get("gesture")
+        pose = context.get("pose")
+        faces = context.get("faces", [])
+        depth_map = context.get("depth")
+        
+        if instruction:
+            commands.extend(self._process_instruction(instruction, detections, context))
+        
+        if gesture:
+            commands.extend(self._process_gesture(gesture))
+        
+        if not commands:
+            commands.extend(self._process_detection_based(detections, context))
 
-        person_detected = any(d.class_name == "person" for d in detections)
-        closest_person = None
+        return commands
+
+    def _process_instruction(
+        self,
+        instruction: str,
+        detections: List[Detection],
+        context: Dict[str, Any],
+    ) -> List[VLACommand]:
+        """Process natural language instruction."""
+        instruction_lower = instruction.lower()
+        commands = []
+        
+        if "come" in instruction_lower or "approach" in instruction_lower or "forward" in instruction_lower:
+            commands.append(VLACommand(
+                action="move_forward",
+                target="instruction",
+                confidence=0.9,
+                reasoning=f"Instruction: {instruction}"
+            ))
+        elif "stop" in instruction_lower or "wait" in instruction_lower or "halt" in instruction_lower:
+            commands.append(VLACommand(
+                action="stop",
+                target=None,
+                confidence=0.95,
+                reasoning=f"Instruction: {instruction}"
+            ))
+        elif "back" in instruction_lower or "retreat" in instruction_lower:
+            commands.append(VLACommand(
+                action="move_backward",
+                target=None,
+                confidence=0.9,
+                reasoning=f"Instruction: {instruction}"
+            ))
+        elif "left" in instruction_lower:
+            commands.append(VLACommand(
+                action="turn_left",
+                target=None,
+                confidence=0.85,
+                reasoning=f"Instruction: {instruction}"
+            ))
+        elif "right" in instruction_lower:
+            commands.append(VLACommand(
+                action="turn_right",
+                target=None,
+                confidence=0.85,
+                reasoning=f"Instruction: {instruction}"
+            ))
+        elif "follow" in instruction_lower:
+            person = self._find_closest_person(detections)
+            if person:
+                commands.append(VLACommand(
+                    action="follow",
+                    target="person",
+                    confidence=0.9,
+                    reasoning="Instruction: follow person"
+                ))
+        
+        return commands
+
+    def _process_gesture(self, gesture) -> List[VLACommand]:
+        """Process gesture-based commands."""
+        commands = []
+        gesture_type = getattr(gesture, "gesture_type", "").lower()
+        
+        if "stop" in gesture_type or "fist" in gesture_type:
+            commands.append(VLACommand(
+                action="stop",
+                target=None,
+                confidence=0.95,
+                reasoning=f"Gesture: {gesture_type}"
+            ))
+        elif "open_palm" in gesture_type or "palm" in gesture_type:
+            commands.append(VLACommand(
+                action="stop",
+                target=None,
+                confidence=0.8,
+                reasoning="Stop gesture detected"
+            ))
+        elif "pointing_up" in gesture_type:
+            commands.append(VLACommand(
+                action="move_forward",
+                target=None,
+                confidence=0.85,
+                reasoning="Pointing up: move forward"
+            ))
+        elif "pointing_down" in gesture_type:
+            commands.append(VLACommand(
+                action="move_backward",
+                target=None,
+                confidence=0.85,
+                reasoning="Pointing down: move backward"
+            ))
+        
+        return commands
+
+    def _find_closest_person(self, detections: List[Detection]) -> Optional[Detection]:
+        """Find the closest person in detections."""
+        closest = None
         min_distance = float("inf")
-
+        
         for det in detections:
             if det.class_name == "person":
                 bbox = det.bbox
@@ -68,8 +203,20 @@ class VLAModel:
                 distance = cx * cx + cy * cy
                 if distance < min_distance:
                     min_distance = distance
-                    closest_person = det
+                    closest = det
+        
+        return closest
 
+    def _process_detection_based(
+        self,
+        detections: List[Detection],
+        context: Dict[str, Any],
+    ) -> List[VLACommand]:
+        """Process detection-based actions (fallback)."""
+        commands = []
+        
+        closest_person = self._find_closest_person(detections)
+        
         if closest_person:
             bbox = closest_person.bbox
             h = bbox.y2 - bbox.y1
@@ -91,7 +238,7 @@ class VLAModel:
                 ))
 
             cx = (bbox.x1 + bbox.x2) / 2
-            frame_center = frame.shape[1] / 2
+            frame_center = 320
 
             if cx < frame_center - 50:
                 commands.append(VLACommand(
@@ -107,24 +254,6 @@ class VLAModel:
                     confidence=0.8,
                     reasoning="Person is to the right"
                 ))
-
-        if context:
-            gesture = context.get("gesture")
-            if gesture:
-                if "stop" in gesture.gesture_type.lower():
-                    commands.append(VLACommand(
-                        action="stop",
-                        target=None,
-                        confidence=0.95,
-                        reasoning="Stop gesture detected"
-                    ))
-                elif "wave" in gesture.gesture_type.lower():
-                    commands.append(VLACommand(
-                        action="greet",
-                        target=None,
-                        confidence=0.9,
-                        reasoning="Wave gesture detected"
-                    ))
 
         return commands
 
