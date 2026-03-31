@@ -15,8 +15,9 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.4.4 | Current | 2026-03-30 | Person Following + Gesture Owner |
-| v0.4.3 | Released | 2026-03-29 | Gesture Detection Fix |
+| v0.6.0 | Current | 2026-03-30 | Navigation + Obstacle Avoidance |
+| v0.5.0 | Released | 2026-03-30 | SLAM + Nav2 + VLA Integration |
+| v0.4.4 | Released | 2026-03-30 | Person Following + Gesture Owner |
 | v0.4.0 | Released | 2026-03-28 | VLA + Event Camera |
 | v0.3.0 | Released | 2026-03-27 | Model Selection |
 | v0.2.x | Released | 2026-03-26 | Tracking + ROS2 |
@@ -85,11 +86,20 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 - [ ] Camera calibration
 
 #### v1.3.0 - Navigation
+**Status:** In Progress
+
+- [x] SLAM integration (v0.5.0)
+- [x] VLA integration (v0.5.0)
+- [x] Path planning (Nav2)
+- [x] Obstacle avoidance (v0.6.0)
+- [ ] Real VLA model (SmolVLA/Octo)
+
+#### v1.4.0 - Advanced AI
 **Status:** Planned
 
-- [ ] SLAM integration
-- [ ] Path planning
-- [ ] Obstacle avoidance
+- [ ] OpenVLA integration
+- [ ] Local LLM for natural language commands
+- [ ] Voice commands
 
 ---
 
