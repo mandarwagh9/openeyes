@@ -78,4 +78,38 @@ multi_camera:
   enabled: false
   sources: [0]  # List of camera indices
 
+slam:
+  enabled: false
+  visual_odom_enabled: false
+  depth_to_scan_enabled: false
+  focal_length: 500.0
+  baseline: 0.1
+  max_features: 100
+  quality_level: 0.01
+  min_distance: 10
+  scan_topic: "/scan"
+  odom_topic: "/odom"
+  range_min: 0.1
+  range_max: 10.0
+  angle_min: -1.57
+  angle_max: 1.57
+
+nav2:
+  enabled: false
+  map_file: ""
+  params_file: ""
+  base_frame: "base_link"
+  odom_frame: "odom"
+  map_frame: "map"
+  autostart: true
+
+vla:
+  enabled: false
+  model_type: "smolvla"  # smolvla, openvla, octo
+  model_name: ""  # Override default model
+  device: "cuda"
+  quantize: true
+  instruction: "follow the person"  # Default instruction
+  fallback_to_rule_based: true  # Use rule-based if model fails
+
 debug: false
