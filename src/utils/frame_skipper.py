@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
 
 class FrameSkipProcessor:
@@ -86,7 +86,7 @@ class AdaptiveFrameSkipper:
 class MultiModelFrameScheduler:
     """Scheduler for managing frame skipping across multiple models."""
 
-    def __init__(self, skip_intervals: dict[str, int] = None):
+    def __init__(self, skip_intervals: Optional[Dict[str, int]] = None):
         self.skip_intervals = skip_intervals or {
             'detector': 1,
             'depth': 2,

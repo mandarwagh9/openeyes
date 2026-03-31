@@ -306,6 +306,9 @@ class ObjectTracker:
         if x2 <= x1 or y2 <= y1:
             return None
         
+        if depth_map is None:
+            return None
+        
         depth_region = depth_map[y1:y2, x1:x2]
         if depth_region.size == 0:
             return None

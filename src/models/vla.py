@@ -306,10 +306,10 @@ class EventCameraProcessor:
             if current_time - e[0] < self._window_ms
         ]
 
-        if not self._event_buffer:
-            return None
-
         height, width = 480, 640
+        
+        if not self._event_buffer:
+            return np.zeros((height, width, 3), dtype=np.uint8)
         event_frame = np.zeros((height, width, 3), dtype=np.uint8)
 
         for ts, x, y, pol in self._event_buffer[-1000:]:

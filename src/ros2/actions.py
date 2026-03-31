@@ -206,7 +206,7 @@ class QoSConfig:
 class MultiCameraManager(Node):
     """Manage multiple camera sources."""
 
-    def __init__(self, camera_sources: List[int] = None):
+    def __init__(self, camera_sources: Optional[List[int]] = None):
         super().__init__("multi_camera_manager")
         self._camera_sources = camera_sources or [0]
         self._cameras: dict = {}

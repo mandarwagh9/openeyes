@@ -78,7 +78,7 @@ class VisualOdometry:
             self._prev_gray, gray, self._prev_points
         )
 
-        if current_points is None or len(current_points) < 10:
+        if current_points is None or status is None or len(current_points) < 10:
             self._prev_gray = gray
             self._prev_frame = frame
             self._prev_points = self._detect_features(gray)

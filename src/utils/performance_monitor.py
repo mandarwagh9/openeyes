@@ -1,6 +1,6 @@
 import time
 import threading
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 from collections import deque
 from dataclasses import dataclass, field
 
@@ -46,7 +46,7 @@ class PerformanceMonitor:
         self._lock = threading.Lock()
         self._current_model_time: Dict[str, float] = {}
 
-        self._stats_callbacks: List[callable] = []
+        self._stats_callbacks: List[Callable] = []
 
     def start_model(self, model_name: str) -> None:
         """Mark start of model inference."""
@@ -152,7 +152,7 @@ class PerformanceMonitor:
             )
             self._logger.info(f"  Models: {model_str}")
 
-    def add_callback(self, callback: callable) -> None:
+    def add_callback(self, callback: Callable) -> None:
         """Add a callback to be called with stats."""
         self._stats_callbacks.append(callback)
 
