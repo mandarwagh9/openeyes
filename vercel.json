@@ -1,7 +1,5 @@
 {
-  "build": {
-    "command": "pip install mkdocs-material && mkdocs build",
-    "output_dir": "site"
-  },
-  "framework": "mkdocs"
+  "buildCommand": "pip install mkdocs-material && mkdocs build",
+  "outputDirectory": "site",
+  "installCommand": "pip install mkdocs-material"
 }
