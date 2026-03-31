@@ -18,3 +18,4 @@ ENV/
 *.onnx
 models/*.pt
 models/*.pth
+site/

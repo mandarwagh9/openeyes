@@ -1,0 +1,92 @@
+/* OpenEyes Custom Dark Theme Styles */
+
+:root {
+  --md-primary-color: #7c3aed;
+  --md-accent-color: #06b6d4;
+  --md-code-fg-color: #e2e8f0;
+  --md-code-bg-color: #1e293b;
+}
+
+.md-header {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.md-hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.md-typeset .hero {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.md-nav__link--active {
+  color: #a78bfa;
+}
+
+.md-search__input {
+  background-color: #1e293b;
+}
+
+.md-sidebar {
+  background-color: #0f172a;
+}
+
+.md-content {
+  max-width: 900px;
+}
+
+h1, h2, h3, h4 {
+  color: #e2e8f0;
+}
+
+code {
+  background-color: #1e293b;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+pre {
+  background-color: #1e293b;
+  border-radius: 8px;
+}
+
+.admonition {
+  border-radius: 8px;
+}
+
+.grid.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.grid.cards > * {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #334155;
+}
+
+table {
+  display: table;
+  width: 100%;
+}
+
+th {
+  background: #1e293b;
+}
+
+tr:nth-child(even) {
+  background: #0f172a;
+}
+
+.md-footer {
+  background: #0f172a;
+}
+
+@media (prefers-color-scheme: dark) {
+  .md-theme-dark {
+    --md-surface-color: #1e293b;
+  }
+}

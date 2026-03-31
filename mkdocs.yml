@@ -1,0 +1,75 @@
+site_name: OpenEyes
+site_description: Open-source vision system for humanoid robots on NVIDIA Jetson Orin Nano
+site_url: https://openeyes.dev
+repo_url: https://github.com/mandarwagh9/openeyes
+repo_name: mandarwagh9/openeyes
+
+theme:
+  name: material
+  custom_dir: overrides
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: cyan
+  font:
+    text: Roboto
+    code: JetBrains Mono
+  features:
+    - navigation.tabs
+    - navigation.top
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  logo: assets/images/logo.svg
+  favicon: assets/images/favicon.svg
+
+extra_css:
+  - assets/css/extra.css
+
+plugins:
+  - search:
+      lang: en
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - getting-started/quickstart.md
+      - getting-started/installation.md
+      - getting-started/configuration.md
+  - User Guide:
+      - user-guide/commands.md
+      - user-guide/ros2.md
+  - Development:
+      - development/architecture.md
+      - development/api.md
+      - development/contributing.md
+  - Reference:
+      - reference/technical-spec.md
+      - reference/hardware.md
+  - Troubleshooting:
+      - troubleshooting/common-issues.md
+      - troubleshooting/faq.md
+
+markdown_extensions:
+  - attr_list
+  - tables
+  - fenced_code
+  - codehilite
+  - toc:
+      permalink: true
+  - meta
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      use_pygments: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mandarwagh9/openeyes
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/mandarwagh9
+
+copyright: >
+  &copy; 2026 OpenEyes Project. Built for humanoid robots.
