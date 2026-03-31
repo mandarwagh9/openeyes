@@ -10,7 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Navigation -->
   <nav class="navbar">
     <div class="navbar-container">
       <a href="index.html" class="navbar-logo">
@@ -32,15 +31,13 @@
     </div>
   </nav>
 
-  <!-- Page Header -->
   <header class="page-header">
     <h1>Getting Started</h1>
     <p>Get up and running with OpenEyes in 5 minutes</p>
   </header>
 
-  <!-- Content -->
   <main class="content">
-    <h2 id="prerequisites">Prerequisites</h2>
+    <h2>Prerequisites</h2>
     <ul>
       <li>NVIDIA Jetson Orin Nano (4GB or 8GB)</li>
       <li>CSI Camera (IMX219) or USB Webcam</li>
@@ -48,150 +45,85 @@
       <li>Internet connection</li>
     </ul>
 
-    <h2 id="install">Step 1: Clone and Install</h2>
+    <h2>Clone & Install</h2>
     <div class="code-block">
       <div class="code-header">
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code># Clone the project
-git clone https://github.com/mandarwagh9/openeyes.git
+      <pre><code>git clone https://github.com/mandarwagh9/openeyes.git
 cd openeyes
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# Install requirements
 pip install -r requirements.txt</code></pre>
     </div>
 
-    <h2 id="camera">Step 2: Verify Camera</h2>
-    <h3>For USB Webcam</h3>
+    <h2>Verify Camera</h2>
+    <h3>USB Webcam</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code># Check camera is detected
-ls /dev/video*
-
-# Test with Python
+      <pre><code>ls /dev/video*
 python3 -c "import cv2; cap = cv2.VideoCapture(0); print('OK' if cap.isOpened() else 'Error'); cap.release()"</code></pre>
     </div>
 
-    <h3>For CSI Camera</h3>
+    <h3>CSI Camera</h3>
     <div class="code-block">
       <div class="code-header">
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code># Check camera device
-ls -la /dev/video*
-
-# Test with GStreamer
+      <pre><code>ls -la /dev/video*
 gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! fakesink</code></pre>
     </div>
 
-    <h2 id="run">Step 3: Run the Vision System</h2>
+    <h2>Run the Vision System</h2>
     <div class="code-block">
       <div class="code-header">
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code># Run with debug window
+      <pre><code># With debug window
 python src/main.py --debug
 
-# Run headless (no display)
+# Headless
 python src/main.py
 
-# Run with ROS2 publishing
-python src/main.py --ros2
-
-# Show version
-python src/main.py --version</code></pre>
+# With ROS2
+python src/main.py --ros2</code></pre>
     </div>
 
-    <h2 id="optimize">Step 4: Enable Maximum Performance (Jetson)</h2>
+    <h2>Jetson Optimization</h2>
     <div class="code-block">
       <div class="code-header">
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code># One-command optimization (requires sudo)
-sudo bash scripts/jetson_perf.sh
-
-# Or manually
-sudo nvpmodel -m 0
+      <pre><code>sudo nvpmodel -m 0
 sudo jetson_clocks</code></pre>
     </div>
 
-    <h2 id="customize">Step 5: Customize (Optional)</h2>
-    <h3>Change Camera</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code># Different CSI sensor (CAM1)
-python src/main.py --camera 1
-
-# USB camera
-python src/main.py --camera 0</code></pre>
-    </div>
-
-    <h3>Disable Models for Speed</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code># Disable extra models for maximum FPS
-python src/main.py --no-face --no-gesture --no-pose --no-depth
-
-# Run pose every 3 frames
-python src/main.py --pose-every 3</code></pre>
-    </div>
-
-    <h3>Change Output Target</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code># Send to different host
-python src/main.py --host 192.168.1.100 --port 5000</code></pre>
-    </div>
-
-    <h2 id="next">Next Steps</h2>
+    <h2>Next Steps</h2>
     <ul>
       <li><a href="commands.html">Explore all commands</a></li>
       <li><a href="ros2.html">Set up ROS2 integration</a></li>
-      <li><a href="hardware.html">View hardware specifications</a></li>
-      <li><a href="contributing.html">Contribute to the project</a></li>
+      <li><a href="hardware.html">View hardware specs</a></li>
     </ul>
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
-    <p>🤖 The future of robotics is open. Let's build it together.</p>
+    <p>The future of robotics is open. Let's build it together.</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="index.html">Home</a>
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
   <script>
-    function toggleMenu() {
-      document.querySelector('.navbar-links').classList.toggle('active');
-    }
+    function toggleMenu() { document.querySelector('.navbar-links').classList.toggle('active'); }
     function copyCode(btn) {
       const code = btn.closest('.code-block').querySelector('code').textContent;
-      navigator.clipboard.writeText(code).then(() => {
-        btn.textContent = 'Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 2000);
-      });
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
     }
   </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contributing - OpenEyes</title>
+  <title>Contribute - OpenEyes</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,9 +25,7 @@
         <li><a href="contributing.html">Contribute</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
-      <div class="navbar-toggle" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="navbar-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
     </div>
   </nav>
 
@@ -37,196 +35,59 @@
   </header>
 
   <main class="content">
-    <h2 id="welcome">Welcome! 🎉</h2>
-    <p>Thank you for your interest in contributing to OpenEyes! This guide will help you get started.</p>
+    <h2>Welcome</h2>
+    <p>Thank you for your interest in contributing to OpenEyes!</p>
 
-    <h2 id="coc">Code of Conduct</h2>
-    <p>By participating in this project, you agree to abide by our Code of Conduct:</p>
+    <h2>How to Contribute</h2>
+    <h3>1. Fork & Clone</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>git clone https://github.com/YOUR_USERNAME/openeyes.git
+cd openeyes</code></pre>
+    </div>
+
+    <h3>2. Create Branch</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>git checkout -b feature/your-feature</code></pre>
+    </div>
+
+    <h3>3. Make Changes</h3>
+    <p>Follow our coding standards - type hints required, Google-style docstrings.</p>
+
+    <h3>4. Test & Commit</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>pytest tests/
+git add .
+git commit -m "feat: add new feature"</code></pre>
+    </div>
+
+    <h3>5. Submit PR</h3>
+    <p>Push to your fork and submit a pull request on GitHub.</p>
+
+    <h2>Code Standards</h2>
     <ul>
-      <li>Be respectful and inclusive</li>
-      <li>Welcome newcomers</li>
-      <li>Accept constructive criticism gracefully</li>
-      <li>Focus on what's best for the community</li>
+      <li>Type hints required on all functions</li>
+      <li>Google-style docstrings</li>
+      <li>snake_case for variables, PascalCase for classes</li>
+      <li>Use isort for imports</li>
     </ul>
 
-    <h2 id="how">How to Contribute</h2>
-    <h3>1. Report Bugs</h3>
-    <p>Found a bug? Please <a href="https://github.com/mandarwagh9/openeyes/issues">open an issue</a> with:</p>
-    <ul>
-      <li>Clear title and description</li>
-      <li>Steps to reproduce</li>
-      <li>Expected vs actual behavior</li>
-      <li>Screenshots/logs if applicable</li>
-    </ul>
+    <h2>Commit Messages</h2>
+    <p>Follow Conventional Commits: <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code></p>
 
-    <h3>2. Suggest Features</h3>
-    <p>Have an idea? <a href="https://github.com/mandarwagh9/openeyes/issues">Open a feature request</a> with:</p>
-    <ul>
-      <li>Clear description of the feature</li>
-      <li>Use cases</li>
-      <li>Any implementation ideas</li>
-    </ul>
-
-    <h3>3. Pull Requests</h3>
-    <p>Want to contribute code? Follow these steps:</p>
-
-    <h4>Step 1: Fork the Repository</h4>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code># Go to https://github.com/mandarwagh9/openeyes
-# Click "Fork" button
-# Clone your fork
-git clone https://github.com/YOUR_USERNAME/openeyes.git</code></pre>
-    </div>
-
-    <h4>Step 2: Create a Branch</h4>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>git checkout -b feature/your-feature-name
-# OR
-git checkout -b fix/bug-description</code></pre>
-    </div>
-
-    <h4>Step 3: Make Changes</h4>
-    <p>Follow our coding standards (see below).</p>
-
-    <h4>Step 4: Test Your Changes</h4>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code># Run tests
-pytest tests/
-
-# Run linting
-pylint src/
-mypy src/</code></pre>
-    </div>
-
-    <h4>Step 5: Commit Changes</h4>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>git add .
-git commit -m "feat: add new feature description"</code></pre>
-    </div>
-
-    <h4>Step 6: Push to GitHub</h4>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>git push origin feature/your-feature-name</code></pre>
-    </div>
-
-    <h4>Step 7: Open a Pull Request</h4>
-    <p>1. Go to your fork on GitHub<br>
-    2. Click "Compare & pull request"<br>
-    3. Fill in the PR template<br>
-    4. Submit</p>
-
-    <h2 id="setup">Development Setup</h2>
-    <h3>Prerequisites</h3>
-    <ul>
-      <li>Python 3.10+</li>
-      <li>Git</li>
-      <li>CUDA 11.8+ (for GPU development)</li>
-    </ul>
-
-    <h3>Setup</h3>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code># Clone repository
-git clone https://github.com/mandarwagh9/openeyes.git
-cd openeyes
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install dev dependencies (if available)
-pip install -r requirements-dev.txt</code></pre>
-    </div>
-
-    <h2 id="standards">Coding Standards</h2>
-    <ul>
-      <li><strong>Type Hints:</strong> Required for all functions</li>
-      <li><strong>Docstrings:</strong> Use Google-style format</li>
-      <li><strong>Naming:</strong> snake_case for variables, PascalCase for classes</li>
-      <li><strong>Imports:</strong> Use isort for organization</li>
-    </ul>
-
-    <h3>Code Style Example</h3>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">python</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>def process_frame(frame: np.ndarray, config: Config) -> Result:
-    """Process a single frame through the vision pipeline.
-    
-    Args:
-        frame: Input frame as BGR numpy array
-        config: Configuration object
-        
-    Returns:
-        Processing result with detections
-        
-    Raises:
-        CameraError: If frame capture fails
-    """
-    # Implementation
-    pass</code></pre>
-    </div>
-
-    <h2 id="commits">Commit Messages</h2>
-    <p>Follow <a href="https://www.conventionalcommits.org/">Conventional Commits</a>:</p>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
-
-[optional body]
-
-[optional footer]
-
-# Types:
-# feat     - New feature
-# fix      - Bug fix
-# docs     - Documentation
-# style    - Code style
-# refactor - Code refactoring
-# test     - Testing
-# chore    - Maintenance</code></pre>
-    </div>
-
-    <h2 id="pr">Pull Request Guidelines</h2>
-    <ul>
-      <li>✅ Tests pass</li>
-      <li>✅ Code follows style guide</li>
-      <li>✅ Documentation updated</li>
-      <li>✅ Commits are logical and well-described</li>
-    </ul>
-
-    <h2 id="questions">Questions?</h2>
+    <h2>Questions?</h2>
     <ul>
       <li><a href="https://github.com/mandarwagh9/openeyes/issues">GitHub Issues</a></li>
-      <li><a href="https://github.com/mandarwagh9/openeyes/discussions">GitHub Discussions</a></li>
+      <li><a href="https://github.com/mandarwagh9/openeyes/discussions">Discussions</a></li>
     </ul>
-
-    <h2 id="thankyou">Thank You! ❤️</h2>
-    <p>Your contributions make OpenEyes better for everyone.</p>
   </main>
 
   <footer class="footer">
-    <p>🤖 The future of robotics is open. Let's build it together.</p>
-    <div class="footer-links">
-      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
-      <a href="index.html">Home</a>
-    </div>
+    <p>The future of robotics is open. Let's build it together.</p>
+    <div class="footer-links"><a href="https://github.com/mandarwagh9/openeyes">GitHub</a><a href="index.html">Home</a></div>
   </footer>
-
-  <script src="js/main.js"></script>
-  <script>
-    function toggleMenu() { document.querySelector('.navbar-links').classList.toggle('active'); }
-    function copyCode(btn) {
-      const code = btn.closest('.code-block').querySelector('code').textContent;
-      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
-    }
-  </script>
+  <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>
 </html>
