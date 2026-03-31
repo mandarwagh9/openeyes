@@ -63,6 +63,33 @@ pylint src/
 mypy src/
 black src/
 isort src/
+
+# SLAM & Navigation (v0.5.0)
+python src/main.py --visual-odom          # Enable visual odometry
+python src/main.py --depth-to-scan      # Convert depth to laser scan
+python src/main.py --slam              # Enable full SLAM mode
+
+# Launch SLAM with Isaac ROS
+ros2 launch openeyes cuvslam.launch.py
+
+# Launch Nav2 navigation
+ros2 launch openeyes nav2.launch.py map:=/path/to/map.yaml
+
+# VLA Commands (v0.5.0)
+python src/main.py --vla               # Enable VLA processing
+python src/main.py --advanced-ai       # Enable all AI features
+
+# Real VLA Models (v0.6.0)
+python src/main.py --real-vla smolvla  # Use SmolVLA (~450M params)
+python src/main.py --real-vla openvla  # Use OpenVLA (7B params, needs AGX)
+python src/main.py --real-vla octo     # Use Octo (~93M params)
+
+# Navigation (v0.6.0)
+python src/main.py --nav2              # Enable Nav2 with obstacle avoidance
+ros2 launch openeyes unified.launch.py # Full autonomous navigation
+
+# Navigation goals
+ros2 topic pub /navigation/goal std_msgs/String "data: '2.0 1.0 0.0'"  # x, y, yaw
 ```
 
 ---
