@@ -1,6 +1,6 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.4.4  
+> **Version**: v0.6.0  
 > **Last Updated**: 2026-03-30
 
 ---
@@ -9,6 +9,115 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v0.6.0] - 2026-03-30
+
+### Added - Real VLA Models
+
+- **VLA Model Wrappers** (`src/models/vla_models.py`)
+  - `SmolVLAWrapper` - Lightweight VLA (~450M params) for Jetson
+  - `OpenVLAWrapper` - Full VLA (7B params, needs AGX)
+  - `OctoWrapper` - Generalist policy (~93M params)
+  - Factory function `create_vla_model()` for easy instantiation
+
+- **CLI Integration**
+  - `--real-vla smolvla|openvla|octo` - Use real transformer-based VLA
+  - Fallback to rule-based VLA if model fails to load
+  - Config section in `config.yaml` for VLA settings
+
+### Added - Navigation & Obstacle Avoidance (Phase 3)
+
+- **Navigation Goal Node** (`src/ros2/navigation_goal.py`)
+  - Send navigation goals to Nav2 via `/navigate_to_pose` action
+  - Waypoint navigation with `/navigate_through_poses`
+  - Goal cancellation support
+  - Status feedback and monitoring
+
+- **Vision Obstacle Avoidance** (`src/ros2/vision_obstacle_avoidance.py`)
+  - Real-time obstacle detection from vision
+  - Velocity override when obstacle detected
+  - Distance estimation from bounding box height
+  - Configurable obstacle classes and distances
+
+- **Unified Launch** (`launch/unified.launch.py`)
+  - Complete autonomous navigation stack
+  - Vision + SLAM + Nav2 integration
+  - Optional teleop and RViz support
+  - All-in-one launch for production use
+
+### Added - CLI Arguments
+
+- `--nav2` - Enable Nav2 integration with obstacle avoidance
+
+---
+
+## [v0.5.0] - 2026-03-30
+
+### Added - SLAM & Navigation Integration (Phase 1)
+
+- **Visual Odometry** (`src/ros2/visual_odometry.py`)
+  - New `VisualOdometry` class using Lucas-Kanade optical flow
+  - Computes frame-to-frame motion for odometry
+  - Total displacement and rotation tracking
+  - Configurable focal length, baseline, and feature parameters
+
+- **Depth to LaserScan** (`src/ros2/depth_to_laserscan.py`)
+  - New `DepthToLaserScan` ROS2 node
+  - Converts depth images to `/scan` topic for Nav2
+  - Configurable range and angle limits
+  - Supports obstacle avoidance in navigation stack
+
+- **Isaac cuVSLAM Launch** (`launch/cuvslam.launch.py`)
+  - NVIDIA Isaac ROS Visual SLAM integration
+  - RealSense camera support (D435i recommended)
+  - IMU fusion mode for visual-inertial odometry
+  - Configurable tracking modes (stereo, VIO, RGBD)
+
+- **Nav2 Launch** (`launch/nav2.launch.py`)
+  - ROS2 Navigation2 stack integration
+  - Controller server, planner server, behavior server
+  - BT navigator for behavior tree navigation
+  - Lifecycle manager for node orchestration
+
+- **Nav2 Parameters** (`config/nav2_params.yaml`)
+  - Complete Nav2 configuration
+  - DWB controller with path following
+  - SMAC planner for 2D path planning
+  - Obstacle and inflation layers for costmaps
+
+### Added - VLA Integration (Phase 2)
+
+- **Enhanced VLA Processing** (`src/models/vla.py`)
+  - Expanded context: depth, faces, pose, tracks, gesture
+  - Natural language instruction processing
+  - Gesture-based command recognition
+  - Detection-based fallback actions
+  - `_process_instruction()`, `_process_gesture()`, `_process_detection_based()`
+
+- **VLA Pipeline Integration** (`src/main.py`)
+  - VLA model initialization with `--vla` flag
+  - Full context passing (detections, depth, faces, gesture, pose, tracks)
+  - Command execution via `_execute_vla_command()`
+  - Scene description generation
+
+### Added - CLI Arguments
+
+- `--slam` - Enable SLAM mode
+- `--visual-odom` - Enable visual odometry publisher
+- `--depth-to-scan` - Convert depth to laser scan
+- `--vla` - Enable VLA processing
+- `--advanced-ai` - Enable all AI features (VLA + event camera)
+
+### Added - Configuration
+
+- **config.yaml** - New SLAM and Nav2 configuration sections:
+  - `slam.visual_odom_enabled`
+  - `slam.depth_to_scan_enabled`
+  - `slam.scan_topic`, `slam.odom_topic`
+  - `slam.range_min`, `slam.range_max`
+  - `nav2.enabled`, `nav2.map_file`, `nav2.params_file`
 
 ---
 
