@@ -6,7 +6,6 @@ repo_name: mandarwagh9/openeyes
 
 theme:
   name: material
-  custom_dir: overrides
   language: en
   palette:
     - scheme: slate
@@ -94,15 +93,6 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight:
       use_pygments: true
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.inlinehilite
-  - pymdownx.snippets
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
 
 copyright: >
   &copy; 2026 OpenEyes Project. Built with ❤️ for humanoid robots.
