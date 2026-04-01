@@ -1,6 +1,6 @@
 # OpenEyes
 
-**v0.6.0** · 🤖 We Give Robots Vision
+**v1.0.0** · 🤖 We Give Robots Vision
 
 [![GitHub stars](https://img.shields.io/github/stars/mandarwagh9/openeyes?style=social)](https://github.com/mandarwagh9/openeyes)
 [![PyPI](https://img.shields.io/pypi/v/openeyes)](https://pypi.org/project/openeyes/)
@@ -29,6 +29,12 @@ A humanoid robot needs to see the world like a human does. Not just pixels — b
 | 🚶 **Person Following** | Autonomous person tracking |
 | 🗺️ **Visual SLAM** | Build maps and navigate |
 | 🤖 **VLA Models** | Vision-Language-Action (SmolVLA, OpenVLA, Octo) |
+| 🔦 **LIDAR Processing** | Point cloud obstacle detection |
+| 🔀 **Sensor Fusion** | Camera + Depth + LIDAR integration |
+| 📸 **Multi-Camera** | Multiple camera support |
+| 🛡️ **Safety Controller** | E-STOP, velocity limits, collision avoidance |
+| ❤️ **Health Monitor** | 24/7 operation with auto-recovery |
+| ⬆️ **OTA Updates** | Remote model updates with rollback |
 
 ---
 
@@ -60,6 +66,7 @@ sudo jetson_clocks
 | All models | 10-15 | Full capability |
 | Minimal | 25-30 | Speed critical |
 | Optimized INT8 | 30-40 | Production |
+| INT8 + DLA | 40-50 | Maximum performance |
 
 ---
 
@@ -102,6 +109,27 @@ python src/main.py --ros2
 
 ---
 
+## 🔧 New in v0.7.0 - v1.0.0
+
+```bash
+# Multi-Modal Sensing (v0.7.0)
+python src/main.py --lidar --lidar-topic /scan
+python src/main.py --realsense
+python src/main.py --multi-camera
+
+# VLA & Performance (v0.8.0)
+python src/main.py --int8 --dla
+python src/main.py --diffusion-policy
+python src/main.py --action-chunking --control-freq 20
+
+# Safety & Reliability (v1.0.0)
+python src/main.py --safety --max-velocity 1.0 --min-distance 0.3
+python src/main.py --health-monitor
+python src/main.py --ota-update
+```
+
+---
+
 ## 📦 Models
 
 | Model | Type | Size | Platform |
@@ -118,6 +146,9 @@ python src/main.py --ros2
 
 | Version | Milestone |
 |:--------|:----------|
+| v1.0.0 | Safety & Reliability, Diffusion Policy, Health Monitor |
+| v0.8.0 | VLA Integration, Action Chunking, TensorRT Optimizer |
+| v0.7.0 | Multi-Modal Sensing, LIDAR, Sensor Fusion |
 | v0.6.0 | Real VLA models, Nav2, SLAM |
 | v0.5.0 | Visual odometry, SLAM |
 | v0.4.x | VLA, event camera |
@@ -137,6 +168,9 @@ pytest tests/
 
 # Run with coverage
 pytest tests/ --cov=src --cov-report=html
+
+# Verify installation
+python src/main.py --version
 ```
 
 ---

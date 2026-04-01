@@ -1,6 +1,6 @@
 # OpenEyes Manifesto
 
-## v0.4.4
+## v1.0.0
 
 ## We Give Robots Vision
 

@@ -1,6 +1,7 @@
 # AGENTS.md - Developer Guidelines for OpenEyes
 
 > AI agent guidelines for OpenEyes - vision system for humanoid robots running on Jetson Orin Nano with full ROS2 integration.
+> **Version**: v1.0.0
 
 ---
 
@@ -90,6 +91,26 @@ ros2 launch openeyes unified.launch.py # Full autonomous navigation
 
 # Navigation goals
 ros2 topic pub /navigation/goal std_msgs/String "data: '2.0 1.0 0.0'"  # x, y, yaw
+
+# Multi-Modal Sensing (v0.7.0)
+python src/main.py --lidar                         # Enable LIDAR processing
+python src/main.py --lidar-topic /scan             # LIDAR topic
+python src/main.py --realsense                     # Enable RealSense D455
+python src/main.py --multi-camera                  # Multi-camera mode
+
+# VLA & Performance (v0.8.0)
+python src/main.py --int8                         # INT8 quantization
+python src/main.py --dla                          # DLA offloading
+python src/main.py --diffusion-policy             # Enable Diffusion Policy
+python src/main.py --action-chunking              # Enable action chunking
+python src/main.py --control-freq 20              # Control frequency (Hz)
+
+# Safety & Reliability (v1.0.0)
+python src/main.py --safety                      # Enable safety controller
+python src/main.py --health-monitor              # Enable health monitoring
+python src/main.py --max-velocity 1.0            # Max velocity (m/s)
+python src/main.py --min-distance 0.3            # Min distance (m)
+python src/main.py --ota-update                   # Enable OTA updates
 ```
 
 ---
@@ -176,11 +197,21 @@ logger.info(f"Detected {len(detections)} objects")
 ```
 src/
 ├── camera/           # CameraHandler, types, CSI device detection
-├── models/           # ObjectDetector, depth_estimator, etc.
+├── models/           # ObjectDetector, depth_estimator, VLA, etc.
+│   ├── action_chunker.py      # v0.8.0 - Real-time control
+│   ├── lora_finetuning.py     # v0.8.0 - VLA customization
+│   ├── diffusion_policy.py    # v1.0.0 - Robot manipulation
+│   └── tensorrt_optimizer.py  # v0.8.0 - INT8/DLA optimization
 ├── output/           # json_formatter, udp_sender
-├── ros2/             # VisionPublisher with MultiThreadedExecutor, JSON fallback
-├── utils/            # config (absolute path resolution), logger
-└── main.py           # Entry point with --ros2 and --version flags
+├── ros2/             # VisionPublisher with MultiThreadedExecutor
+│   ├── lidar_processing.py    # v0.7.0 - LIDAR point cloud
+│   ├── sensor_fusion.py       # v0.7.0 - Multi-sensor fusion
+│   └── multi_camera.py        # v0.7.0 - Multi-camera support
+├── utils/            # config, logger
+│   ├── health_monitor.py      # v1.0.0 - 24/7 operation
+│   ├── ota_update.py          # v1.0.0 - Model updates
+│   └── safety_controller.py  # v1.0.0 - Safety features
+└── main.py           # Entry point with all CLI flags
 ```
 
 ### Data Flow
@@ -370,11 +401,34 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ## Performance Targets
 
-| Metric | Target | v0.1.1 |
+| Metric | Target | v1.0.0 |
 |:-------|:-------|:-------|
-| FPS | 20-30 | 10-12 (all), 22-25 (minimal) |
+| FPS | 30-50 | 10-12 (all), 40-50 (INT8+DLA) |
 | Latency | <50ms | ~40ms |
 | Memory | <2GB | ~1.2GB |
+| Control Frequency | 10-30 Hz | Configurable |
+
+---
+
+## v0.7.0 - v1.0.0 New Features
+
+### Multi-Modal Sensing (v0.7.0)
+- LIDAR processing with obstacle detection
+- Sensor fusion (camera + depth + LIDAR)
+- Multi-camera support
+- RealSense D455 integration
+
+### VLA & Performance (v0.8.0)
+- Action chunking for 10-30 Hz control
+- LoRA fine-tuning for VLA customization
+- TensorRT INT8 quantization
+- DLA offloading
+
+### Safety & Reliability (v1.0.0)
+- Health monitor for 24/7 operation
+- Safety controller with E-STOP
+- OTA updates with rollback
+- Safe velocity/distance limits
 
 ---
 

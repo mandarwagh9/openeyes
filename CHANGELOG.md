@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v0.6.0  
-> **Last Updated**: 2026-03-30
+> **Version**: v1.0.0  
+> **Last Updated**: 2026-04-01
 
 ---
 
@@ -9,6 +9,119 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v1.0.0] - 2026-04-01
+
+### Added - Safety & Reliability
+
+- **Health Monitor** (`src/utils/health_monitor.py`)
+  - `HealthMonitor` class for 24/7 operation
+  - Component health tracking with heartbeat
+  - Auto-recovery from failures
+  - Watchdog timer for stuck processes
+  - System diagnostics (CPU, memory, GPU)
+
+- **OTA Update System** (`src/utils/ota_update.py`)
+  - `OTAUpdater` class for model updates
+  - Version checking and download
+  - Automatic rollback on failure
+  - Safe update with verification
+
+- **Safety Controller** (`src/utils/safety_controller.py`)
+  - `SafetyController` class for robot safety
+  - Emergency stop (E-STOP) integration
+  - Safe velocity limits
+  - Minimum distance monitoring
+  - Collision avoidance triggers
+
+### Added - Diffusion Policy & Action Chunking
+
+- **Action Chunker** (`src/models/action_chunker.py`)
+  - `ActionChunker` class for real-time control
+  - 10-30 Hz control frequency support
+  - Action sequence prediction
+  - Smooth trajectory generation
+
+- **Diffusion Policy** (`src/models/diffusion_policy.py`)
+  - `DiffusionPolicy` class for robot manipulation
+  - Denoising diffusion process
+  - Multi-step action planning
+  - Integration with VLA models
+
+### Added - CLI Arguments
+
+- `--health-monitor` - Enable health monitoring
+- `--safety` - Enable safety controller
+- `--max-velocity` - Set maximum velocity (m/s)
+- `--min-distance` - Set minimum obstacle distance (m)
+- `--ota-update` - Enable OTA updates
+- `--diffusion-policy` - Enable Diffusion Policy
+- `--action-chunking` - Enable action chunking
+- `--control-freq` - Set control frequency (Hz)
+
+---
+
+## [v0.8.0] - 2026-04-01
+
+### Added - VLA Integration & Performance
+
+- **LoRA Fine-tuning** (`src/models/lora_finetuning.py`)
+  - `LoRAAdapter` class for VLA customization
+  - Low-rank adaptation layers
+  - On-device fine-tuning support
+  - Model checkpointing
+
+- **TensorRT Optimizer** (`src/models/tensorrt_optimizer.py`)
+  - `TensorRTOptimizer` class for model optimization
+  - INT8 quantization with calibration
+  - DLA (Deep Learning Accelerator) offloading
+  - FP16/INT8 precision modes
+  - Engine caching for fast startup
+
+### Added - CLI Arguments
+
+- `--int8` - Enable INT8 quantization
+- `--dla` - Enable DLA offloading
+- `--diffusion-policy` - Enable Diffusion Policy
+- `--action-chunking` - Enable action chunking
+- `--control-freq` - Set control frequency (10-30 Hz)
+
+---
+
+## [v0.7.0] - 2026-04-01
+
+### Added - Multi-Modal Sensing
+
+- **LIDAR Processing** (`src/ros2/lidar_processing.py`)
+  - `LIDARProcessor` class for point cloud processing
+  - Obstacle detection from LIDAR data
+  - Cluster-based object detection
+  - Configurable LIDAR topic subscription
+  - Range and angle filtering
+
+- **Sensor Fusion** (`src/ros2/sensor_fusion.py`)
+  - `SensorFusion` class for multi-sensor integration
+  - Camera + Depth + LIDAR fusion
+  - 3D obstacle tracking
+  - Confidence scoring
+
+- **Multi-Camera Support** (`src/ros2/multi_camera.py`)
+  - `MultiCameraManager` for handling multiple cameras
+  - Synchronized capture option
+  - Camera calibration support
+
+### Added - CLI Arguments
+
+- `--lidar` - Enable LIDAR processing
+- `--lidar-topic` - Specify LIDAR topic (default: /scan)
+- `--realsense` - Enable RealSense D455 support
+- `--multi-camera` - Enable multi-camera mode
+
+### Changed
+
+- **Performance Targets**: Updated to 30+ FPS with INT8 optimization
 
 ---
 

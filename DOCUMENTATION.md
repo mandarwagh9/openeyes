@@ -2,6 +2,8 @@
 
 Welcome to the OpenEyes documentation. This index helps you find the right document for your needs.
 
+> **Version**: v1.0.0
+
 ## Quick Links
 
 | Your Goal | Start Here |
@@ -62,16 +64,20 @@ Welcome to the OpenEyes documentation. This index helps you find the right docum
 
 ## Version Information
 
-### Current Version: v0.4.4
+### Current Version: v1.0.0
 
 | Version | Release Date | Key Changes |
 |:--------|:-------------|:------------|
-| v0.4.4 | 2026-03-30 | Person following, gesture owner, bbox height ratio |
-| v0.4.3 | 2026-03-29 | Gesture detection fix |
+| v1.0.0 | 2026-04-01 | Safety & Reliability, Diffusion Policy, Health Monitor, OTA |
+| v0.8.0 | 2026-04-01 | Action Chunker, LoRA, TensorRT Optimizer, INT8, DLA |
+| v0.7.0 | 2026-04-01 | LIDAR, Sensor Fusion, Multi-Camera, RealSense |
+| v0.6.0 | 2026-03-30 | Navigation + Obstacle Avoidance |
+| v0.5.0 | 2026-03-30 | SLAM + Nav2 + VLA |
+| v0.4.4 | 2026-03-30 | Person following, gesture owner |
 | v0.4.0 | 2026-03-28 | VLA models, event camera |
 | v0.3.0 | 2026-03-27 | Model selection |
 | v0.2.x | 2026-03-26 | Tracking, ROS2, performance |
-| v0.1.0 | 2026-03-28 | Command subscription, full ROS2, validation |
+| v0.1.0 | 2026-03-28 | Command subscription, full ROS2 |
 | v0.0.3 | 2026-03-26 | YOLO11n, frame skipping, ROS2 |
 | v0.0.2 | 2026-03-25 | Depth, face, gesture, pose |
 | v0.0.1 | 2026-03-15 | Initial release |

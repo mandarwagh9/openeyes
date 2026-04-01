@@ -22,6 +22,7 @@
         <li><a href="commands.html">Commands</a></li>
         <li><a href="ros2.html">ROS2</a></li>
         <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="safety.html">Safety</a></li>
         <li><a href="contributing.html">Contribute</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
@@ -90,11 +91,58 @@ python src/main.py --nav2
 python src/main.py --visual-odom
 python src/main.py --slam</code></pre>
     </div>
+
+    <h2>Multi-Modal Sensing (v0.7.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --lidar
+python src/main.py --lidar-topic /scan
+python src/main.py --realsense
+python src/main.py --multi-camera</code></pre>
+    </div>
+
+    <h2>VLA & Performance (v0.8.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --int8
+python src/main.py --dla
+python src/main.py --diffusion-policy
+python src/main.py --action-chunking
+python src/main.py --control-freq 20</code></pre>
+    </div>
+
+    <h2>Safety & Reliability (v1.0.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --safety
+python src/main.py --health-monitor
+python src/main.py --max-velocity 1.0
+python src/main.py --min-distance 0.3
+python src/main.py --ota-update</code></pre>
+    </div>
+
+    <h2>Safety Options</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+        <tbody>
+          <tr><td><code>--safety</code></td><td>Enable safety controller</td><td>false</td></tr>
+          <tr><td><code>--health-monitor</code></td><td>Enable health monitoring</td><td>false</td></tr>
+          <tr><td><code>--max-velocity</code></td><td>Max velocity (m/s)</td><td>1.0</td></tr>
+          <tr><td><code>--min-distance</code></td><td>Min obstacle distance (m)</td><td>0.3</td></tr>
+          <tr><td><code>--ota-update</code></td><td>Enable OTA updates</td><td>false</td></tr>
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <footer class="footer">
-    <p>The future of robotics is open. Let's build it together.</p>
-    <div class="footer-links"><a href="https://github.com/mandarwagh9/openeyes">GitHub</a><a href="index.html">Home</a></div>
+    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+      <a href="safety.html">Safety</a>
+    </div>
   </footer>
   <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>

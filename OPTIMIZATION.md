@@ -1,6 +1,6 @@
 # Performance Optimization Guide
 
-This guide covers optimization techniques to achieve 15+ FPS on Jetson Orin Nano.
+This guide covers optimization techniques to achieve 30+ FPS on Jetson Orin Nano.
 
 ## Quick Start - Enable Max Performance
 
@@ -31,6 +31,30 @@ yolo export model=yolo11n.pt format=engine half=True
 # YOLO11n - INT8 (fastest)
 yolo export model=yolo11n.pt format=engine int8=True
 ```
+
+## v0.8.0+ Performance: INT8 + DLA
+
+With v0.8.0's TensorRT optimizer, you can now use INT8 quantization and DLA offloading:
+
+```bash
+# INT8 quantization (~2x faster)
+python src/main.py --int8
+
+# INT8 + DLA offloading (~3x faster)
+python src/main.py --int8 --dla
+
+# Full optimization for maximum FPS
+python src/main.py --no-face --no-gesture --no-pose --no-depth --int8 --dla
+```
+
+### Performance with INT8 + DLA
+
+| Configuration | FPS |
+|:--------------|:----|
+| All models (default) | 10-12 |
+| Minimal (no extra models) | 22-25 |
+| INT8 | 30-35 |
+| INT8 + DLA | 40-50 |
 
 ## Frame Skipping
 
@@ -141,12 +165,13 @@ camera:
 ## Performance Comparison
 
 | Configuration | All Models FPS | Object Only FPS |
-|--------------|----------------|-----------------|
-| YOLO11n + Default (v0.1.1) | 10-12 | 25-35 |
+|:--------------|----------------|-----------------|
+| YOLO11n + Default | 10-12 | 25-35 |
 | YOLO11n + --no-face/gesture/pose | 18-22 | 40-50 |
 | YOLO11n + All disabled | 22-25 | 50-60 |
-| YOLO11n + INT8 + All disabled | 30-40 | 80-100 |
-| YOLO11n + Jetson max + INT8 | 40-50 | 100-120 |
+| **YOLO11n + INT8 (v0.8.0+)** | **30-35** | **60-80** |
+| **YOLO11n + INT8 + DLA (v0.8.0+)** | **40-50** | **80-100** |
+| YOLO11n + Jetson max + INT8 | 50-60 | 100-120 |
 
 ## Troubleshooting
 

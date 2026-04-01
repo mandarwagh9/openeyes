@@ -22,6 +22,7 @@
         <li><a href="commands.html">Commands</a></li>
         <li><a href="ros2.html">ROS2</a></li>
         <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="safety.html">Safety</a></li>
         <li><a href="contributing.html">Contribute</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
@@ -52,6 +53,8 @@
           <tr><td><code>/vision/gestures</code></td><td>JSON</td><td>Gesture recognitions</td></tr>
           <tr><td><code>/vision/poses</code></td><td>JSON</td><td>Body poses</td></tr>
           <tr><td><code>/vision/status</code></td><td>JSON</td><td>System status</td></tr>
+          <tr><td><code>/vision/lidar</code></td><td>sensor_msgs/PointCloud2</td><td>LIDAR point cloud (v0.7.0+)</td></tr>
+          <tr><td><code>/vision/fusion</code></td><td>JSON</td><td>Sensor fusion data (v0.7.0+)</td></tr>
         </tbody>
       </table>
     </div>
@@ -69,7 +72,11 @@ ros2 topic pub /vision/cmd std_msgs/String "data: 'follow'" -1</code></pre>
       <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
       <pre><code>ros2 launch openeyes openeyes.launch.py ros2:=true
 ros2 launch openeyes unified.launch.py
-ros2 launch openeyes nav2.launch.py map:=/path/to/map.yaml</code></pre>
+ros2 launch openeyes nav2.launch.py map:=/path/to/map.yaml
+
+# v0.7.0+ New Launch Files
+ros2 launch openeyes lidar.launch.py lidar_topic:=/scan
+ros2 launch openeyes multi_camera.launch.py cameras:=[0,1,2]</code></pre>
     </div>
 
     <h2>Navigation</h2>
@@ -81,8 +88,12 @@ ros2 topic pub /navigation/goal std_msgs/String "data: '2.0 1.0 0.0'"</code></pr
   </main>
 
   <footer class="footer">
-    <p>The future of robotics is open. Let's build it together.</p>
-    <div class="footer-links"><a href="https://github.com/mandarwagh9/openeyes">GitHub</a><a href="index.html">Home</a></div>
+    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+      <a href="safety.html">Safety</a>
+    </div>
   </footer>
   <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>

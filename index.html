@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenEyes — Robot Vision System</title>
+  <title>OpenEyes — Robot Vision System v1.0.0</title>
   <meta name="description" content="Open-source vision system for humanoid robots on NVIDIA Jetson">
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
@@ -24,6 +24,7 @@
         <li><a href="#hardware">Hardware</a></li>
         <li><a href="#models">Models</a></li>
         <li><a href="getting-started.html">Docs</a></li>
+        <li><a href="safety.html">Safety</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
       <div class="navbar-toggle" onclick="toggleMenu()">
@@ -89,6 +90,46 @@
         <h3>VLA Models</h3>
         <p>Vision-Language-Action</p>
       </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🔦</span>
+        <h3>LIDAR Processing</h3>
+        <p>Point cloud obstacle detection</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🔀</span>
+        <h3>Sensor Fusion</h3>
+        <p>Camera + Depth + LIDAR</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">📸</span>
+        <h3>Multi-Camera</h3>
+        <p>Multiple camera support</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">⚡</span>
+        <h3>Action Chunking</h3>
+        <p>10-30 Hz real-time control</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🧠</span>
+        <h3>Diffusion Policy</h3>
+        <p>Robot manipulation AI</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🛡️</span>
+        <h3>Safety Controller</h3>
+        <p>E-STOP, velocity limits</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">❤️</span>
+        <h3>Health Monitor</h3>
+        <p>24/7 with auto-recovery</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">⬆️</span>
+        <h3>OTA Updates</h3>
+        <p>Model updates + rollback</p>
+      </div>
     </div>
   </section>
 
@@ -118,8 +159,13 @@
           </tr>
           <tr>
             <td>INT8</td>
-            <td><span class="badge">30-40</span></td>
+            <td><span class="badge badge-int8">30-40</span></td>
             <td>Production</td>
+          </tr>
+          <tr>
+            <td>INT8 + DLA</td>
+            <td><span class="badge badge-dla">40-50</span></td>
+            <td>Maximum performance</td>
           </tr>
         </tbody>
       </table>
@@ -164,6 +210,28 @@ cd openeyes
 pip install -r requirements.txt
 python src/main.py --debug</code></pre>
     </div>
+
+    <h3>New in v0.7.0 - v1.0.0</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># Multi-Modal Sensing (v0.7.0)
+python src/main.py --lidar --lidar-topic /scan
+python src/main.py --realsense
+python src/main.py --multi-camera
+
+# VLA & Performance (v0.8.0)
+python src/main.py --int8 --dla
+python src/main.py --diffusion-policy
+python src/main.py --action-chunking --control-freq 20
+
+# Safety & Reliability (v1.0.0)
+python src/main.py --safety --max-velocity 1.0 --min-distance 0.3
+python src/main.py --health-monitor
+python src/main.py --ota-update</code></pre>
+    </div>
   </section>
 
   <section id="models" class="section">
@@ -191,10 +259,11 @@ python src/main.py --debug</code></pre>
   </section>
 
   <footer class="footer">
-    <p>OpenEyes — Open-source robot vision</p>
+    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="getting-started.html">Docs</a>
+      <a href="safety.html">Safety</a>
       <a href="hardware.html">Hardware</a>
     </div>
   </footer>

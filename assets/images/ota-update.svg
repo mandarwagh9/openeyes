@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+  <path d="M24 8 L24 20"/>
+  <path d="M24 28 L24 40"/>
+  <path d="M16 12 L8 16"/>
+  <path d="M32 12 L40 16"/>
+  <path d="M16 36 L8 32"/>
+  <path d="M32 36 L40 32"/>
+  <circle cx="24" cy="24" r="6"/>
+  <path d="M20 24 L28 24"/>
+  <path d="M24 20 L24 28"/>
+</svg>

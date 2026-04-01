@@ -1,7 +1,7 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v0.4.4  
-> **Last Updated**: 2026-03-30
+> **Version**: v1.0.0  
+> **Last Updated**: 2026-04-01
 
 ---
 
@@ -60,6 +60,59 @@ python src/main.py
 
 ```bash
 python src/main.py --help
+```
+
+```
+usage: main.py [-h] [--camera CAMERA] [--width WIDTH] [--height HEIGHT]
+                [--fps FPS] [--host HOST] [--port PORT] [--debug]
+                [--config CONFIG] [--no-face] [--no-gesture] [--no-pose]
+                [--no-depth] [--no-parallel] [--pose-every POSE_EVERY] [--ros2]
+                [--version] [--info] [--log-file LOG_FILE]
+                [--lidar] [--lidar-topic LIDAR_TOPIC] [--realsense]
+                [--multi-camera] [--int8] [--dla] [--diffusion-policy]
+                [--action-chunking] [--control-freq CONTROL_FREQ]
+                [--safety] [--health-monitor] [--max-velocity MAX_VELOCITY]
+                [--min-distance MIN_DISTANCE] [--ota-update]
+
+optional arguments:
+  --camera CAMERA         Camera index (0, 1...) or RTSP URL
+  --width WIDTH           Frame width (default: 640)
+  --height HEIGHT        Frame height (default: 480)
+  --fps FPS              Target FPS (default: 30)
+  --host HOST            Output host IP (default: 127.0.0.1)
+  --port PORT            Output port (default: 5000)
+  --debug                Enable debug mode (shows video window)
+  --config CONFIG        Config file path
+  --no-face              Disable face detection
+  --no-gesture           Disable gesture recognition
+  --no-pose              Disable pose estimation
+  --no-depth             Disable depth estimation
+  --no-parallel          Disable parallel processing
+  --pose-every N         Run pose every N frames (default: 2)
+  --ros2                 Enable ROS2 publishing
+  --version              Show version
+  --info                 Show system info and recommendations
+  --log-file PATH        Log file path (with rotation)
+
+  # v0.7.0 - Multi-Modal Sensing
+  --lidar                Enable LIDAR processing
+  --lidar-topic TOPIC    LIDAR topic (default: /scan)
+  --realsense            Enable RealSense D455
+  --multi-camera         Enable multi-camera mode
+
+  # v0.8.0 - VLA & Performance
+  --int8                 Enable INT8 quantization
+  --dla                  Enable DLA offloading
+  --diffusion-policy     Enable Diffusion Policy
+  --action-chunking      Enable action chunking
+  --control-freq HZ      Control frequency (10-30 Hz, default: 20)
+
+  # v1.0.0 - Safety & Reliability
+  --safety               Enable safety controller
+  --health-monitor       Enable health monitoring
+  --max-velocity M/S     Max velocity m/s (default: 1.0)
+  --min-distance M       Min obstacle distance (default: 0.3)
+  --ota-update           Enable OTA updates
 ```
 
 ```
@@ -269,6 +322,8 @@ python src/main.py --no-face --no-gesture --no-pose
 | `python src/main.py --pose-every 3` | ~12-14 FPS |
 | `python src/main.py --no-face --no-gesture --no-pose` | ~18-22 FPS |
 | `python src/main.py --no-face --no-gesture --no-pose --no-depth` | ~22-25 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose --no-depth` + `--int8` | ~30-35 FPS |
+| `python src/main.py --no-face --no-gesture --no-pose --no-depth` + `--int8 --dla` | ~40-50 FPS |
 | `python src/main.py --no-face --no-gesture --no-pose` + `sudo nvpmodel -m 0 && sudo jetson_clocks` | ~22-28 FPS |
 
 > **Tip**: Run `sudo nvpmodel -m 0 && sudo jetson_clocks` for maximum Jetson performance!

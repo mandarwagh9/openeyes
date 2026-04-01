@@ -22,6 +22,7 @@
         <li><a href="commands.html">Commands</a></li>
         <li><a href="ros2.html">ROS2</a></li>
         <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="safety.html">Safety</a></li>
         <li><a href="contributing.html">Contribute</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
@@ -89,15 +90,40 @@
           <tr><td>USB Webcam 1080p</td><td>$50</td></tr>
           <tr><td>64GB microSD</td><td>$20</td></tr>
           <tr><td>5V/4A Power Supply</td><td>$15</td></tr>
-          <tr><td><strong>Total</strong></td><td><strong>$285</strong></td></tr>
+          <tr><td><strong>Total (Basic)</strong></td><td><strong>$285</strong></td></tr>
         </tbody>
       </table>
     </div>
+
+    <h2>LIDAR Options (v0.7.0+)</h2>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>LIDAR</th><th>Range</th><th>Interface</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>YDLIDAR X4</td><td>10m</td><td>USB</td><td>$90</td></tr>
+          <tr><td>RPLIDAR A1M8</td><td>12m</td><td>USB</td><td>$100</td></tr>
+          <tr><td>LDS-50C</td><td>8m</td><td>USB</td><td>$60</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>RealSense D455 (v0.7.0+)</h2>
+    <ul>
+      <li><strong>Depth Range:</strong> 0.6m - 6m</li>
+      <li><strong>RGB Resolution:</strong> 1280x720</li>
+      <li><strong>FOV:</strong> 87° x 58°</li>
+      <li><strong>Interface:</strong> USB-C</li>
+      <li><strong>Cost:</strong> $150</li>
+    </ul>
   </main>
 
   <footer class="footer">
-    <p>The future of robotics is open. Let's build it together.</p>
-    <div class="footer-links"><a href="https://github.com/mandarwagh9/openeyes">GitHub</a><a href="index.html">Home</a></div>
+    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+      <a href="safety.html">Safety</a>
+    </div>
   </footer>
   <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>

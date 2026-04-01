@@ -22,6 +22,7 @@
         <li><a href="commands.html">Commands</a></li>
         <li><a href="ros2.html">ROS2</a></li>
         <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="safety.html">Safety</a></li>
         <li><a href="contributing.html">Contribute</a></li>
         <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
       </ul>
@@ -106,16 +107,67 @@ sudo jetson_clocks</code></pre>
     <h2>Next Steps</h2>
     <ul>
       <li><a href="commands.html">Explore all commands</a></li>
+      <li><a href="safety.html">Safety & Reliability Features</a></li>
       <li><a href="ros2.html">Set up ROS2 integration</a></li>
       <li><a href="hardware.html">View hardware specs</a></li>
     </ul>
+
+    <h2>v0.7.0+ New Features</h2>
+    <h3>Multi-Modal Sensing</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># Enable LIDAR processing
+python src/main.py --lidar --lidar-topic /scan
+
+# Enable RealSense D455
+python src/main.py --realsense
+
+# Multi-camera mode
+python src/main.py --multi-camera</code></pre>
+    </div>
+
+    <h3>VLA & Performance (v0.8.0+)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># INT8 quantization (~2x faster)
+python src/main.py --int8
+
+# INT8 + DLA (~3x faster)
+python src/main.py --int8 --dla
+
+# Maximum FPS
+python src/main.py --no-face --no-gesture --no-pose --no-depth --int8 --dla</code></pre>
+    </div>
+
+    <h3>Safety Features (v1.0.0+)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># Enable safety controller
+python src/main.py --safety --max-velocity 0.5 --min-distance 0.5
+
+# Enable health monitoring
+python src/main.py --health-monitor
+
+# Full production mode
+python src/main.py --safety --health-monitor --ota-update</code></pre>
+    </div>
   </main>
 
   <footer class="footer">
-    <p>The future of robotics is open. Let's build it together.</p>
+    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="index.html">Home</a>
+      <a href="safety.html">Safety</a>
     </div>
   </footer>
 

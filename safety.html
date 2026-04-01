@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safety & Reliability - OpenEyes</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="index.html" class="navbar-logo">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        <span>OpenEyes</span>
+      </a>
+      <ul class="navbar-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="getting-started.html">Getting Started</a></li>
+        <li><a href="commands.html">Commands</a></li>
+        <li><a href="ros2.html">ROS2</a></li>
+        <li><a href="hardware.html">Hardware</a></li>
+        <li><a href="safety.html" class="active">Safety</a></li>
+        <li><a href="contributing.html">Contribute</a></li>
+        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
+      </ul>
+      <div class="navbar-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+
+  <header class="safety-hero">
+    <h1>Safety & Reliability</h1>
+    <p>Industrial-grade safety features for 24/7 robot operation. Emergency stop, health monitoring, and OTA updates with automatic rollback.</p>
+  </header>
+
+  <main class="content">
+    <section class="section">
+      <div class="section-header">
+        <h2>v1.0.0 Industry Standard Features</h2>
+      </div>
+      
+      <div class="safety-grid">
+        <div class="safety-card">
+          <h3>
+            <img src="assets/images/health-monitor.svg" alt="Health Monitor">
+            Health Monitor
+          </h3>
+          <ul>
+            <li><span>Component Health Tracking</span><code>24/7</code></li>
+            <li><span>Auto-Recovery</span><code>Enabled</code></li>
+            <li><span>Watchdog Timer</span><code>Configurable</code></li>
+            <li><span>System Diagnostics</span><code>CPU/GPU/Mem</code></li>
+          </ul>
+        </div>
+
+        <div class="safety-card">
+          <h3>
+            <img src="assets/images/safety-shield.svg" alt="Safety Controller">
+            Safety Controller
+          </h3>
+          <ul>
+            <li><span>Emergency Stop (E-STOP)</span><code>Enabled</code></li>
+            <li><span>Safe Velocity Limits</span><code>0-1.0 m/s</code></li>
+            <li><span>Min Distance</span><code>0.3m default</code></li>
+            <li><span>Collision Avoidance</span><code>Auto</code></li>
+          </ul>
+        </div>
+
+        <div class="safety-card">
+          <h3>
+            <img src="assets/images/ota-update.svg" alt="OTA Updates">
+            OTA Updates
+          </h3>
+          <ul>
+            <li><span>Model Updates</span><code>Automatic</code></li>
+            <li><span>Rollback on Failure</span><code>Enabled</code></li>
+            <li><span>Version Checking</span><code>Enabled</code></li>
+            <li><span>Safe Verification</span><code>Enabled</code></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Quick Start</h2>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code># Enable all safety features (v1.0.0)
+python src/main.py --safety --health-monitor --ota-update
+
+# Configure safety parameters
+python src/main.py --safety --max-velocity 0.5 --min-distance 0.5
+
+# Health monitoring only
+python src/main.py --health-monitor</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Health Monitor</h2>
+        <p>The HealthMonitor class provides 24/7 operation with automatic failure recovery.</p>
+      </div>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>Component Heartbeats</strong> - Each vision component reports health status every 5 seconds</li>
+        <li><strong>Auto-Recovery</strong> - Failed components are automatically restarted</li>
+        <li><strong>Watchdog Timer</strong> - Detects stuck processes (>30s without heartbeat)</li>
+        <li><strong>System Diagnostics</strong> - CPU, Memory, GPU monitoring via tegrastats</li>
+      </ul>
+
+      <h3>Architecture</h3>
+      <div class="diagram-container">
+        <svg width="600" height="200" viewBox="0 0 600 200" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="20" y="70" width="100" height="60" rx="8"/>
+          <text x="70" y="105" text-anchor="middle" font-size="12">Camera</text>
+          
+          <rect x="150" y="70" width="100" height="60" rx="8"/>
+          <text x="200" y="105" text-anchor="middle" font-size="12">Detector</text>
+          
+          <rect x="280" y="70" width="100" height="60" rx="8"/>
+          <text x="330" y="105" text-anchor="middle" font-size="12">Depth</text>
+          
+          <rect x="410" y="70" width="100" height="60" rx="8"/>
+          <text x="460" y="105" text-anchor="middle" font-size="12">MediaPipe</text>
+          
+          <rect x="230" y="150" width="140" height="40" rx="8" stroke-dasharray="4 2"/>
+          <text x="300" y="175" text-anchor="middle" font-size="12">HealthMonitor</text>
+          
+          <line x1="120" y1="100" x2="150" y2="100"/>
+          <line x1="250" y1="100" x2="280" y2="100"/>
+          <line x1="380" y1="100" x2="410" y2="100"/>
+          <line x1="70" y1="130" x2="70" y2="150"/>
+          <line x1="200" y1="130" x2="200" y2="150"/>
+          <line x1="330" y1="130" x2="330" y2="150"/>
+          <line x1="460" y1="130" x2="460" y2="150"/>
+          <line x1="70" y1="150" x2="530" y2="150"/>
+        </svg>
+      </div>
+
+      <h3>CLI Options</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>--health-monitor</code></td><td>Enable health monitoring</td><td>false</td></tr>
+            <tr><td><code>--watchdog-timeout</code></td><td>Seconds before watchdog triggers</td><td>30</td></tr>
+            <tr><td><code>--auto-recovery</code></td><td>Auto-restart failed components</td><td>true</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Safety Controller</h2>
+        <p>Industrial safety features including emergency stop, velocity limits, and collision avoidance.</p>
+      </div>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>E-STOP Integration</strong> - Hardware/software emergency stop signals</li>
+        <li><strong>Safe Velocity Limits</strong> - Configurable max velocity (0.1-2.0 m/s)</li>
+        <li><strong>Minimum Distance</strong> - Collision avoidance trigger distance</li>
+        <li><strong>Speed Regulation</strong> - Automatic slowdown near obstacles</li>
+      </ul>
+
+      <h3>Safety Zones</h3>
+      <div class="diagram-container">
+        <svg width="500" height="300" viewBox="0 0 500 300" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="250" cy="150" r="120" stroke-dasharray="4 2"/>
+          <circle cx="250" cy="150" r="80" stroke-dasharray="4 2"/>
+          <circle cx="250" cy="150" r="40"/>
+          <text x="250" y="155" text-anchor="middle" font-size="14" font-weight="bold">ROBOT</text>
+          <text x="250" y="40" text-anchor="middle" font-size="10" fill="#a1a1a1">DANGER ZONE (&lt;0.3m)</text>
+          <text x="250" y="80" text-anchor="middle" font-size="10" fill="#a1a1a1">WARNING ZONE (&lt;0.5m)</text>
+          <text x="250" y="120" text-anchor="middle" font-size="10" fill="#a1a1a1">SAFE ZONE (&gt;0.5m)</text>
+        </svg>
+      </div>
+
+      <h3>CLI Options</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>--safety</code></td><td>Enable safety controller</td><td>false</td></tr>
+            <tr><td><code>--max-velocity</code></td><td>Max velocity in m/s</td><td>1.0</td></tr>
+            <tr><td><code>--min-distance</code></td><td>Min obstacle distance in meters</td><td>0.3</td></tr>
+            <tr><td><code>--e-stop</code></td><td>Enable emergency stop</td><td>true</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Example Configuration</h3>
+      <div class="config-example">
+        <div class="code-header">
+          <span class="code-lang">yaml</span>
+        </div>
+        <pre><code>safety:
+  enabled: true
+  max_velocity: 0.5  # m/s - slower for safety
+  min_distance: 0.5  # meters
+  e_stop_enabled: true
+  slowdown_factor: 0.5  # reduce speed by 50% in warning zone
+
+health_monitor:
+  enabled: true
+  watchdog_timeout: 30  # seconds
+  auto_recovery: true
+  heartbeat_interval: 5  # seconds</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>OTA Updates</h2>
+        <p>Over-the-air model updates with automatic rollback on failure.</p>
+      </div>
+
+      <h3>Features</h3>
+      <ul>
+        <li><strong>Version Checking</strong> - Automatic check for new model versions</li>
+        <li><strong>Safe Download</strong> - Verified downloads with checksum validation</li>
+        <li><strong>Automatic Rollback</strong> - Revert to previous version on failure</li>
+        <li><strong>Incremental Updates</strong> - Only download changed model weights</li>
+      </ul>
+
+      <h3>Update Flow</h3>
+      <div class="flow-diagram">
+        <div class="flow-item">Check Version</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">Download</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">Verify</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">Deploy</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-item">Monitor</div>
+      </div>
+
+      <h3>CLI Options</h3>
+      <div class="table-container">
+        <table>
+          <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>--ota-update</code></td><td>Enable OTA updates</td><td>false</td></tr>
+            <tr><td><code>--ota-check-interval</code></td><td>Hours between version checks</td><td>24</td></tr>
+            <tr><td><code>--auto-rollback</code></td><td>Auto-rollback on failure</td><td>true</td></tr>
+            <tr><td><code>--update-url</code></td><td>Custom update server URL</td><td>default</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Performance Stats</h2>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="value">24/7</div>
+          <div class="label">Continuous Operation</div>
+        </div>
+        <div class="stat-item">
+          <div class="value">&lt;100ms</div>
+          <div class="label">Safety Response Time</div>
+        </div>
+        <div class="stat-item">
+          <div class="value">99.9%</div>
+          <div class="label">Uptime Target</div>
+        </div>
+        <div class="stat-item">
+          <div class="value">30s</div>
+          <div class="label">Watchdog Timeout</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Common Configurations</h2>
+      </div>
+
+      <h3>Development / Testing</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>python src/main.py --health-monitor --safety</code></pre>
+      </div>
+
+      <h3>Production Deployment</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>python src/main.py --safety --health-monitor --ota-update \
+  --max-velocity 0.5 --min-distance 0.5</code></pre>
+      </div>
+
+      <h3>Maximum Safety</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">bash</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><code>python src/main.py --safety --health-monitor --ota-update \
+  --max-velocity 0.3 --min-distance 0.8 --watchdog-timeout 15</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2>Related Pages</h2>
+      </div>
+      <ul>
+        <li><a href="commands.html">All CLI Commands</a></li>
+        <li><a href="getting-started.html">Getting Started Guide</a></li>
+        <li><a href="hardware.html">Hardware Specifications</a></li>
+        <li><a href="ros2.html">ROS2 Integration</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>The future of robotics is open. Let's build it together.</p>
+    <div class="footer-links">
+      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
+      <a href="index.html">Home</a>
+    </div>
+  </footer>
+
+  <script>
+    function toggleMenu() { document.querySelector('.navbar-links').classList.toggle('active'); }
+    function copyCode(btn) {
+      const code = btn.closest('.code-block, .config-example').querySelector('code').textContent;
+      navigator.clipboard.writeText(code).then(() => { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); });
+    }
+  </script>
+</body>
+</html>

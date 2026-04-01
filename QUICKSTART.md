@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v0.4.4  
+> **Version**: v1.0.0  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -150,6 +150,8 @@ python src/main.py --host 192.168.1.100 --port 5000
 | Without face/gesture/pose | 18-22 FPS |
 | Without all extras + Jetson max | 22-28 FPS |
 | Object detection only | 40-60 FPS |
+| INT8 (v0.8.0+) | 30-40 FPS |
+| INT8 + DLA (v0.8.0+) | 40-50 FPS |
 | YOLO11n TensorRT INT8 | 80-100 FPS |
 
 > **Tip**: See [OPTIMIZATION.md](OPTIMIZATION.md) for more performance tuning options.

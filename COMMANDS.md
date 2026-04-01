@@ -9,6 +9,7 @@
 | Max speed | `--no-face --no-gesture --no-pose --no-depth` |
 | With ROS2 | `--ros2` |
 | Person follow | `--follow` |
+| Version | `--version` |
 
 ---
 
@@ -35,6 +36,7 @@ python src/main.py --precision fp16              # TensorRT FP16
 python src/main.py --batch-size 4                # Batch inference
 python src/main.py --dla                         # Use DLA (Jetson)
 python src/main.py --no-monitoring               # Disable stats
+python src/main.py --int8                        # INT8 quantization (v0.8.0+)
 ```
 
 ## Disable Models
@@ -69,6 +71,32 @@ python src/main.py --event-camera                 # Event camera
 python src/main.py --advanced-ai                   # All AI features
 ```
 
+## Multi-Modal Sensing (v0.7.0+)
+```bash
+python src/main.py --lidar                        # Enable LIDAR processing
+python src/main.py --lidar-topic /scan            # LIDAR topic (default: /scan)
+python src/main.py --realsense                    # Enable RealSense D455
+python src/main.py --multi-camera                 # Multi-camera mode
+```
+
+## VLA & Performance (v0.8.0+)
+```bash
+python src/main.py --int8                         # Enable INT8 quantization
+python src/main.py --dla                         # Enable DLA offloading
+python src/main.py --diffusion-policy             # Enable Diffusion Policy
+python src/main.py --action-chunking              # Enable action chunking
+python src/main.py --control-freq 20              # Control frequency (10-30 Hz)
+```
+
+## Safety & Reliability (v1.0.0+)
+```bash
+python src/main.py --safety                      # Enable safety controller
+python src/main.py --health-monitor              # Enable health monitoring
+python src/main.py --max-velocity 1.0            # Max velocity (m/s)
+python src/main.py --min-distance 0.3            # Min obstacle distance (m)
+python src/main.py --ota-update                   # Enable OTA updates
+```
+
 ## Info & Logs
 ```bash
 python src/main.py --version                      # Show version
@@ -86,8 +114,8 @@ sudo python3 scripts/jetson_helper.py --optimize # Apply optimization
 
 ## Common Combinations
 ```bash
-# Maximum FPS
-python src/main.py --no-face --no-gesture --no-pose --no-depth --precision int8
+# Maximum FPS (v0.7.0+)
+python src/main.py --no-face --no-gesture --no-pose --no-depth --int8
 
 # Balanced (good FPS + features)
 python src/main.py --no-depth --precision fp16
@@ -97,4 +125,13 @@ python src/main.py --ros2 --follow --precision fp16
 
 # Development
 python src/main.py --debug --log-file logs/debug.log
+
+# Full Safety Mode (v1.0.0+)
+python src/main.py --safety --health-monitor --max-velocity 0.5 --min-distance 0.5
+
+# Multi-Modal with Fusion (v0.7.0+)
+python src/main.py --lidar --realsense --sensor-fusion
+
+# High-Performance VLA (v0.8.0+)
+python src/main.py --vla --int8 --dla --action-chunking --control-freq 30
 ```
