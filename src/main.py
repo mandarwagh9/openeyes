@@ -172,6 +172,22 @@ def main() -> None:
             config._config["ros2"]["enabled"] = True
             print("RealSense camera mode enabled (depth + IMU)")
 
+        if args.int8:
+            config._config["performance"]["tensorrt"]["precision"] = "int8"
+            print("INT8 quantization enabled")
+
+        if args.dla:
+            config._config["performance"]["tensorrt"]["dla_enabled"] = True
+            print("DLA offloading enabled")
+
+        if args.diffusion_policy:
+            from src.models.diffusion_policy import DiffusionPolicy
+            print("Diffusion policy enabled")
+
+        if args.action_chunking:
+            from src.models.action_chunker import create_action_chunker
+            print(f"Action chunking enabled ({args.control_freq} Hz)")
+
         if args.vla or args.advanced_ai:
             from src.models.vla import VLAModel
             if VLAModel is not None:

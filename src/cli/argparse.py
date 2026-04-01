@@ -249,6 +249,32 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Use RealSense camera (depth + IMU) for SLAM",
     )
+    parser.add_argument(
+        "--int8",
+        action="store_true",
+        help="Use INT8 quantized models for faster inference",
+    )
+    parser.add_argument(
+        "--dla",
+        action="store_true",
+        help="Use DLA (Deep Learning Accelerator) for inference",
+    )
+    parser.add_argument(
+        "--diffusion-policy",
+        action="store_true",
+        help="Enable diffusion policy for manipulation",
+    )
+    parser.add_argument(
+        "--action-chunking",
+        action="store_true",
+        help="Enable action chunking for smooth control",
+    )
+    parser.add_argument(
+        "--control-freq",
+        type=int,
+        default=20,
+        help="Control frequency in Hz (default: 20)",
+    )
 
     return parser
 
