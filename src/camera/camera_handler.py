@@ -51,6 +51,8 @@ class CameraHandler:
     @staticmethod
     def _detect_jetson() -> bool:
         """Detect if running on NVIDIA Jetson platform."""
+        if os.environ.get("OPENEYES_TEST_MODE") == "true":
+            return False
         try:
             with open("/proc/device-tree/model", "r") as f:
                 model = f.read().lower()

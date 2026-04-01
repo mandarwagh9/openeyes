@@ -31,13 +31,15 @@ class VisionSystem:
     """Optimized vision system with parallel processing and modular architecture."""
 
     def __init__(self, config: Config, use_ros2: bool = False, log_file: Optional[str] = None):
+        import logging
+        import logging.handlers
+        
         self._config = config
         self._use_ros2 = use_ros2
         self._logger = logging.getLogger("openeyes")
         self._logger.setLevel(logging.DEBUG if config.debug else logging.INFO)
         
         if log_file:
-            import logging.handlers
             handler = logging.handlers.RotatingFileHandler(
                 log_file, maxBytes=5*1024*1024, backupCount=3
             )
@@ -46,11 +48,10 @@ class VisionSystem:
             )
             self._logger.addHandler(handler)
         else:
-            self._logger = logging.basicConfig(
+            logging.basicConfig(
                 level=logging.DEBUG if config.debug else logging.INFO,
                 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )
-            self._logger = logging.getLogger("openeyes")
 
         self._camera: Optional[CameraHandler] = None
         self._detector = None
@@ -227,8 +228,6 @@ class VisionSystem:
             try:
                 self._face_detector = FaceDetector()
                 self._face_detector.load()
-                if self._config.debug:
-                    self._face_detector._debug = True
                 self._logger.info("Face Detector loaded")
             except ModelError as e:
                 self._logger.warning(f"Face Detector not available: {e}")
@@ -239,8 +238,6 @@ class VisionSystem:
                     min_confidence=self._config.gesture_confidence
                 )
                 self._gesture_recognizer.load()
-                if self._config.debug:
-                    self._gesture_recognizer._debug = True
                 self._logger.info("Gesture Recognizer loaded")
             except ModelError as e:
                 self._logger.warning(f"Gesture Recognizer not available: {e}")
@@ -434,7 +431,6 @@ class VisionSystem:
                     "confidence": obj.confidence
                 })
             self._ros2_pub.publish_detections(detections, (frame_shape[1], frame_shape[0]))
-            self._logger.debug(f"Published {len(detections)} detections")
 
             if result.depth and result.depth.enabled:
                 self._ros2_pub.publish_depth(result.depth, (frame_shape[1], frame_shape[0]))
@@ -459,21 +455,26 @@ class VisionSystem:
         box_color = (0, 255, 0)
         text_color = (0, 255, 0)
 
-        stats = self._perf_monitor.get_stats() if self._perf_monitor else {}
+        fps = 0.0
+        if hasattr(self, '_fps_counter') and hasattr(self, '_fps_start_time'):
+            elapsed = time.time() - self._fps_start_time
+            if elapsed > 0:
+                fps = self._fps_counter / elapsed
 
         overlay_y = 35
         line_height = 28
 
         stats_lines = [
-            f"FPS: {stats.get('fps', 0):.1f}",
-            f"Latency: {stats.get('avg_latency_ms', 0):.1f}ms",
-            f"Memory: {stats.get('memory_used_mb', 0):.0f}MB",
+            f"FPS: {fps:.1f}",
+            f"Objects: {len(result.objects)}",
+            f"Faces: {len(result.faces)}",
+            f"Gestures: {len(result.gestures)}",
         ]
 
         for line in stats_lines:
-            (text_w, text_h), _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
-            cv2.rectangle(frame, (5, overlay_y - text_h - 5), (text_w + 15, overlay_y + 5), (0, 0, 0), -1)
-            cv2.putText(frame, line, (10, overlay_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
+            (text_w, text_h), _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+            cv2.rectangle(frame, (5, overlay_y - text_h - 5), (text_w + 20, overlay_y + 5), (0, 0, 0), -1)
+            cv2.putText(frame, line, (10, overlay_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, text_color, 2)
             overlay_y += line_height
 
         for det in result.objects:

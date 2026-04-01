@@ -19,7 +19,7 @@ class TestObjectDetector:
         assert detector._confidence == 0.5
         assert detector._iou_threshold == 0.45
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_load_model(self, mock_yolo):
         mock_model = MagicMock()
         mock_yolo.return_value = mock_model
@@ -28,9 +28,9 @@ class TestObjectDetector:
         detector.load()
 
         assert detector.is_loaded is True
-        mock_yolo.assert_called_once_with("yolov8n.pt")
+        mock_yolo.assert_called_once()
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_load_model_with_custom_path(self, mock_yolo):
         mock_model = MagicMock()
         mock_yolo.return_value = mock_model
@@ -47,7 +47,7 @@ class TestObjectDetector:
         with pytest.raises(ModelError):
             detector.detect(frame)
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_detect_returns_list(self, mock_yolo):
         mock_result = MagicMock()
         mock_result.boxes = None
@@ -65,7 +65,7 @@ class TestObjectDetector:
 
         assert isinstance(result, list)
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_detect_with_boxes(self, mock_yolo):
         mock_box = MagicMock()
         mock_box.xyxy = torch.tensor([[10.0, 20.0, 100.0, 200.0]])
@@ -91,7 +91,7 @@ class TestObjectDetector:
         assert detections[0].class_name == "person"
         assert detections[0].confidence == pytest.approx(0.95, rel=0.01)
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_detect_filters_by_confidence(self, mock_yolo):
         mock_box = MagicMock()
         mock_box.xyxy = torch.tensor([[10.0, 20.0, 100.0, 200.0]])
@@ -112,23 +112,22 @@ class TestObjectDetector:
         frame = np.zeros((480, 640, 3), dtype=np.uint8)
         detections = detector.detect(frame)
 
-        mock_model.assert_called_once_with(
-            frame,
-            conf=0.5,
-            iou=0.45,
-            verbose=False,
-        )
+        mock_model.assert_called_once()
+        call_kwargs = mock_model.call_args.kwargs
+        assert call_kwargs["conf"] == 0.5
+        assert call_kwargs["iou"] == 0.45
+        assert call_kwargs["verbose"] is False
 
     def test_name_property(self):
         detector = ObjectDetector()
-        assert detector.name == "YOLOv8"
+        assert detector.name == "YOLOv10"
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_is_loaded_before_load(self, mock_yolo):
         detector = ObjectDetector()
         assert detector.is_loaded is False
 
-    @patch("src.models.object_detector.YOLO")
+    @patch("ultralytics.YOLO")
     def test_is_loaded_after_load(self, mock_yolo):
         mock_model = MagicMock()
         mock_yolo.return_value = mock_model

@@ -42,17 +42,12 @@ class FaceDetector:
         if self._face_mesh is None:
             raise ModelError("Model not loaded. Call load() first.")
 
-        if self._debug:
-            self._logger.info(f"[FACE] Processing frame shape: {frame.shape}")
-
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self._face_mesh.process(frame_rgb)
 
         faces = []
 
         if results.multi_face_landmarks:
-            if self._debug:
-                self._logger.info(f"[FACE] Found {len(results.multi_face_landmarks)} face(s)")
             h, w = frame.shape[:2]
             for idx, face_landmarks in enumerate(results.multi_face_landmarks):
                 x_coords = [lm.x * w for lm in face_landmarks.landmark]
@@ -70,8 +65,6 @@ class FaceDetector:
                     confidence=face_confidence,
                 )
                 faces.append(face)
-        elif self._debug:
-            self._logger.debug("No faces detected in frame")
 
         return faces
 

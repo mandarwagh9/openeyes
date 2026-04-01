@@ -21,6 +21,7 @@ class TestCameraHandler:
     def test_open_success(self, mock_video_capture):
         mock_cap = MagicMock()
         mock_cap.isOpened.return_value = True
+        mock_cap.read.return_value = (True, np.zeros((480, 640, 3), dtype=np.uint8))
         mock_video_capture.return_value = mock_cap
 
         camera = CameraHandler()
@@ -54,14 +55,22 @@ class TestCameraHandler:
         assert isinstance(frame, np.ndarray)
         assert frame.shape == (480, 640, 3)
 
+    @patch("src.camera.camera_handler.CameraHandler._check_csi_available", return_value=False, create=True)
     @patch("src.camera.camera_handler.cv2.VideoCapture")
-    def test_read_returns_none_on_failure(self, mock_video_capture):
+    def test_read_returns_none_on_failure(self, mock_video_capture, mock_csi):
         mock_cap = MagicMock()
         mock_cap.isOpened.return_value = True
-        mock_cap.read.return_value = (False, None)
+        call_count = [0]
+        def read_side_effect():
+            call_count[0] += 1
+            if call_count[0] == 1:
+                return (True, np.zeros((480, 640, 3), dtype=np.uint8))
+            return (False, None)
+        mock_cap.read.side_effect = read_side_effect
         mock_video_capture.return_value = mock_cap
 
         camera = CameraHandler()
+        camera._max_reconnect_attempts = 0
         camera.open()
         frame = camera.read()
 
@@ -82,6 +91,7 @@ class TestCameraHandler:
     def test_release(self, mock_video_capture):
         mock_cap = MagicMock()
         mock_cap.isOpened.return_value = True
+        mock_cap.read.return_value = (True, np.zeros((480, 640, 3), dtype=np.uint8))
         mock_video_capture.return_value = mock_cap
 
         camera = CameraHandler()
@@ -110,6 +120,7 @@ class TestCameraHandler:
         mock_cap = MagicMock()
         mock_cap.isOpened.return_value = True
         mock_cap.get.return_value = 640.0
+        mock_cap.read.return_value = (True, np.zeros((480, 640, 3), dtype=np.uint8))
         mock_video_capture.return_value = mock_cap
 
         camera = CameraHandler()
@@ -122,6 +133,7 @@ class TestCameraHandler:
         mock_cap = MagicMock()
         mock_cap.isOpened.return_value = True
         mock_cap.get.return_value = 480.0
+        mock_cap.read.return_value = (True, np.zeros((480, 640, 3), dtype=np.uint8))
         mock_video_capture.return_value = mock_cap
 
         camera = CameraHandler()

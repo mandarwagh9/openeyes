@@ -46,8 +46,6 @@ class GestureRecognizer:
         gestures = []
 
         if results.multi_hand_landmarks:
-            if self._debug:
-                self._logger.info(f"[GESTURE] Found {len(results.multi_hand_landmarks)} hand(s)")
             for idx, hand_landmarks in enumerate(results.multi_hand_landmarks):
                 handedness = "right"
                 if results.multi_handedness and idx < len(results.multi_handedness):
@@ -64,8 +62,6 @@ class GestureRecognizer:
                     confidence=gesture_confidence,
                 )
                 gestures.append(gesture)
-        elif self._debug:
-            self._logger.debug("No hands detected in frame")
 
         return gestures
 

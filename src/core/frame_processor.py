@@ -135,6 +135,7 @@ class FrameProcessor:
             frame, frame_rgb
         )
 
+
         depth_enabled = depth_map is not None
         if depth_map is not None:
             self._last_depth = depth_map
@@ -218,13 +219,19 @@ class FrameProcessor:
                 self._pose_estimator.estimate, frame_rgb
             )
 
+        from concurrent.futures import Future
+        
         detections: list[Any] = []
         depth_map: Optional[np.ndarray] = None
         faces: list[FaceDetection] = []
         gestures: list[Gesture] = []
         pose = PoseData(detected=False)
 
-        for key, future in as_completed(futures):
+        if not futures:
+            return detections, depth_map, faces, gestures, pose
+
+        future_list: list[tuple[str, Future]] = list(futures.items())
+        for key, future in future_list:
             try:
                 result = future.result()
                 if key == "detector":
