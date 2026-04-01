@@ -1,13 +1,13 @@
 # ROADMAP.md - Project Roadmap for OpenEyes
 
-> **Version**: v0.4.4  
-> **Last Updated**: 2026-03-30
+> **Version**: v0.7.0 (Phase 1 Complete)
+> **Last Updated**: 2026-04-01
 
 ---
 
 ## Overview
 
-This roadmap outlines the development plan for OpenEyes - a vision system for humanoid robots.
+This roadmap outlines the development plan for OpenEyes - a vision system for humanoid robots running on NVIDIA Jetson Orin Nano.
 
 ---
 
@@ -15,155 +15,127 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
-| v0.6.0 | Current | 2026-03-30 | Navigation + Obstacle Avoidance |
+| v0.7.0 | Current | 2026-04-01 | Multi-Modal Sensing + LIDAR + Sensor Fusion |
+| v0.6.0 | Released | 2026-03-30 | Navigation + Obstacle Avoidance |
 | v0.5.0 | Released | 2026-03-30 | SLAM + Nav2 + VLA Integration |
 | v0.4.4 | Released | 2026-03-30 | Person Following + Gesture Owner |
 | v0.4.0 | Released | 2026-03-28 | VLA + Event Camera |
 | v0.3.0 | Released | 2026-03-27 | Model Selection |
 | v0.2.x | Released | 2026-03-26 | Tracking + ROS2 |
 | v0.1.0 | Released | 2026-03-28 | Command Subscription + Full ROS2 |
-| v0.0.3 | Released | 2026-03-26 | Performance + ROS2 |
-| v0.0.2 | Released | 2026-03-25 | Full Vision Pipeline |
-| v0.0.1 | Released | 2026-03-15 | Object Detection |
 
 ---
 
-## Release Timeline
+## Industry Standard Roadmap (18-Month Plan)
 
-### v0.0.x - Foundation Phase
+### Phase 1: Foundation (Months 1-6) ✅ COMPLETE
 
-#### v0.0.3 - Performance + ROS2 ✓
+#### v0.7.0 - Multi-Modal Sensing (April 2026) ✅
 **Status:** Complete
 
-- [x] YOLO11n integration (better than YOLOv10n)
-- [x] MiDaS depth estimation
-- [x] MediaPipe Face detection
-- [x] MediaPipe Gesture recognition
-- [x] MediaPipe Pose estimation
-- [x] Parallel processing optimization
-- [x] CSI camera support (IMX219)
-- [x] Auto-display detection
-- [x] TensorRT/ONNX optimization
-
-**Released:** March 2026
-
-**Performance:**
-- 7-10 FPS with all models
-- 30+ FPS with object detection only
+- [x] Isaac ROS VSLAM integration (GPU-accelerated visual odometry)
+- [x] Cartographer support for 2D LiDAR mapping
+- [x] Depth-to-LaserScan conversion (pointcloud_to_laserscan)
+- [x] Nav2 behavior tree customization support
+- [x] LIDAR integration for obstacle detection (`src/ros2/lidar_processing.py`)
+- [x] RealSense D455 support (stereo depth + IMU)
+- [x] Sensor fusion module (camera + depth + LIDAR) (`src/ros2/sensor_fusion.py`)
+- [x] Multi-camera support (`src/ros2/multi_camera.py`)
+- [x] CLI args: `--lidar`, `--lidar-topic`, `--realsense`, `--multi-camera`
 
 ---
 
-### v1.0.x - Integration Phase
+### Phase 2: AI & Performance (Months 7-12)
 
-#### v1.0.0 - Full Integration
-**Status:** In Progress
+#### v0.8.0 - VLA Integration (July 2026)
+**Status:** Planned
 
-- [ ] Unified vision pipeline optimization
-- [ ] Performance tuning (target: 15+ FPS)
-- [ ] ROS2 integration (optional)
-- [ ] Production ready
-- [ ] Multi-camera support
-- [ ] Model switching (YOLOv10s/m for accuracy)
+- [ ] SmolVLA integration (~450M params, Orin Nano optimized)
+- [ ] Isaac GR00T support for humanoid control
+- [ ] Action chunking for real-time control (10-30 Hz)
+- [ ] LoRA fine-tuning support for VLA customization
 
-**Target:** June 2026
+#### v0.9.0 - Performance Optimization (September 2026)
+**Status:** Planned
+
+- [ ] Full INT8 quantization with calibration
+- [ ] DLA (Deep Learning Accelerator) offloading
+- [ ] DeepStream multi-camera pipeline
+- [ ] Memory optimization for unified memory
+- [ ] Target: 30 FPS with all models on Orin Nano
+
+#### v1.0.0 - Diffusion Policies (December 2026)
+**Status:** Planned
+
+- [ ] Diffusion Policy integration for manipulation
+- [ ] ACT (Action Chunking with Transformers)
+- [ ] On-device VLA inference optimization
 
 ---
 
-### v1.1.x - Advanced Features
+### Phase 3: Safety & Certification (Months 13-18)
 
-#### v1.1.0 - Enhanced Models
+#### v1.1.0 - Reliability (March 2027)
 **Status:** Planned
 
-- [ ] YOLOv10s (higher accuracy)
-- [ ] Better depth estimation
-- [ ] Custom model training
+- [ ] 24/7 operation with auto-recovery
+- [ ] Comprehensive error handling and logging
+- [ ] Health monitoring and diagnostics
+- [ ] OTA model updates
 
-#### v1.2.0 - Multi-Camera
+#### v1.2.0 - Safety Certification (June 2027)
 **Status:** Planned
 
-- [ ] Stereo vision
-- [ ] 360° coverage
-- [ ] Camera calibration
-
-#### v1.3.0 - Navigation
-**Status:** In Progress
-
-- [x] SLAM integration (v0.5.0)
-- [x] VLA integration (v0.5.0)
-- [x] Path planning (Nav2)
-- [x] Obstacle avoidance (v0.6.0)
-- [ ] Real VLA model (SmolVLA/Octo)
-
-#### v1.4.0 - Advanced AI
-**Status:** Planned
-
-- [ ] OpenVLA integration
-- [ ] Local LLM for natural language commands
-- [ ] Voice commands
+- [ ] ISO 10218 compliance preparation
+- [ ] Emergency stop integration
+- [ ] Safe speed/position monitoring
+- [ ] Functional safety documentation
 
 ---
 
 ## Feature Roadmap
 
-### Phase 1: Core Vision (v0.0.x)
+### Phase 1: Multi-Modal Sensing (v0.7.x) ✅
+
+| Feature | Priority | Status |
+|:--------|:---------|:-------|
+| Isaac ROS VSLAM | P0 | Complete |
+| LIDAR Processing | P0 | Complete |
+| Sensor Fusion | P0 | Complete |
+| Multi-Camera | P1 | Complete |
+| RealSense Support | P1 | Complete |
+
+### Phase 2: VLA & Performance (v0.8.x - v0.9.x)
 
 | Feature | Priority | Version | Status |
 |:--------|:---------|:--------|:-------|
-| Object Detection (YOLOv10) | P0 | v0.0.1 | Complete |
-| Depth Estimation (MiDaS) | P0 | v0.0.2 | Complete |
-| Face Detection | P1 | v0.0.2 | Complete |
-| Gesture Recognition | P1 | v0.0.2 | Complete |
-| Pose Estimation | P1 | v0.0.2 | Complete |
+| SmolVLA | P0 | v0.8.0 | Planned |
+| Isaac GR00T | P1 | v0.8.0 | Planned |
+| INT8 Quantization | P0 | v0.9.0 | Planned |
+| DLA Offloading | P0 | v0.9.0 | Planned |
+| DeepStream Pipeline | P1 | v0.9.0 | Planned |
 
-### Phase 2: Integration (v1.0.x)
+### Phase 3: Safety & Reliability (v1.0.x - v1.2.x)
 
-| Feature | Priority | Version |
-|:--------|:---------|:--------|
-| Unified Pipeline | P0 | v1.0.0 |
-| Performance (15+ FPS) | P0 | v1.0.0 |
-| ROS2 Bridge | P2 | v1.0.0 |
-| Multi-Camera | P1 | v1.1.0 |
-
-### Phase 3: Advanced (v1.1.x - v2.0.x)
-
-| Feature | Priority | Version |
-|:--------|:---------|:--------|
-| Custom Training | P2 | v1.1.0 |
-| SLAM | P1 | v1.2.0 |
-| Navigation | P1 | v1.3.0 |
-| Voice Commands | P2 | v2.0.0 |
+| Feature | Priority | Version | Status |
+|:--------|:---------|:--------|:-------|
+| Diffusion Policy | P1 | v1.0.0 | Planned |
+| 24/7 Operation | P0 | v1.1.0 | Planned |
+| Health Monitoring | P0 | v1.1.0 | Planned |
+| ISO 10218 Prep | P1 | v1.2.0 | Planned |
+| Emergency Stop | P0 | v1.2.0 | Planned |
 
 ---
 
-## Milestones
+## Industry Standard Requirements
 
-### M1: First Detection ✓
-**Goal:** Get object detection working
-**Status:** Complete
-
-### M2: Depth Perception ✓
-**Goal:** Add 3D understanding
-**Status:** Complete
-
-### M3: Human Interaction ✓
-**Goal:** Detect faces, gestures, poses
-**Status:** Complete
-
-### M4: Production Ready
-**Goal:** Stable, optimized, documented
-**Target:** June 2026
-
----
-
-## Long-term Vision
-
-### v2.0+ - Autonomous
-
-- Full SLAM implementation
-- Navigation and path planning
-- Real-time obstacle avoidance
-- Voice command integration
-- Integration with robot control systems
+| Category | Requirements | Status |
+|:---------|:-------------|:-------|
+| Technical | Multi-modal sensing, <100ms latency, >99% accuracy | v0.7.0 ✅ |
+| AI/ML | Deep learning, VLA, continuous learning | v0.8.0+ |
+| Standards | ROS2 compliance, ISO 10218 | v1.2.0 |
+| Reliability | MTBF >50K hours, 24/7 operation | v1.1.0 |
+| Safety | SIL 2/PLd compliance, emergency integration | v1.2.0 |
 
 ---
 
@@ -181,4 +153,4 @@ Want to suggest features? Please [open an issue](https://github.com/mandarwagh9/
 - Timeline is approximate and may change based on resources and feedback
 - Priorities may shift based on user requirements
 - Community contributions can accelerate development
-- YOLOv10 uses AGPL-3.0 license - consider RTMDet for commercial use
+- All new modules follow ROS2 standards for interoperability

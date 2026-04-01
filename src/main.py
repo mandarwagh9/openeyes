@@ -164,6 +164,14 @@ def main() -> None:
             config._config["ros2"]["enabled"] = True
             print("Nav2 integration enabled (obstacle avoidance)")
 
+        if args.lidar:
+            config._config["ros2"]["enabled"] = True
+            print(f"LIDAR processing enabled (topic: {args.lidar_topic})")
+
+        if args.realsense:
+            config._config["ros2"]["enabled"] = True
+            print("RealSense camera mode enabled (depth + IMU)")
+
         if args.vla or args.advanced_ai:
             from src.models.vla import VLAModel
             if VLAModel is not None:

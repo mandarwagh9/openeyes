@@ -226,6 +226,29 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Enable Nav2 integration with obstacle avoidance",
     )
+    parser.add_argument(
+        "--lidar",
+        action="store_true",
+        help="Enable LIDAR processing for obstacle detection",
+    )
+    parser.add_argument(
+        "--lidar-topic",
+        type=str,
+        default="/scan",
+        help="LIDAR scan topic (default: /scan)",
+    )
+    parser.add_argument(
+        "--multi-camera",
+        type=int,
+        nargs="+",
+        default=None,
+        help="Enable multi-camera mode (list camera indices)",
+    )
+    parser.add_argument(
+        "--realsense",
+        action="store_true",
+        help="Use RealSense camera (depth + IMU) for SLAM",
+    )
 
     return parser
 
