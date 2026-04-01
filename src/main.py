@@ -188,6 +188,18 @@ def main() -> None:
             from src.models.action_chunker import create_action_chunker
             print(f"Action chunking enabled ({args.control_freq} Hz)")
 
+        if args.safety:
+            from src.utils.safety_controller import create_safety_controller
+            print(f"Safety controller enabled (max_vel={args.max_velocity}, min_dist={args.min_distance})")
+
+        if args.health_monitor:
+            from src.utils.health_monitor import create_health_monitor
+            print("Health monitoring enabled for 24/7 operation")
+
+        if args.ota_update:
+            from src.utils.ota_update import create_ota_updater
+            print("OTA update system enabled")
+
         if args.vla or args.advanced_ai:
             from src.models.vla import VLAModel
             if VLAModel is not None:

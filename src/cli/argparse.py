@@ -275,6 +275,33 @@ def create_parser() -> argparse.ArgumentParser:
         default=20,
         help="Control frequency in Hz (default: 20)",
     )
+    parser.add_argument(
+        "--safety",
+        action="store_true",
+        help="Enable safety controller (emergency stop, speed limits)",
+    )
+    parser.add_argument(
+        "--health-monitor",
+        action="store_true",
+        help="Enable health monitoring for 24/7 operation",
+    )
+    parser.add_argument(
+        "--max-velocity",
+        type=float,
+        default=0.5,
+        help="Maximum velocity in m/s (default: 0.5)",
+    )
+    parser.add_argument(
+        "--min-distance",
+        type=float,
+        default=0.3,
+        help="Minimum safe distance to obstacles in m (default: 0.3)",
+    )
+    parser.add_argument(
+        "--ota-update",
+        action="store_true",
+        help="Check for OTA model updates",
+    )
 
     return parser
 
