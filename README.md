@@ -127,6 +127,20 @@ python src/main.py --ros2
 
 ---
 
+## 🧪 Testing
+
+See [TEST_RESULTS.md](TEST_RESULTS.md) for complete test results on Jetson Orin Nano Super.
+
+```bash
+# Run all tests
+pytest tests/
+
+# Run with coverage
+pytest tests/ --cov=src --cov-report=html
+```
+
+---
+
 ## 🤝 Contribute
 
 OpenEyes is built by people like you. See [CONTRIBUTING.md](CONTRIBUTING.md) to join us.
