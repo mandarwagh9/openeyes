@@ -193,7 +193,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v0.6.0",
+        version="OpenEyes v1.0.0",
     )
     parser.add_argument(
         "--info",
@@ -238,13 +238,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="LIDAR scan topic (default: /scan)",
     )
     parser.add_argument(
-        "--multi-camera",
-        type=int,
-        nargs="+",
-        default=None,
-        help="Enable multi-camera mode (list camera indices)",
-    )
-    parser.add_argument(
         "--realsense",
         action="store_true",
         help="Use RealSense camera (depth + IMU) for SLAM",
@@ -253,11 +246,6 @@ def create_parser() -> argparse.ArgumentParser:
         "--int8",
         action="store_true",
         help="Use INT8 quantized models for faster inference",
-    )
-    parser.add_argument(
-        "--dla",
-        action="store_true",
-        help="Use DLA (Deep Learning Accelerator) for inference",
     )
     parser.add_argument(
         "--diffusion-policy",
