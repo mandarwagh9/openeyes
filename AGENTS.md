@@ -443,4 +443,74 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 - [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md)
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- [WORLD_MODELS.md](docs/WORLD_MODELS.md)
+- [WORLD_MODELS_PLAN.md](WORLD_MODELS_PLAN.md)
 - [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+## World Model Development Guidelines (v2.5.0+)
+
+### Architecture Principles
+
+1. **Augment, don't replace**: World models add prediction/planning on top of existing detection/tracking/depth
+2. **Latency budget**: World model inference must stay under 10ms for planning, 50ms for perception
+3. **Memory budget**: World models must stay under 1GB additional memory on Jetson Orin Nano
+4. **Power budget**: World model stack must stay under 10W additional power
+
+### Code Structure
+
+```
+src/world_model/
+├── __init__.py
+├── base.py              # WorldModel abstract interface
+├── lewm.py              # LeWorldModel (15M params)
+├── planner.py           # CEM planner
+├── safety_evaluator.py  # Predictive safety checks
+└── types.py             # Prediction, Plan data types
+```
+
+### World Model Interface
+
+All world models must implement the `WorldModel` abstract interface:
+
+```python
+from src.world_model.base import WorldModel
+
+class MyWorldModel(WorldModel):
+    def encode(self, frame: np.ndarray) -> np.ndarray:
+        """Encode frame to latent state."""
+        ...
+    
+    def predict(self, latent: np.ndarray, action: np.ndarray) -> np.ndarray:
+        """Predict next latent state given action."""
+        ...
+    
+    def plan(self, current: np.ndarray, goal: np.ndarray, 
+             horizon: int = 10) -> list[np.ndarray]:
+        """Plan action sequence to reach goal."""
+        ...
+```
+
+### Performance Requirements
+
+| Metric | LeWM (15M) | V-JEPA 2 ViT-B (80M) |
+|--------|-----------|---------------------|
+| Latency | <10ms | <100ms |
+| Memory | <100MB | <1GB |
+| Power | 3-5W | 6-9W |
+| Control rate | 100-200 Hz | 10-20 Hz |
+
+### Testing Requirements
+
+- All world model tests must pass on Jetson Orin Nano
+- Latency tests: `assert latency_ms < 10` for LeWM
+- Memory tests: `assert memory_mb < 100` for LeWM
+- Prediction accuracy: `assert iou > 0.8` for occlusion handling
+
+### Key References
+
+- **LeWorldModel**: arXiv:2603.19312
+- **V-JEPA 2**: https://github.com/facebookresearch/vjepa2
+- **DINO-WM**: https://github.com/gaoyuezhou/dino_wm
+- **Full docs**: [docs/WORLD_MODELS.md](docs/WORLD_MODELS.md)

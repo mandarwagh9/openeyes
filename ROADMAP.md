@@ -17,6 +17,7 @@ OpenEyes is an open-source, hardware-agnostic robot vision framework designed fo
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
+| v2.5.0 | Planned | 2026-Q4 | World Models & Predictive Intelligence |
 | v2.0.0 | Planned | 2026-Q3 | Hardware-Agnostic Edge Vision Framework |
 | v1.5.0 | Planned | 2026-Q2 | YOLO26 + Depth Anything V3 + Fleet Management |
 | v1.0.0 | Current | 2026-04-01 | Safety & Reliability + Diffusion Policy |
@@ -220,6 +221,56 @@ Full enforcement from August 2026 - critical for European deployments.
 
 ---
 
+## Phase 4: World Models & Predictive Intelligence (v2.5.0)
+
+**Target**: Q4 2026 - Q1 2027 | **Theme**: "From Reactive to Predictive"
+
+### LeWorldModel Integration (P0)
+
+15M parameter latent-space world model for real-time planning at 100-200 Hz on Jetson Orin Nano.
+
+- [ ] `src/world_model/` module with abstract `WorldModel` interface
+- [ ] LeWorldModel implementation (DINOv2 encoder + transition model)
+- [ ] CEM planner for goal-conditioned planning in latent space
+- [ ] Predictive tracking: handle 5-10 frame occlusions
+- [ ] Predictive safety evaluation: test actions before execution
+- [ ] CLI args: `--world-model`, `--plan-horizon`, `--plan-samples`, `--safety-predict`
+- [ ] ROS2 topic: `/vision/predictions` for predicted trajectories
+- [ ] Tests: latency <10ms, memory <100MB, power <5W
+
+### V-JEPA 2 Perception Enhancement (P1)
+
+80M parameter video JEPA for temporal feature extraction at 10-20 FPS.
+
+- [ ] TensorRT 3D-RoPE custom plugin (2-3 week effort)
+- [ ] `src/models/vjepa2_extractor.py` for feature extraction
+- [ ] Feature fusion with YOLO26 detection head
+- [ ] Temporal consistency for SAM 3 segmentation
+- [ ] ONNX fallback if TensorRT plugin delayed
+- [ ] CLI args: `--vjepa-frames`, `--vjepa-precision`, `--feature-fusion`
+
+### Edge-Cloud Split Architecture (P0)
+
+Adaptive routing between edge (reactive) and cloud (deliberative) world models.
+
+- [ ] `src/pipeline/edge_cloud_router.py` for routing logic
+- [ ] Cloud API (REST/gRPC) for V-JEPA ViT-L / Kairos 4B inference
+- [ ] Adaptive complexity detector: decide when to offload
+- [ ] Fallback handling: graceful degradation when cloud unavailable
+- [ ] Telemetry: track routing statistics, cloud latency
+- [ ] CLI args: `--edge-cloud`, `--cloud-url`, `--complexity-threshold`
+
+### Advanced World Model Features (P2)
+
+- [ ] Synthetic data generation for rare edge cases
+- [ ] Multi-step manipulation planning
+- [ ] Physical interaction prediction (push, drop, collision)
+- [ ] V-JEPA 2.1 dense features for detection/segmentation
+- [ ] Kairos 3.0 integration (when Jetson Thor available)
+- [ ] Hierarchical planning (short + long horizon)
+
+---
+
 ## Feature Priority Matrix
 
 | Feature | Priority | Version | Effort | Impact |
@@ -238,6 +289,10 @@ Full enforcement from August 2026 - critical for European deployments.
 | Industry templates | P1 | v2.0.0 | 3 weeks | High |
 | VLA edge support | P2 | v2.0.0 | 4 weeks | Medium |
 | EU AI Act compliance | P2 | v2.0.0 | 2 weeks | Medium |
+| LeWorldModel integration | P0 | v2.5.0 | 3 weeks | Critical |
+| V-JEPA 2 perception | P1 | v2.5.0 | 6 weeks | High |
+| Edge-cloud split (world models) | P0 | v2.5.0 | 4 weeks | High |
+| Synthetic data generation | P2 | v2.5.0 | 4 weeks | Medium |
 
 ---
 
