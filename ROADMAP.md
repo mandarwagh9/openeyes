@@ -1,13 +1,15 @@
 # ROADMAP.md - Project Roadmap for OpenEyes
 
-> **Version**: v1.0.0 (Industry Standard)
-> **Last Updated**: 2026-04-01
+> **Version**: v2.0.0 (Hardware-Agnostic Edge Vision Framework)
+> **Last Updated**: 2026-04-02
 
 ---
 
 ## Overview
 
-This roadmap outlines the development plan for OpenEyes - a vision system for humanoid robots running on NVIDIA Jetson Orin Nano.
+OpenEyes is an open-source, hardware-agnostic robot vision framework designed for edge AI on NVIDIA Jetson, Raspberry Pi, Hailo, Intel NPU, and Qualcomm platforms. It bridges the full train → optimize → deploy → operate loop, enabling small teams to go from zero to production robot vision in 5 minutes.
+
+**Position**: "The Fastest Path from Zero to Robot Vision on Edge"
 
 ---
 
@@ -15,6 +17,8 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 | Version | Status | Date | Description |
 |:--------|:-------|:-----|:------------|
+| v2.0.0 | Planned | 2026-Q3 | Hardware-Agnostic Edge Vision Framework |
+| v1.5.0 | Planned | 2026-Q2 | YOLO26 + Depth Anything V3 + Fleet Management |
 | v1.0.0 | Current | 2026-04-01 | Safety & Reliability + Diffusion Policy |
 | v0.8.0 | Released | 2026-04-01 | VLA Integration + Action Chunking + TensorRT |
 | v0.7.0 | Released | 2026-04-01 | Multi-Modal Sensing + LIDAR + Sensor Fusion |
@@ -28,106 +32,252 @@ This roadmap outlines the development plan for OpenEyes - a vision system for hu
 
 ---
 
-## Industry Standard Roadmap (18-Month Plan) ✅ COMPLETE
+## Phase 1: Foundation (v0.1.0 - v1.0.0) ✅ COMPLETE
 
-All phases of the industry standard roadmap have been implemented:
+All phases of the original 18-month industry standard roadmap have been implemented.
 
-### Phase 1: Foundation (Months 1-6) ✅ COMPLETE
+### v0.7.0 - Multi-Modal Sensing ✅ COMPLETE
+- [x] Isaac ROS VSLAM integration
+- [x] LIDAR processing and obstacle detection
+- [x] Sensor fusion (camera + depth + LIDAR)
+- [x] Multi-camera support
+- [x] RealSense D455 integration
 
-#### v0.7.0 - Multi-Modal Sensing (April 2026) ✅ COMPLETE
-**Status:** Complete
+### v0.8.0 - VLA & Performance ✅ COMPLETE
+- [x] Action chunking for 10-30 Hz control
+- [x] LoRA fine-tuning for VLA customization
+- [x] TensorRT INT8 quantization with calibration
+- [x] DLA offloading
 
-- [x] Isaac ROS VSLAM integration (GPU-accelerated visual odometry)
-- [x] Cartographer support for 2D LiDAR mapping
-- [x] Depth-to-LaserScan conversion (pointcloud_to_laserscan)
-- [x] Nav2 behavior tree customization support
-- [x] LIDAR integration for obstacle detection (`src/ros2/lidar_processing.py`)
-- [x] RealSense D455 support (stereo depth + IMU)
-- [x] Sensor fusion module (camera + depth + LIDAR) (`src/ros2/sensor_fusion.py`)
-- [x] Multi-camera support (`src/ros2/multi_camera.py`)
-- [x] CLI args: `--lidar`, `--lidar-topic`, `--realsense`, `--multi-camera`
-
-### Phase 2: AI & Performance (Months 7-12) ✅ COMPLETE
-
-#### v0.8.0 - VLA Integration (April 2026) ✅ COMPLETE
-**Status:** Complete
-
-- [x] Action chunking for real-time control (10-30 Hz) (`src/models/action_chunker.py`)
-- [x] LoRA fine-tuning support for VLA customization (`src/models/lora_finetuning.py`)
-- [x] TensorRT INT8 quantization with calibration (`src/models/tensorrt_optimizer.py`)
-- [x] DLA (Deep Learning Accelerator) offloading
-- [x] CLI args: `--int8`, `--dla`, `--action-chunking`, `--control-freq`
-
-#### v1.0.0 - Diffusion Policies (April 2026) ✅ COMPLETE
-**Status:** Complete
-
-- [x] Diffusion Policy integration for manipulation (`src/models/diffusion_policy.py`)
-- [x] Action Chunking with Transformers
-- [x] On-device VLA inference optimization
-
-### Phase 3: Safety & Certification (Months 13-18) ✅ COMPLETE
-
-#### v1.0.0 - Safety & Reliability (April 2026) ✅ COMPLETE
-**Status:** Complete
-
-- [x] 24/7 operation with auto-recovery (`src/utils/health_monitor.py`)
-- [x] Comprehensive error handling and logging
-- [x] Health monitoring and diagnostics
-- [x] OTA model updates with rollback (`src/utils/ota_update.py`)
-- [x] Emergency stop integration (`src/utils/safety_controller.py`)
-- [x] Safe speed/position monitoring
-- [x] Functional safety documentation
-- [x] CLI args: `--safety`, `--health-monitor`, `--max-velocity`, `--min-distance`, `--ota-update`
+### v1.0.0 - Safety & Reliability ✅ COMPLETE
+- [x] Health monitor for 24/7 operation
+- [x] Safety controller with E-STOP
+- [x] OTA updates with rollback
+- [x] Diffusion Policy integration
 
 ---
 
-## Feature Roadmap (Complete)
+## Phase 2: Hardware Abstraction & Model Updates (v1.5.0)
 
-### Phase 1: Multi-Modal Sensing (v0.7.x) ✅ COMPLETE
+**Target**: Q2 2026 | **Theme**: "Run Anywhere, Detect Everything"
 
-| Feature | Priority | Status |
-|:--------|:---------|:-------|
-| Isaac ROS VSLAM | P0 | Complete |
-| LIDAR Processing | P0 | Complete |
-| Sensor Fusion | P0 | Complete |
-| Multi-Camera | P1 | Complete |
-| RealSense Support | P1 | Complete |
+### YOLO26 Integration (P0)
 
-### Phase 2: VLA & Performance (v0.8.x - v0.9.x) ✅ COMPLETE
+The latest Ultralytics YOLO26 (Jan 2026) brings NMS-free end-to-end predictions with 43% faster CPU inference vs YOLO11.
 
-| Feature | Priority | Version | Status |
-|:--------|:---------|:--------|:-------|
-| Action Chunker | P0 | v0.8.0 | Complete |
-| LoRA Fine-tuning | P1 | v0.8.0 | Complete |
-| TensorRT Optimizer | P0 | v0.8.0 | Complete |
-| Diffusion Policy | P1 | v1.0.0 | Complete |
-| INT8 Quantization | P0 | v0.8.0 | Complete |
-| DLA Offloading | P0 | v0.8.0 | Complete |
+- [ ] Add YOLO26n model support (~40 FPS on Orin Nano, 40.9% mAP)
+- [ ] Add YOLO26s model support (~25 FPS on Orin Nano, 48.6% mAP)
+- [ ] INT8 QAT export pipeline for YOLO26
+- [ ] Benchmark suite comparing YOLO11 vs YOLO26 on all supported hardware
+- [ ] Backward compatibility: `--model yolo26n` flag
 
-### Phase 3: Safety & Reliability (v1.0.x) ✅ COMPLETE
+### Depth Anything V3 Integration (P0)
 
-| Feature | Priority | Version | Status |
-|:--------|:---------|:--------|:-------|
-| Health Monitor | P0 | v1.0.0 | Complete |
-| OTA Updates | P1 | v1.0.0 | Complete |
-| Safety Controller | P0 | v1.0.0 | Complete |
-| Emergency Stop | P0 | v1.0.0 | Complete |
+Depth Anything V3 (ByteDance, ICLR 2026 Oral) is the new SOTA with single plain transformer architecture, outperforming DA2 by 35.7% in camera pose accuracy.
+
+- [ ] Replace MiDaS with Depth Anything V3 as default depth estimator
+- [ ] TensorRT export for DA3 (TensorRT ROS2 nodes exist from RWTH Aachen)
+- [ ] Multi-view depth support (DA3 capability)
+- [ ] Depth-ray representation for improved geometric accuracy
+- [ ] CLI arg: `--depth-model da3-small` (edge-optimized variant)
+
+### Hardware Abstraction Layer (P0)
+
+The #1 developer pain point is fragmented tooling. HAL provides a single API targeting TensorRT, OpenVINO, TVM, and Hailo DFC.
+
+- [ ] `src/backends/` directory with backend abstraction
+- [ ] TensorRT backend (existing, refactor into backend interface)
+- [ ] OpenVINO backend for Intel CPU/NPU deployment
+- [ ] TVM backend for hardware-agnostic auto-tuning
+- [ ] Hailo DFC backend for Raspberry Pi AI HAT+ 2
+- [ ] Auto-detection: `--backend auto` selects best available backend
+- [ ] Unified model export: `openeyes export --backend openvino --model yolo26n`
+- [ ] Backend benchmarking CLI: `openeyes benchmark --all-backends`
+
+### Multi-Platform Support (P0)
+
+Expand beyond Jetson to support the full edge AI hardware ecosystem.
+
+- [ ] Raspberry Pi 5 + AI HAT+ 2 (Hailo-10H, 40 TOPS, $150 total)
+- [ ] Intel Core Ultra + OpenVINO (48 TOPS NPU)
+- [ ] Qualcomm RB5/RB6 (15-30 TOPS Hexagon NPU)
+- [ ] Hailo-8 standalone accelerator (26 TOPS, 3.5W)
+- [ ] Platform detection: `openeyes platform-info` shows detected hardware
+- [ ] Hardware-specific optimization profiles
+
+### SAM 3 Integration (P1)
+
+SAM 3 (Meta, Mar 2026) introduces concept-aware segmentation with 4M unique concept labels - a new paradigm for promptable object segmentation.
+
+- [ ] SAM 3 integration for concept-aware segmentation
+- [ ] EdgeSAM variant for edge deployment (40x speedup, ~11ms)
+- [ ] Text-prompted segmentation: `--segment "red boxes"`
+- [ ] Video tracking with SAM 3's built-in tracker
+
+### Fleet Management Foundation (P1)
+
+No open-source solution exists for managing model versioning, OTA updates, and performance telemetry across heterogeneous edge vision devices.
+
+- [ ] Device registration and heartbeat protocol
+- [ ] Model version registry with signed artifacts
+- [ ] Performance telemetry collection (FPS, latency, errors)
+- [ ] Fleet dashboard (web-based, lightweight)
+- [ ] Group-based model deployment (deploy to all "warehouse-robots")
+- [ ] CLI: `openeyes fleet list`, `openeyes fleet deploy --group warehouse`
 
 ---
 
-## Future Development
+## Phase 3: Production & Scale (v2.0.0)
 
-Now that the 18-month industry standard roadmap is complete, the project moves to maintenance and enhancement mode.
+**Target**: Q3 2026 | **Theme**: "From Prototype to Production"
 
-### Potential Next Steps
+### Unified Inference Pipeline (P0)
 
-| Area | Description | Priority |
-|:-----|:------------|:---------|
-| Integration Testing | Real robot hardware integration | Medium |
-| VLA Model Loading | SmolVLA, Isaac GR00T actual weights | Medium |
-| DeepStream Pipeline | Multi-camera DeepStream implementation | Low |
-| ROS2 Package | Full ROS2 package for distribution | Low |
-| Community | Documentation, examples, tutorials | Ongoing |
+A single pipeline abstraction that handles detection, depth, segmentation, and tracking with automatic backend selection and model orchestration.
+
+- [ ] `Pipeline` class: declarative pipeline definition
+- [ ] Automatic model scheduling (run detection every frame, depth every 3rd)
+- [ ] Zero-copy GPU memory management
+- [ ] Pipeline configuration via YAML
+- [ ] Pipeline visualization: `openeyes pipeline visualize config.yaml`
+- [ ] Hot-reload pipeline configuration without restart
+
+### Edge-Cloud Split Inference (P0)
+
+Practical approach for models too large for edge (VLA 7B params → 1-2 FPS on Orin Nano).
+
+- [ ] Edge-cloud split inference protocol
+- [ ] Lightweight edge model for fast filtering
+- [ ] Cloud fallback for complex scenes
+- [ ] Adaptive routing: edge handles 90%, cloud handles 10% edge cases
+- [ ] Latency budget management (edge < 50ms, cloud < 500ms)
+- [ ] Offline mode: graceful degradation when cloud unavailable
+
+### Real-World Benchmarking Suite (P0)
+
+Comprehensive benchmarks across all supported hardware and models.
+
+- [ ] FPS benchmarks per model per hardware
+- [ ] Power consumption measurements
+- [ ] Accuracy benchmarks (mAP, depth error, tracking IDF1)
+- [ ] Thermal throttling detection and reporting
+- [ ] Benchmark report generation: `openeyes benchmark --report`
+- [ ] CI integration: run benchmarks on supported hardware nightly
+
+### Production Deployment Toolkit (P0)
+
+Everything needed to go from prototype to production deployment.
+
+- [ ] Docker images for all supported platforms
+- [ ] Systemd service templates
+- [ ] Auto-start on boot with health monitoring
+- [ ] Log rotation and structured logging (JSON)
+- [ ] Prometheus metrics endpoint
+- [ ] Grafana dashboard templates
+- [ ] Deployment scripts: `openeyes deploy --target jetson-orin-nano`
+
+### Advanced Tracking (P1)
+
+Upgrade from ByteTrack to latest tracking algorithms with occlusion handling.
+
+- [ ] ByteTrack (current, keep as default)
+- [ ] BoT-SORT with ReID for crowded scenes
+- [ ] OC-SORT for non-linear motion handling
+- [ ] SAM 3 Tracker for concept-aware tracking
+- [ ] BoostTrack for improved occlusion handling
+- [ ] Auto-switching: select tracker based on scene complexity
+
+### Industry Templates (P1)
+
+Pre-configured pipelines for highest-demand industries.
+
+- [ ] **Warehouse/Logistics**: Package detection, damage inspection, pallet counting
+- [ ] **Manufacturing QA**: Defect detection, assembly verification, PPE compliance
+- [ ] **Agriculture**: Weed detection, crop health monitoring, yield estimation
+- [ ] **Retail**: Shelf monitoring, inventory counting, customer analytics
+- [ ] Template CLI: `openeyes init --template warehouse`
+
+### VLA Edge Support (P2)
+
+Quantized VLA inference for edge devices with realistic performance expectations.
+
+- [ ] OpenVLA INT4 quantization (~3.5GB, ~2 FPS on Orin Nano 8GB)
+- [ ] GR00T N1.6 Jetson deployment guide
+- [ ] Edge-cloud VLA with RoboECC pattern
+- [ ] Instruction-tuned VLA for domain-specific tasks
+- [ ] VLA performance monitoring and fallback to rule-based
+
+### EU AI Act Compliance (P2)
+
+Full enforcement from August 2026 - critical for European deployments.
+
+- [ ] On-device data anonymization (face blurring, license plate masking)
+- [ ] Model provenance tracking
+- [ ] Dataset lineage documentation
+- [ ] Audit trail for all decisions
+- [ ] Human-in-the-loop escalation
+- [ ] Compliance report generation: `openeyes compliance report`
+
+---
+
+## Feature Priority Matrix
+
+| Feature | Priority | Version | Effort | Impact |
+|:--------|:---------|:--------|:-------|:-------|
+| YOLO26n/s integration | P0 | v1.5.0 | 2 weeks | High |
+| Depth Anything V3 | P0 | v1.5.0 | 2 weeks | High |
+| Hardware Abstraction Layer | P0 | v1.5.0 | 4 weeks | Critical |
+| Multi-platform support | P0 | v1.5.0 | 4 weeks | Critical |
+| Fleet management | P1 | v1.5.0 | 3 weeks | High |
+| SAM 3 integration | P1 | v1.5.0 | 2 weeks | Medium |
+| Unified inference pipeline | P0 | v2.0.0 | 4 weeks | Critical |
+| Edge-cloud split inference | P0 | v2.0.0 | 3 weeks | High |
+| Benchmarking suite | P0 | v2.0.0 | 2 weeks | High |
+| Production deployment toolkit | P0 | v2.0.0 | 3 weeks | Critical |
+| Advanced tracking | P1 | v2.0.0 | 2 weeks | Medium |
+| Industry templates | P1 | v2.0.0 | 3 weeks | High |
+| VLA edge support | P2 | v2.0.0 | 4 weeks | Medium |
+| EU AI Act compliance | P2 | v2.0.0 | 2 weeks | Medium |
+
+---
+
+## Target Industries
+
+| Industry | Market Size | Growth | Key Features Needed |
+|:---------|:-----------|:-------|:-------------------|
+| Warehouse/Logistics | $29.98B | 18.7% CAGR | Package detection, damage inspection, fleet management |
+| Manufacturing QA | Largest CV segment | 13% CAGR | Defect detection, assembly verification, PPE monitoring |
+| Agriculture | $18.5B → $74.2B | 16.4% CAGR | Weed detection, crop monitoring, outdoor robustness |
+| Retail | $8.58B by 2032 | 24.3% CAGR | Shelf monitoring, inventory counting, privacy-preserving |
+| Energy/Utilities | Steady | Growing | Infrastructure inspection, predictive maintenance |
+
+---
+
+## Hardware Support Matrix
+
+| Platform | TOPS | Power | Price | Status | Backend |
+|:---------|:-----|:------|:------|:-------|:--------|
+| Jetson Orin Nano | 40 | 5-15W | $199-249 | Current | TensorRT |
+| Jetson Orin NX | 100 | 10-25W | $399-499 | Planned v1.5 | TensorRT |
+| Jetson T4000 | 1,200 | 40-70W | TBD | Planned v2.0 | TensorRT |
+| Pi 5 + AI HAT+ 2 | 40 | ~12W | ~$150 | Planned v1.5 | Hailo DFC |
+| Intel Core Ultra | 48 | 15-45W | $300-600 | Planned v1.5 | OpenVINO |
+| Qualcomm RB5/RB6 | 15-30 | 5-15W | $600-800 | Planned v2.0 | QNN |
+| Hailo-8 | 26 | 3.5W | $150-200 | Planned v1.5 | Hailo DFC |
+
+---
+
+## Competitive Positioning
+
+| Dimension | OpenEyes | Isaac ROS | LeRobot | yolo_ros |
+|:----------|:---------|:----------|:--------|:---------|
+| Hardware support | Multi-vendor | NVIDIA only | Any (training) | NVIDIA only |
+| Full pipeline | Yes | Yes | No (learning only) | No (detection only) |
+| Fleet management | Yes | No | No | No |
+| Setup time | 5 minutes | Hours-days | Days | 30 minutes |
+| Open source | Apache 2.0 | Apache 2.0 | Apache 2.0 | GPL-3.0 |
+| Edge-optimized | Primary focus | Secondary | No | Yes |
+| Production-ready | Yes | Yes | No | Partial |
 
 ---
 
@@ -143,6 +293,7 @@ Want to suggest features? Please [open an issue](https://github.com/mandarwagh9/
 ## Notes
 
 - Timeline is approximate and may change based on resources and feedback
-- Priorities may shift based on user requirements
+- Priorities may shift based on user requirements and market changes
 - Community contributions can accelerate development
 - All new modules follow ROS2 standards for interoperability
+- Hardware abstraction layer is the critical path for v1.5.0
