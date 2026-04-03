@@ -92,13 +92,13 @@ class CameraHandler:
         """Build GStreamer pipeline for Jetson CSI camera.
 
         Optimized for Jetson Orin Nano:
+        - Capture at 1280x720 (saves NVMM memory vs 1920x1080)
         - Hardware scaling via nvvidconv (VIC engine, zero CPU)
         - sync=false drop=true max-buffers=2 for lowest latency
-        - Captures at native sensor res, scales to target on GPU
         """
         return (
             f"nvarguscamerasrc sensor-id={self._source} ! "
-            f"video/x-raw(memory:NVMM),width=1920,height=1080,format=NV12,framerate={fps}/1 ! "
+            f"video/x-raw(memory:NVMM),width=1280,height=720,format=NV12,framerate={fps}/1 ! "
             f"nvvidconv ! "
             f"video/x-raw(memory:NVMM),width={width},height={height},format=NV12 ! "
             f"nvvidconv ! "

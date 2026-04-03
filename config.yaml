@@ -113,9 +113,9 @@ vla:
   fallback_to_rule_based: true  # Use rule-based if model fails
 
 depth:
-  model: "da3-small"  # da3-small, da3-base, midas-small
+  model: "midas-small"  # midas-small (default), da3-small (requires HF token), da3-base
   enabled: true
-  skip_frames: 8
+  skip_frames: 16
 
 world_model:
   enabled: false
