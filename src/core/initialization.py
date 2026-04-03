@@ -55,15 +55,15 @@ class InitializationManager:
             raise
         return detector
 
-    def init_depth_estimator(self, enabled: bool) -> Optional[DepthEstimator]:
+    def init_depth_estimator(self, enabled: bool, model: str = "da3-small") -> Optional[DepthEstimator]:
         """Initialize depth estimator if enabled."""
         if not enabled:
             return None
         try:
-            estimator = DepthEstimator()
+            estimator = DepthEstimator(model=model)
             estimator.load()
             if estimator.is_loaded:
-                self._logger.info("Depth Estimator loaded")
+                self._logger.info(f"Depth Estimator loaded ({estimator.name})")
             else:
                 self._logger.warning("Depth Estimator using fallback")
             return estimator
@@ -248,7 +248,7 @@ def init_all_components(
     components = {
         "camera": init_mgr.init_camera(),
         "detector": init_mgr.init_detector(),
-        "depth_estimator": init_mgr.init_depth_estimator(use_depth),
+        "depth_estimator": init_mgr.init_depth_estimator(use_depth, config.depth_model),
         "face_detector": init_mgr.init_face_detector(use_face),
         "gesture_recognizer": init_mgr.init_gesture_recognizer(use_gesture),
         "pose_estimator": init_mgr.init_pose_estimator(use_pose),

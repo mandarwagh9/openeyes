@@ -211,6 +211,18 @@ class Config:
     def debug(self) -> bool:
         return self.get("debug", default=False)
 
+    @property
+    def depth_model(self) -> str:
+        return self.get("depth", "model", default="da3-small")
+
+    @property
+    def depth_enabled(self) -> bool:
+        return self.get("depth", "enabled", default=True)
+
+    @property
+    def depth_skip_frames(self) -> int:
+        return self.get("depth", "skip_frames", default=8)
+
 
 DEFAULT_CONFIG = """\
 camera:

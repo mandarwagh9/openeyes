@@ -243,6 +243,18 @@ def create_parser() -> argparse.ArgumentParser:
         help="Use RealSense camera (depth + IMU) for SLAM",
     )
     parser.add_argument(
+        "--depth-model",
+        type=str,
+        default="da3-small",
+        choices=["da3-small", "da3-base", "midas-small"],
+        help="Depth estimation model (default: da3-small)",
+    )
+    parser.add_argument(
+        "--no-depth",
+        action="store_true",
+        help="Disable depth estimation",
+    )
+    parser.add_argument(
         "--int8",
         action="store_true",
         help="Use INT8 quantized models for faster inference",

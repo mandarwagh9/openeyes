@@ -112,6 +112,11 @@ vla:
   instruction: "follow the person"  # Default instruction
   fallback_to_rule_based: true  # Use rule-based if model fails
 
+depth:
+  model: "da3-small"  # da3-small, da3-base, midas-small
+  enabled: true
+  skip_frames: 8
+
 world_model:
   enabled: false
   type: "lewm"  # lewm, vjepa2
