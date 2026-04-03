@@ -64,6 +64,13 @@ class FrameProcessor:
         frame_scheduler: Optional[MultiModelFrameScheduler] = None,
         adaptive_skipper: Optional[AdaptiveFrameSkipper] = None,
         logger: Optional[Any] = None,
+        world_model: Optional[Any] = None,
+        use_world_model: bool = False,
+        world_model_horizon: int = 10,
+        world_model_samples: int = 100,
+        prediction_fps: int = 30,
+        occlusion_frames: int = 5,
+        safety_predict: bool = False,
     ):
         self._camera = camera
         self._detector = detector
@@ -87,6 +94,14 @@ class FrameProcessor:
         self._adaptive_skipper = adaptive_skipper
         self._logger = logger
 
+        self._world_model = world_model
+        self._use_world_model = use_world_model
+        self._wm_horizon = world_model_horizon
+        self._wm_samples = world_model_samples
+        self._prediction_fps = prediction_fps
+        self._occlusion_frames = occlusion_frames
+        self._safety_predict = safety_predict
+
         self._executor = ThreadPoolExecutor(max_workers=5)
         
         self._last_depth: Optional[np.ndarray] = None
@@ -96,6 +111,11 @@ class FrameProcessor:
         self._frame_id: int = 0
         self._follow_target: bool = False
         self._pose_skip_frames: int = 1
+
+        self._wm_prediction_frame: int = 0
+        self._wm_prediction_interval: int = max(1, 30 // prediction_fps) if prediction_fps > 0 else 30
+        self._last_predictions: dict = {}
+        self._current_latent: Optional[np.ndarray] = None
 
     @property
     def frame_id(self) -> int:
@@ -347,12 +367,89 @@ class FrameProcessor:
         if not self._tracker or not detections:
             return []
 
-        tracks = self._tracker.update(detections, (frame.shape[1], frame.shape[0]))
+        if self._use_world_model and self._world_model and self._world_model.is_loaded:
+            tracks = self._process_tracking_with_world_model(
+                detections, frame, depth_map
+            )
+        else:
+            tracks = self._tracker.update(detections, (frame.shape[1], frame.shape[0]))
 
         if self._follow_target and frame.shape:
             self._handle_follow_command(detections, depth_map, frame.shape)
 
         return tracks
+
+    def _process_tracking_with_world_model(
+        self,
+        detections: list[Any],
+        frame: np.ndarray,
+        depth_map: Optional[np.ndarray],
+    ) -> list[Any]:
+        """Process tracking with world model predictions for occlusion handling."""
+        self._wm_prediction_frame += 1
+
+        should_predict = (
+            self._wm_prediction_frame % self._wm_prediction_interval == 0
+        )
+
+        predictions = None
+        if should_predict and self._world_model and self._world_model.is_loaded:
+            predictions = self._generate_predictions(detections, frame)
+
+        tracks = self._tracker.update_with_predictions(
+            detections,
+            (frame.shape[1], frame.shape[0]),
+            predictions=predictions,
+            max_occlusion_frames=self._occlusion_frames,
+        )
+
+        if should_predict and self._world_model.is_loaded:
+            try:
+                self._current_latent = self._world_model.encode(frame)
+                self._world_model.record_state(self._current_latent)
+            except Exception as e:
+                if self._logger:
+                    self._logger.debug(f"World model encode error: {e}")
+
+        return tracks
+
+    def _generate_predictions(
+        self,
+        detections: list[Any],
+        frame: np.ndarray,
+    ) -> Optional[dict]:
+        """Generate world model predictions for tracked objects."""
+        if not self._world_model or not self._world_model.is_loaded:
+            return None
+
+        if not self._tracker:
+            return None
+
+        predictions = {}
+        h, w = frame.shape[:2]
+
+        active_tracks = self._tracker._get_active_tracks() if hasattr(self._tracker, '_get_active_tracks') else []
+
+        for track in active_tracks:
+            if track.time_since_update > 0:
+                bbox = (track.bbox.x1, track.bbox.y1, track.bbox.x2, track.bbox.y2)
+
+                pred = self._world_model.predict_bbox_trajectory(
+                    track_id=track.track_id,
+                    class_name=track.class_name,
+                    current_bbox=bbox,
+                    frame_shape=(w, h),
+                    horizon=self._wm_horizon,
+                )
+
+                next_pos = pred.get_next_position()
+                if next_pos:
+                    predictions[track.track_id] = (
+                        next_pos.x1, next_pos.y1, next_pos.x2, next_pos.y2
+                    )
+                    self._last_predictions[track.track_id] = pred
+
+        return predictions if predictions else None
 
     def _handle_follow_command(
         self,

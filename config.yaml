@@ -112,4 +112,17 @@ vla:
   instruction: "follow the person"  # Default instruction
   fallback_to_rule_based: true  # Use rule-based if model fails
 
+world_model:
+  enabled: false
+  type: "lewm"  # lewm, vjepa2
+  device: "cuda"
+  precision: "fp16"
+  latent_dim: 384
+  use_dinov2: true
+  plan_horizon: 10
+  plan_samples: 100
+  prediction_fps: 30
+  occlusion_frames: 5
+  safety_predict: false
+
 debug: false

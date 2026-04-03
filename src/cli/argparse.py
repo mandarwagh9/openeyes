@@ -291,6 +291,43 @@ def create_parser() -> argparse.ArgumentParser:
         help="Check for OTA model updates",
     )
 
+    parser.add_argument(
+        "--world-model",
+        type=str,
+        default="none",
+        choices=["none", "lewm", "vjepa2"],
+        help="World model to use (none/lewm/vjepa2)",
+    )
+    parser.add_argument(
+        "--plan-horizon",
+        type=int,
+        default=10,
+        help="Planning horizon in steps",
+    )
+    parser.add_argument(
+        "--plan-samples",
+        type=int,
+        default=100,
+        help="CEM sample count for planning",
+    )
+    parser.add_argument(
+        "--prediction-fps",
+        type=int,
+        default=30,
+        help="Prediction update rate",
+    )
+    parser.add_argument(
+        "--occlusion-frames",
+        type=int,
+        default=5,
+        help="Max frames to predict through occlusion",
+    )
+    parser.add_argument(
+        "--safety-predict",
+        action="store_true",
+        help="Enable predictive safety evaluation",
+    )
+
     return parser
 
 

@@ -18,6 +18,8 @@ class Track:
     hits: int = 1
     time_since_update: int = 0
     centroid: Tuple[float, float] = field(default=(0.0, 0.0))
+    is_predicted: bool = False
+    _max_occlusion: int = 5
 
 
 class ObjectTracker:
@@ -437,3 +439,119 @@ class ObjectTracker:
     @property
     def follow_target_id(self) -> Optional[int]:
         return self._follow_target_id
+
+    def update_with_predictions(
+        self,
+        detections: List[Detection],
+        frame_shape: Tuple[int, int],
+        predictions: Optional[Dict[int, Tuple[float, float, float, float]]] = None,
+        max_occlusion_frames: int = 5,
+    ) -> List[Track]:
+        """Update tracks with detections and world model predictions.
+
+        When detections are missing for a track, uses predicted bounding boxes
+        to maintain tracking through occlusions.
+
+        Args:
+            detections: Current frame detections
+            frame_shape: (width, height) of the frame
+            predictions: Dict of {track_id: (x1, y1, x2, y2)} from world model
+            max_occlusion_frames: Max frames to predict through occlusion
+
+        Returns:
+            Updated list of active tracks
+        """
+        self._frame_count += 1
+        timestamp = time.time()
+
+        if not detections and not predictions:
+            self._age_tracks()
+            return self._get_active_tracks()
+
+        detection_bboxes = [(d.bbox, d.class_name, d.confidence) for d in detections]
+        matched_tracks = set()
+        matched_detections = set()
+
+        for track_id, track in list(self._tracks.items()):
+            if track.time_since_update > max(track._max_occlusion or max_occlusion_frames, self._max_age):
+                continue
+
+            best_iou = 0
+            best_idx = -1
+
+            for idx, (bbox, class_name, conf) in enumerate(detection_bboxes):
+                if idx in matched_detections:
+                    continue
+                if track.class_name != class_name:
+                    continue
+                iou = self._compute_iou(track.bbox, bbox)
+                if iou > best_iou:
+                    best_iou = iou
+                    best_idx = idx
+
+            if best_iou >= self._iou_threshold:
+                bbox, class_name, conf = detection_bboxes[best_idx]
+                track.bbox = bbox
+                track.class_name = class_name
+                track.confidence = conf
+                track.timestamp = timestamp
+                track.age += 1
+                track.hits += 1
+                track.time_since_update = 0
+                track.centroid = self._compute_centroid(bbox)
+                track.is_predicted = False
+                matched_tracks.add(track_id)
+                matched_detections.add(best_idx)
+
+        if predictions:
+            for track_id, pred_bbox in predictions.items():
+                if track_id in matched_tracks:
+                    continue
+                if track_id not in self._tracks:
+                    continue
+
+                track = self._tracks[track_id]
+                if track.time_since_update > max_occlusion_frames:
+                    continue
+
+                px1, py1, px2, py2 = pred_bbox
+                pred_bbox_obj = BoundingBox(x1=px1, y1=py1, x2=px2, y2=py2)
+
+                track.bbox = pred_bbox_obj
+                track.timestamp = timestamp
+                track.age += 1
+                track.time_since_update += 1
+                track.centroid = self._compute_centroid(pred_bbox_obj)
+                track.is_predicted = True
+                track.confidence *= 0.95
+
+                matched_tracks.add(track_id)
+
+        for idx, (bbox, class_name, conf) in enumerate(detection_bboxes):
+            if idx in matched_detections:
+                continue
+            if len(self._tracks) >= self._max_tracks:
+                break
+
+            track_id = self._next_track_id
+            self._next_track_id += 1
+            centroid = self._compute_centroid(bbox)
+
+            new_track = Track(
+                track_id=track_id,
+                class_name=class_name,
+                bbox=bbox,
+                confidence=conf,
+                timestamp=timestamp,
+                centroid=centroid,
+                is_predicted=False,
+            )
+            new_track._max_occlusion = max_occlusion_frames
+            self._tracks[track_id] = new_track
+
+        self._age_tracks()
+        return self._get_active_tracks()
+
+    def get_predicted_tracks(self) -> List[Track]:
+        """Get tracks that are currently using predicted positions."""
+        return [t for t in self._get_active_tracks() if t.is_predicted]
