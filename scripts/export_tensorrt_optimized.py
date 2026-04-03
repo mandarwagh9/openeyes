@@ -69,20 +69,43 @@ def quantize_int8(onnx_path: str, calib_dir: str, output_path: str, num_images: 
     print(f"  INT8 ONNX saved to: {output_path}")
 
 
+def find_trtexec() -> str:
+    """Find trtexec binary across different JetPack versions."""
+    candidates = [
+        "trtexec",
+        "/usr/src/tensorrt/bin/trtexec",
+        "/usr/lib/aarch64-linux-gnu/trtexec",
+        "/opt/nvidia/deepstream/deepstream-*/bin/trtexec",
+    ]
+    import shutil
+    for path in candidates:
+        if shutil.which(path):
+            return path
+    # Try glob for deepstream paths
+    import glob
+    matches = glob.glob("/opt/nvidia/deepstream/*/bin/trtexec")
+    if matches:
+        return matches[0]
+    return "trtexec"  # Let subprocess fail with clear error
+
+
 def build_engine(onnx_path: str, engine_path: str, fp16: bool = True,
                  int8: bool = False, workspace_gb: int = 2, imgsz: int = 640):
     """Build TensorRT engine with SOTA optimizations."""
     print(f"[3/3] Building TensorRT engine...")
 
+    trtexec = find_trtexec()
+    print(f"  Using: {trtexec}")
+
     shape = f"1x3x{imgsz}x{imgsz}"
     cmd = [
-        "trtexec",
+        trtexec,
         f"--onnx={onnx_path}",
         f"--saveEngine={engine_path}",
         f"--minShapes=images:{shape}",
         f"--optShapes=images:{shape}",
         f"--maxShapes=images:{shape}",
-        f"--workspace={workspace_gb * 1024}",
+        f"--memPoolSize=workspace:{workspace_gb}G",
         "--best",
         "--useCudaGraph",
         "--noDataTransfers",
