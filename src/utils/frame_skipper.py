@@ -86,14 +86,23 @@ class AdaptiveFrameSkipper:
 class MultiModelFrameScheduler:
     """Scheduler for managing frame skipping across multiple models."""
 
-    def __init__(self, skip_intervals: Optional[Dict[str, int]] = None):
-        self.skip_intervals = skip_intervals or {
-            'detector': 1,
-            'depth': 2,
-            'face': 2,
-            'gesture': 2,
-            'pose': 2
-        }
+    def __init__(self, skip_intervals: Optional[Dict[str, int]] = None, turbo: bool = False):
+        if turbo:
+            self.skip_intervals = skip_intervals or {
+                'detector': 1,
+                'depth': 16,
+                'face': 12,
+                'gesture': 12,
+                'pose': 12
+            }
+        else:
+            self.skip_intervals = skip_intervals or {
+                'detector': 1,
+                'depth': 8,
+                'face': 6,
+                'gesture': 6,
+                'pose': 6
+            }
         self.frame_count = 0
         self.last_results: dict[str, Any] = {}
 

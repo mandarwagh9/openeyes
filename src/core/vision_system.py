@@ -90,6 +90,7 @@ class VisionSystem:
         self._prediction_fps = 30
         self._occlusion_frames = 5
         self._safety_predict = False
+        self._turbo_mode = False
 
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
@@ -179,7 +180,16 @@ class VisionSystem:
             'gesture': 6,
             'pose': 6
         }
-        self._frame_scheduler = MultiModelFrameScheduler(skip_intervals)
+        if getattr(self, '_turbo_mode', False):
+            skip_intervals = {
+                'detector': 1,
+                'depth': 16,
+                'face': 12,
+                'gesture': 12,
+                'pose': 12
+            }
+            self._logger.info("TURBO MODE: Aggressive frame skipping enabled")
+        self._frame_scheduler = MultiModelFrameScheduler(skip_intervals, turbo=getattr(self, '_turbo_mode', False))
         self._adaptive_skipper = AdaptiveFrameSkipper(
             base_skip=2,
             motion_threshold=5000.0,

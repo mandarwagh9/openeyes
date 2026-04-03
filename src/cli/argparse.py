@@ -327,6 +327,11 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Enable predictive safety evaluation",
     )
+    parser.add_argument(
+        "--turbo",
+        action="store_true",
+        help="Turbo mode: aggressive frame skipping for max FPS (depth=16, face/gesture/pose=12)",
+    )
 
     return parser
 

@@ -130,6 +130,10 @@ def main() -> None:
         if args.no_depth:
             system._use_depth = False
 
+        if args.turbo:
+            system._turbo_mode = True
+            print("TURBO MODE: Aggressive frame skipping for max FPS")
+
         if args.no_monitoring and system._perf_monitor:
             system._perf_monitor.enabled = False
 
