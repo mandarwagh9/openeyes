@@ -168,6 +168,8 @@ class FrameProcessor:
 
         track_data_list = self._convert_tracks_to_data(tracks)
 
+        predictions = self._collect_predictions_for_result(tracks)
+
         vla_commands = self._process_vla(
             frame, detections, faces, gestures, pose, track_data_list, depth
         )
@@ -185,6 +187,7 @@ class FrameProcessor:
             gestures=gestures,
             pose=pose,
             tracks=track_data_list,
+            predictions=predictions,
         )
 
         return result
@@ -514,9 +517,44 @@ class FrameProcessor:
                     confidence=track.confidence,
                     centroid=track.centroid,
                     age=track.age,
+                    is_predicted=getattr(track, 'is_predicted', False),
                 )
             )
         return track_data_list
+
+    def _collect_predictions_for_result(self, tracks: list[Any]) -> list[list]:
+        """Collect world model predictions for visualization."""
+        if not self._use_world_model or not self._world_model:
+            return []
+
+        predictions = []
+        h, w = 480, 640
+        if hasattr(self, '_camera') and self._camera:
+            try:
+                h, w = self._camera.height, self._camera.width
+            except Exception:
+                pass
+
+        for track in tracks:
+            if hasattr(track, 'bbox'):
+                bbox = (track.bbox.x1, track.bbox.y1, track.bbox.x2, track.bbox.y2)
+                try:
+                    pred = self._world_model.predict_bbox_trajectory(
+                        track_id=track.track_id,
+                        class_name=track.class_name,
+                        current_bbox=bbox,
+                        frame_shape=(w, h),
+                        horizon=5,
+                    )
+                    future_bboxes = [
+                        BoundingBox(x1=p.x1, y1=p.y1, x2=p.x2, y2=p.y2)
+                        for p in pred.positions
+                    ]
+                    predictions.append(future_bboxes)
+                except Exception:
+                    pass
+
+        return predictions
 
     def _process_vla(
         self,

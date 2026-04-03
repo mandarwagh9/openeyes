@@ -60,6 +60,17 @@ class PoseData:
 
 
 @dataclass
+class PredictedTrack:
+    """A tracked object with predicted future positions."""
+    track_id: int
+    class_name: str
+    current_bbox: BoundingBox
+    predicted_bboxes: List[BoundingBox]  # Future positions
+    is_predicted: bool = False  # True if currently using prediction (occluded)
+    confidence: float = 0.0
+
+
+@dataclass
 class TrackData:
     track_id: int
     class_name: str
@@ -67,6 +78,7 @@ class TrackData:
     confidence: float
     centroid: tuple
     age: int
+    is_predicted: bool = False
 
 
 @dataclass
@@ -79,10 +91,13 @@ class VisionResult:
     gestures: List[Gesture]
     pose: PoseData
     tracks: List[TrackData] = None
+    predictions: List[List[BoundingBox]] = None
     
     def __post_init__(self):
         if self.tracks is None:
             self.tracks = []
+        if self.predictions is None:
+            self.predictions = []
 
 
 class CameraInterface(Protocol):

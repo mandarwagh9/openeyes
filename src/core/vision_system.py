@@ -506,11 +506,56 @@ class VisionSystem:
 
         for track in result.tracks:
             bbox = track.bbox
-            cv2.rectangle(frame, (int(bbox.x1), int(bbox.y1)), (int(bbox.x2), int(bbox.y2)), box_color, 2)
+            is_predicted = getattr(track, 'is_predicted', False)
+            track_color = (255, 165, 0) if is_predicted else box_color
+            cv2.rectangle(frame, (int(bbox.x1), int(bbox.y1)), (int(bbox.x2), int(bbox.y2)), track_color, 2)
             label = f"ID:{track.track_id}"
+            if is_predicted:
+                label += " [PRED]"
             (text_w, text_h), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.rectangle(frame, (int(bbox.x1), int(bbox.y1) - text_h - 10), (int(bbox.x1) + text_w + 5, int(bbox.y1)), (0, 0, 0), -1)
-            cv2.putText(frame, label, (int(bbox.x1), int(bbox.y1) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, text_color, 2)
+            cv2.putText(frame, label, (int(bbox.x1), int(bbox.y1) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, track_color, 2)
+
+        if result.predictions:
+            colors = [
+                (255, 0, 255),
+                (255, 255, 0),
+                (0, 255, 255),
+                (128, 0, 255),
+                (0, 128, 255),
+            ]
+            for track_idx, future_bboxes in enumerate(result.predictions):
+                color = colors[track_idx % len(colors)]
+                for step_idx, future_bbox in enumerate(future_bboxes):
+                    alpha = 1.0 - (step_idx * 0.15)
+                    thickness = max(1, 3 - step_idx)
+                    x1 = int(future_bbox.x1)
+                    y1 = int(future_bbox.y1)
+                    x2 = int(future_bbox.x2)
+                    y2 = int(future_bbox.y2)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), color, thickness)
+                    label = f"+{step_idx+1}"
+                    (lw, lh), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.4, 1)
+                    cx = (x1 + x2) // 2
+                    cy = (y1 + y2) // 2
+                    cv2.circle(frame, (cx, cy), 3, color, -1)
+                    cv2.putText(frame, label, (cx + 5, cy - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1)
+
+        if result.predictions or self._use_world_model:
+            wm_y = h - 35
+            wm_lines = [f"WM: PREDICTIONS={len(result.predictions)}"]
+            if self._world_model and hasattr(self._world_model, 'get_info'):
+                try:
+                    info = self._world_model.get_info()
+                    wm_lines.append(f"  LATENT={info.get('latent_dim', '?')}")
+                    wm_lines.append(f"  PLAN_MS={info.get('planning_time_ms', 0):.1f}")
+                except Exception:
+                    pass
+            for line in wm_lines:
+                (tw, th), _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 1)
+                cv2.rectangle(frame, (5, wm_y - th - 5), (tw + 15, wm_y + 5), (0, 0, 0), -1)
+                cv2.putText(frame, line, (10, wm_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 255), 1)
+                wm_y -= 22
 
         gesture_y = h - 35
         for gesture in result.gestures:
