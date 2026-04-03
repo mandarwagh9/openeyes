@@ -1,0 +1,31 @@
+FROM nvcr.io/nvidia/l4t-jetpack:r36.2.0
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+ENV OPENEYES_BACKEND=tensorrt
+ENV OPENEYES_PRECISION=fp16
+ENV OPENEYES_CAMERA=0
+ENV OPENEYES_DEBUG=false
+
+RUN mkdir -p /app/logs /app/models
+
+VOLUME ["/app/models", "/app/logs"]
+
+EXPOSE 5000/udp
+EXPOSE 9090/tcp
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD python3 -c "import socket; s=socket.socket(); s.settimeout(5); s.connect(('127.0.0.1', 9090)); s.close()" || exit 1
+
+CMD ["python3", "-m", "src.main", "--camera", "0", "--ros2", "--health-monitor"]

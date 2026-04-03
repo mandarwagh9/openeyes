@@ -1,0 +1,35 @@
+[Unit]
+Description=OpenEyes Vision System
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=mandar
+WorkingDirectory=/home/mandar/openeyes
+ExecStart=/usr/bin/python3 -m src.main --camera 0 --ros2 --health-monitor
+Restart=always
+RestartSec=5
+
+# Resource limits
+MemoryMax=2G
+CPUQuota=80%
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/mandar/openeyes/logs /home/mandar/openeyes/models
+
+# Environment
+Environment=OPENEYES_BACKEND=tensorrt
+Environment=OPENEYES_PRECISION=fp16
+Environment=PYTHONUNBUFFERED=1
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openeyes
+
+[Install]
+WantedBy=multi-user.target

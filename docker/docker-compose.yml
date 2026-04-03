@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  openeyes:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.jetson-orin-nano
+    runtime: nvidia
+    environment:
+      - OPENEYES_BACKEND=tensorrt
+      - OPENEYES_PRECISION=fp16
+      - OPENEYES_CAMERA=0
+      - OPENEYES_DEBUG=false
+    devices:
+      - /dev/video0:/dev/video0
+    volumes:
+      - ../models:/app/models
+      - ../logs:/app/logs
+    ports:
+      - "5000:5000/udp"
+      - "9090:9090/tcp"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
