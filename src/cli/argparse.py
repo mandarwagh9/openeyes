@@ -250,11 +250,6 @@ def create_parser() -> argparse.ArgumentParser:
         help="Depth estimation model (default: da3-small)",
     )
     parser.add_argument(
-        "--no-depth",
-        action="store_true",
-        help="Disable depth estimation",
-    )
-    parser.add_argument(
         "--int8",
         action="store_true",
         help="Use INT8 quantized models for faster inference",
