@@ -1,7 +1,7 @@
 # CONTRIBUTING.md - Contributing to OpenEyes
 
-> **Version**: v0.0.1  
-> **Last Updated**: 2026-03-13
+> **Version**: v2.5.0-dev  
+> **Last Updated**: 2026-04-03
 
 ---
 
@@ -269,6 +269,53 @@ Closes #15
 2. At least one maintainer review required
 3. Address feedback promptly
 4. Squash commits before merge
+
+---
+
+## Areas Needing Help
+
+### High Priority
+- **TensorRT Plugins**: Implement 3D-RoPE plugin for V-JEPA 2 TensorRT export
+- **OpenVINO Backend**: Implement OpenVINO backend for Intel NPU support
+- **Hailo DFC Backend**: Implement Hailo Dataflow Compiler backend for Pi 5
+- **V-JEPA 2 Integration**: Full integration with feature fusion for detection/segmentation
+- **Edge-Cloud Split**: Implement adaptive routing between edge and cloud inference
+
+### Medium Priority
+- **BoT-SORT / OC-SORT**: Advanced tracking algorithms for occlusion handling
+- **SAM 3 Integration**: Concept-aware segmentation with EdgeSAM variant
+- **EU AI Act Compliance**: Face blurring, license plate masking, audit trails
+- **Synthetic Data Generation**: Generate rare edge case scenarios for training
+- **Fleet Dashboard**: Web-based fleet management UI
+
+### Documentation
+- **Tutorials**: Step-by-step guides for each industry template
+- **Video Demos**: Record demo videos for each feature
+- **API Documentation**: Auto-generated API docs from docstrings
+
+---
+
+## Development Setup
+
+```bash
+# Clone and install
+git clone https://github.com/mandarwagh9/openeyes.git
+cd openeyes
+pip install -r requirements.txt
+pip install pytest pytest-cov black isort mypy pylint
+
+# Run tests
+pytest tests/ -v
+
+# Run linters
+black src/
+isort src/
+mypy src/
+pylint src/ --fail-under=8.0
+
+# Run benchmarks
+python -m benchmarks.run_benchmarks --all
+```
 
 ---
 

@@ -1,7 +1,7 @@
 # INSTALL.md - Detailed Installation Guide for OpenEyes
 
-> **Version**: v1.0.0  
-> **Last Updated**: 2026-04-01
+> **Version**: v2.5.0-dev  
+> **Last Updated**: 2026-04-03
 
 ---
 
@@ -15,362 +15,259 @@
 6. [Testing](#6-testing)
 7. [Jetson Performance](#7-jetson-performance)
 8. [CSI Camera Setup](#8-csi-camera-setup)
-9. [Troubleshooting](#9-troubleshooting)
+9. [Docker Installation](#9-docker-installation)
+10. [Multi-Platform Support](#10-multi-platform-support)
+11. [Troubleshooting](#11-troubleshooting)
 
 ---
 
 ## 1. Hardware Setup
 
-### 1.1 Required Hardware
+### 1.1 Supported Platforms
+
+| Platform | TOPS | Power | Price | Backend |
+|:---------|:-----|:------|:------|:--------|
+| **Jetson Orin Nano** | 40 | 5-15W | $199-249 | TensorRT |
+| **Jetson Orin NX** | 100 | 10-25W | $399-499 | TensorRT |
+| **Raspberry Pi 5 + AI HAT+ 2** | 40 | ~12W | ~$150 | Hailo DFC |
+| **Intel Core Ultra** | 48 | 15-45W | $300-600 | OpenVINO |
+| **Hailo-8** | 26 | 3.5W | $150-200 | Hailo DFC |
+| **Qualcomm RB5/RB6** | 15-30 | 5-15W | $600-800 | QNN |
+
+### 1.2 Required Hardware
 
 | Item | Specification |
 |:-----|:--------------|
-| **Jetson** | NVIDIA Jetson Orin Nano (4GB or 8GB) |
+| **Board** | Any supported platform above |
 | **Camera** | CSI Camera (IMX219) or USB Webcam (720p/1080p) |
 | **Storage** | 64GB+ microSD or NVMe |
-| **Power** | 5V/4A barrel jack or USB-C PD |
-
-### 1.2 Connect Hardware (CSI Camera)
-
-```
-1. Insert microSD card into Jetson
-2. Connect CSI camera ribbon to CAM0 connector
-3. Connect Ethernet cable (or configure WiFi)
-4. Connect power supply
-5. Press power button
-```
-
-### 1.3 Connect Hardware (USB Webcam)
-
-```
-1. Insert microSD card into Jetson
-2. Connect USB webcam to Jetson USB port
-3. Connect Ethernet cable (or configure WiFi)
-4. Connect power supply
-5. Press power button
-```
+| **Power** | Appropriate power supply for your platform |
 
 ---
 
 ## 2. OS Installation
 
-### 2.1 Download JetPack
+### 2.1 Jetson Orin Nano
 
-1. Download **NVIDIA JetPack SDK Manager** from:
-   https://developer.nvidia.com/embedded/jetpack
+1. Download JetPack 6.2 from [NVIDIA Developer](https://developer.nvidia.com/embedded/jetpack)
+2. Flash using NVIDIA SDK Manager or `jetson-disk-image-creator.sh`
+3. Boot and complete initial setup
 
-2. Run SDK Manager:
-   ```bash
-   sdkmanager
-   ```
+### 2.2 Raspberry Pi 5
 
-3. Select:
-   - Jetson Orin Nano
-   - JetPack 5.1+
-   - Ubuntu 22.04
+1. Install Raspberry Pi OS (64-bit) using Raspberry Pi Imager
+2. Enable camera: `sudo raspi-config` → Interface Options → Camera
+3. Install Hailo AI HAT+ 2 drivers per Hailo documentation
 
-4. Flash to device
+### 2.3 Intel Core Ultra
 
-### 2.2 Post-Installation Setup
-
-```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install essential packages
-sudo apt install -y git python3-pip python3-venv
-```
+1. Install Ubuntu 22.04 or 24.04
+2. Install Intel NPU drivers from [Intel](https://github.com/intel/linux-npu-driver)
 
 ---
 
 ## 3. Python Environment
 
-### 3.1 Create Virtual Environment
-
 ```bash
-# Navigate to project
-cd /path/to/openeyes
+# Python 3.10+ required
+python3 --version
 
 # Create virtual environment
 python3 -m venv venv
-
-# Activate
 source venv/bin/activate
-```
 
-### 3.2 Install Dependencies
-
-```bash
 # Upgrade pip
 pip install --upgrade pip
-
-# Install requirements
-pip install -r requirements.txt
-```
-
-### 3.3 Requirements.txt
-
-```
-# Core
-opencv-python>=4.8.0
-numpy>=1.24.0
-PyYAML>=6.0
-python-dotenv>=1.0.0
-
-# AI/ML
-torch>=2.0.0
-torchvision>=0.15.0
-ultralytics>=8.0.0
-onnxruntime>=1.15.0
-onnxruntime-gpu>=1.15.0
-mediapipe==0.10.9
-timm>=1.0.0
-
-# Communication
-pyserial>=3.5
 ```
 
 ---
 
 ## 4. Project Setup
 
-### 4.1 Clone Repository
-
 ```bash
+# Clone repository
 git clone https://github.com/mandarwagh9/openeyes.git
 cd openeyes
-```
 
-### 4.2 Create Directories
+# Install dependencies
+pip install -r requirements.txt
 
-```bash
-mkdir -p models output logs
-```
-
-### 4.3 Configuration
-
-Create `config.yaml`:
-
-```yaml
-camera:
-  source: 0
-  width: 640
-  height: 480
-  fps: 30
-
-models:
-  yolo:
-    path: models/yolov8n.pt
-    confidence: 0.5
-  depth:
-    enabled: true
-    path: models/depth_midas.pt
-
-output:
-  format: json
-  protocol: udp
-  host: 127.0.0.1
-  port: 5000
+# Verify installation
+python -m src.main --version
 ```
 
 ---
 
 ## 5. Model Download
 
-### 5.1 Download YOLOv8
+Models are included in the `models/` directory:
+- `yolo11n.engine` - TensorRT engine (FP16)
+- `yolo11n.onnx` - ONNX format
+- `yolo26n.pt` - PyTorch format (latest SOTA)
+
+### Download Additional Models
 
 ```bash
-# Using ultralytics
-python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx')"
+# Download YOLO26n
+python -c "from ultralytics import YOLO; YOLO('yolo26n.pt')"
 
-# Or download directly
-wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt
-mv yolov8n.pt models/
-```
-
-### 5.2 Download MiDaS
-
-```bash
-# Download MiDaS v2.1
-wget https://github.com/intel-isd/MiDaS/releases/download/v2.1/midas_v21_onnx.pt
-mv midas_v21_onnx.pt models/depth_midas.pt
+# Rebuild TensorRT engine with optimizations
+python scripts/export_tensorrt_optimized.py --model models/yolo11n.pt
 ```
 
 ---
 
 ## 6. Testing
 
-### 6.1 Test Camera
-
 ```bash
-python -c "
-import cv2
-cap = cv2.VideoCapture(0)
-if cap.isOpened():
-    print('✓ Camera detected')
-    ret, frame = cap.read()
-    if ret:
-        print(f'✓ Frame captured: {frame.shape}')
-    cap.release()
-else:
-    print('✗ Camera not found')
-"
-```
+# Run all tests
+pytest tests/ -v
 
-### 6.2 Test Object Detection
+# With coverage
+pytest tests/ --cov=src --cov-report=html
 
-```bash
-python -c "
-from src.models import ObjectDetector
-detector = ObjectDetector('models/yolov8n.pt')
-import cv2, numpy as np
-frame = np.zeros((480, 640, 3), dtype=np.uint8)
-result = detector.detect(frame)
-print(f'✓ Object detector works')
-"
-```
-
-### 6.3 Run Full System
-
-```bash
-python src/main.py --debug
-```
-
-Expected output:
-```
-[INFO] Camera initialized: 640x480 @ 30fps
-[INFO] YOLOv10 loaded successfully
-[INFO] Starting vision pipeline...
-[INFO] Processing frames...
+# Current: 119 tests passing
 ```
 
 ---
 
 ## 7. Jetson Performance
 
-### 7.1 Enable Maximum Performance Mode
-
-For best AI performance on Jetson Orin Nano:
-
 ```bash
-# Enable 15W power mode (MAXN)
-sudo nvpmodel -m 0
+# One-command optimization (recommended)
+sudo bash scripts/jetson_perf.sh
 
-# Lock CPU/GPU clocks to maximum
-sudo jetson_clocks
-
-# Verify performance mode
-sudo nvpmodel -q
+# Verify
+nvpmodel -q
+tegrastats
 ```
-
-### 7.2 Verify CUDA
-
-```bash
-python -c "import torch; print('CUDA:', torch.cuda.is_available())"
-```
-
-### 7.3 Performance Tips
-
-- Use CSI camera instead of USB for lower latency
-- Disable unused models for higher FPS
-- Use `--no-parallel` if experiencing stability issues
-- Use `--pose-every 3` to reduce pose estimation frequency
 
 ---
 
 ## 8. CSI Camera Setup
 
-### 8.1 Verify CSI Camera
+### 8.1 Verify Camera
 
 ```bash
-# Check camera device
-ls -la /dev/video*
+# Check for CSI camera device
+ls /dev/video*
 
-# Test with GStreamer
-gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! fakesink
+# Test GStreamer pipeline
+gst-launch-1.0 nvarguscamerasrc ! nvvidconv ! video/x-raw,width=640,height=480 ! xvimagesink
 ```
 
-### 8.2 Camera Device Tree
-
-If camera is not detected, you may need to enable it in extlinux.conf:
+### 8.2 Troubleshooting
 
 ```bash
-sudo nano /boot/extlinux/extlinux.conf
-```
-
-Add to APPEND line:
-```
-FDT /boot/kernel_og_tegra234-p3768-0000+p3767-0000-nv.dtb
-```
-
-> Note: Modern JetPack versions usually auto-detect CSI cameras.
-
----
-
-## 9. Troubleshooting
-
-### 9.1 Camera Issues
-
-```bash
-# List video devices
-ls -la /dev/video*
-
-# Restart Argus daemon
+# If camera not detected:
 sudo systemctl restart nvargus-daemon
 
-# Check GStreamer
-gst-inspect-1.0 nvarguscamerasrc
-```
-
-### 9.2 Memory Issues
-
-```bash
-# Check available memory
-free -h
-
-# Check GPU memory
-tegrastats
-```
-
-### 9.3 OpenCV Issues
-
-If OpenCV doesn't work with GStreamer:
-```bash
-# Uninstall pip OpenCV to use system OpenCV
-pip uninstall -y opencv-contrib-python opencv-python
-```
-
-### 9.4 Import Errors
-
-```bash
-# Reinstall dependencies
-pip install --force-reinstall -r requirements.txt
-```
-
-### 9.5 Display Issues
-
-If display doesn't show:
-```bash
-# Set display manually
-export DISPLAY=:0
+# Check camera status
+v4l2-ctl --list-devices
 ```
 
 ---
 
-## 10. Uninstall
+## 9. Docker Installation
+
+### 9.1 Install Docker
 
 ```bash
-# Deactivate virtual environment
-deactivate
+# Install Docker
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
 
-# Remove directory
-cd ..
-rm -rf openeyes
+# Install NVIDIA Container Toolkit
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+sudo systemctl restart docker
+```
+
+### 9.2 Run with Docker
+
+```bash
+cd docker
+docker compose up -d
+
+# View logs
+docker compose logs -f
+```
+
+### 9.3 Systemd Service
+
+```bash
+# Install service
+sudo cp docker/openeyes.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable openeyes
+sudo systemctl start openeyes
+
+# View logs
+sudo journalctl -u openeyes -f
 ```
 
 ---
 
-## Next Steps
+## 10. Multi-Platform Support
 
-- Read [USER_GUIDE.md](USER_GUIDE.md) for usage guide
-- Check [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for issues
+### 10.1 Hardware Abstraction Layer
+
+OpenEyes automatically detects your platform and selects the optimal backend:
+
+```bash
+# Auto-detect and run
+python -m src.main --camera 0
+
+# Force specific backend
+python -m src.main --camera 0 --backend tensorrt
+python -m src.main --camera 0 --backend openvino
+python -m src.main --camera 0 --backend hailo_dfc
+```
+
+### 10.2 Platform Detection
+
+```bash
+# Show detected platform info
+python -c "from src.platforms import PlatformDetector; print(PlatformDetector.detect())"
+```
+
+---
+
+## 11. Troubleshooting
+
+### No Camera Detected
+```bash
+ls /dev/video*
+sudo systemctl restart nvargus-daemon  # Jetson
+```
+
+### Low FPS
+```bash
+sudo bash scripts/jetson_perf.sh
+python -m src.main --camera 0 --turbo
+```
+
+### Out of Memory
+```bash
+# GStreamer pipeline now captures at 1280x720 (fixed in v1.5.0)
+# If still OOM, increase swap:
+sudo fallocate -l 4G /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
+```
+
+### Depth Anything V3 Requires HuggingFace Token
+```bash
+# Use MiDaS by default (works offline)
+python -m src.main --camera 0 --depth-model midas-small
+
+# Or login for DA3
+huggingface-cli login
+python -m src.main --camera 0 --depth-model da3-small
+```
+
+### Docker GPU Not Available
+```bash
+# Verify NVIDIA Container Toolkit
+docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu22.04 nvidia-smi
+```

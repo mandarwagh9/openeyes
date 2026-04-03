@@ -1,18 +1,19 @@
 # OpenEyes
 
-**v1.0.0** · 🤖 We Give Robots Vision
+**v2.5.0-dev** · 🤖 Hardware-Agnostic Edge Vision Framework with World Models
 
 [![GitHub stars](https://img.shields.io/github/stars/mandarwagh9/openeyes?style=social)](https://github.com/mandarwagh9/openeyes)
-[![PyPI](https://img.shields.io/pypi/v/openeyes)](https://pypi.org/project/openeyes/)
 [![License](https://img.shields.io/github/license/mandarwagh9/openeyes)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-119%20passing-brightgreen)](https://github.com/mandarwagh9/openeyes/actions)
+[![Python](https://img.shields.io/badge/python-3.10+-blue)](https://www.python.org/)
 
 ---
 
 ## What is OpenEyes?
 
-OpenEyes is an open-source vision system for humanoid robots. It runs entirely on **NVIDIA Jetson Orin Nano** — no cloud, no lag, no dependencies.
+OpenEyes is an open-source, hardware-agnostic robot vision framework for edge AI. It runs on **NVIDIA Jetson**, **Raspberry Pi**, **Intel NPU**, **Hailo**, and **Qualcomm** platforms — with world models for predictive intelligence.
 
-A humanoid robot needs to see the world like a human does. Not just pixels — but understanding. Distance. Intent. Action.
+A robot needs to see, predict, and plan — not just react. OpenEyes delivers the full pipeline: detection → tracking → depth → prediction → planning — all on edge hardware.
 
 ---
 
@@ -20,169 +21,280 @@ A humanoid robot needs to see the world like a human does. Not just pixels — b
 
 | Capability | Description |
 |:-----------|:------------|
-| 🔍 **Object Detection** | Real-time detection of 80+ object classes |
-| 📏 **Depth Estimation** | Measure distance to everything in the scene |
-| 👤 **Face Detection** | Identify and track faces |
-| 👋 **Gesture Recognition** | Understand hand signals |
-| 🦴 **Pose Estimation** | Detect body positions |
-| 🎯 **Object Tracking** | Follow specific objects |
-| 🚶 **Person Following** | Autonomous person tracking |
-| 🗺️ **Visual SLAM** | Build maps and navigate |
-| 🤖 **VLA Models** | Vision-Language-Action (SmolVLA, OpenVLA, Octo) |
-| 🔦 **LIDAR Processing** | Point cloud obstacle detection |
-| 🔀 **Sensor Fusion** | Camera + Depth + LIDAR integration |
-| 📸 **Multi-Camera** | Multiple camera support |
-| 🛡️ **Safety Controller** | E-STOP, velocity limits, collision avoidance |
-| ❤️ **Health Monitor** | 24/7 operation with auto-recovery |
-| ⬆️ **OTA Updates** | Remote model updates with rollback |
+| 🔍 **Object Detection** | YOLO11n/12n/26n with TensorRT optimization (35-40 FPS) |
+| 📏 **Depth Estimation** | MiDaS + Depth Anything V3 (35.7% better than MiDaS) |
+| 👤 **Face Detection** | MediaPipe FaceMesh (optimized: complexity=0) |
+| 👋 **Gesture Recognition** | MediaPipe Hands (optimized: max_hands=1) |
+| 🦴 **Pose Estimation** | MediaPipe Pose (optimized: complexity=0) |
+| 🎯 **Object Tracking** | ByteTrack with occlusion handling via world models |
+| 🚶 **Person Following** | Autonomous person tracking with predictive following |
+| 🧠 **World Models** | LeWM (15M) for 100-200 Hz predictive planning |
+| 🔮 **V-JEPA 2** | Spatiotemporal features for perception enhancement |
+| 🛡️ **Safety** | Predictive collision avoidance, E-STOP, health monitoring |
+| 📡 **ROS2** | Full integration with 7+ topics |
+| 🚀 **Fleet Management** | Multi-device deployment with OTA updates |
+| 🏭 **Industry Templates** | Warehouse, Manufacturing, Agriculture, Retail |
+| 🐳 **Docker** | Production-ready containerized deployment |
+
+---
+
+## 🏗️ Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    OpenEyes v2.5.0 Pipeline                  │
+│                                                              │
+│  Camera → Detection → Tracking → Depth → [World Model]      │
+│                                              ↓               │
+│                                    Predictive Planning       │
+│                                    Safety Evaluation         │
+│                                    Occlusion Handling        │
+│                                                              │
+│  Hardware Abstraction Layer                                  │
+│  TensorRT │ OpenVINO │ TVM │ Hailo │ QNN │ ONNXRuntime       │
+│                                                              │
+│  Platforms: Jetson Orin │ Pi 5 │ Intel NPU │ Hailo │ Qualcomm│
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 🚀 Quick Start
 
+### 1. Install
+
 ```bash
-# Clone and install
-git clone https://github.com/mandarwagh9/openeyes.git
+git clone https://github.com/mandarwagh9/openeyes
 cd openeyes
 pip install -r requirements.txt
-
-# Run with debug window
-python src/main.py --debug
 ```
 
-### First Time on Jetson?
+### 2. Run
 
 ```bash
-sudo nvpmodel -m 0
-sudo jetson_clocks
+# Basic vision pipeline
+python -m src.main --camera 0 --debug
+
+# With person following
+python -m src.main --camera 0 --follow --debug
+
+# With world model (predictive tracking)
+python -m src.main --camera 0 --world-model lewm --follow --debug
+
+# Turbo mode for maximum FPS
+python -m src.main --camera 0 --world-model lewm --follow --turbo --debug
+
+# Industry template (warehouse)
+python -m src.main --camera 0 --template warehouse --debug
 ```
 
----
-
-## ⚡ Performance
-
-| Configuration | FPS | Use Case |
-|:--------------|:----|:---------|
-| All models | 10-15 | Full capability |
-| Minimal | 25-30 | Speed critical |
-| Optimized INT8 | 30-40 | Production |
-| INT8 + DLA | 40-50 | Maximum performance |
-
----
-
-## 💻 Hardware
-
-- **Platform**: NVIDIA Jetson Orin Nano (4GB / 8GB)
-- **Camera**: CSI (IMX219) or USB Webcam
-- **OS**: Ubuntu 22.04 + JetPack 5.1+
-
----
-
-## 📖 Documentation
-
-**Live Site**: https://mandarwagh9.github.io/openeyes/
-
-| Guide | Description |
-|:------|:------------|
-| [Quick Start](docs/getting-started/quickstart.md) | Get up and running in 5 minutes |
-| [Installation](docs/getting-started/installation.md) | Detailed installation guide |
-| [Commands](docs/user-guide/commands.md) | All CLI options |
-| [ROS2](docs/user-guide/ros2.md) | ROS2 integration |
-| [Hardware](docs/reference/hardware.md) | Hardware specifications |
-
----
-
-## 🤖 ROS2 Integration
+### 3. Optimize (Jetson)
 
 ```bash
-# Enable ROS2 publishing
-python src/main.py --ros2
+# One-command performance optimization
+sudo bash scripts/jetson_perf.sh
 
-# Topics published:
-# /vision/detections  - Object detections
-# /vision/depth       - Depth map
-# /vision/faces       - Face detections
-# /vision/gestures   - Gesture recognition
-# /vision/poses      - Body poses
-# /vision/status     - System status
+# Expected: 8-12 FPS with full pipeline in turbo mode
 ```
 
 ---
 
-## 🔧 New in v0.7.0 - v1.0.0
+## 📊 Performance
+
+| Configuration | FPS (Orin Nano) | Notes |
+|:--------------|:----------------|:------|
+| Detection only (TensorRT) | 35-40 | YOLO11n FP16 |
+| Full pipeline (default) | 4-6 | All models enabled |
+| Full pipeline + turbo | 8-12 | Aggressive frame skipping |
+| Minimal (--no-face --no-gesture --no-pose) | 15-20 | Detection + depth + tracking |
+| World model (LeWM 15M) | 100-200 Hz | Planning only, <10ms |
+
+---
+
+## 🎮 CLI Reference
+
+### Core Commands
+
+| Flag | Description |
+|:-----|:------------|
+| `--camera N` | Camera source (default: 0) |
+| `--debug` | Show annotated debug window |
+| `--follow` | Enable person following |
+| `--ros2` | Enable ROS2 publishing |
+| `--model NAME` | Detection model (yolo11n, yolo12n, yolo26n) |
+| `--list-models` | List available models |
+
+### World Models
+
+| Flag | Description |
+|:-----|:------------|
+| `--world-model TYPE` | World model (none, lewm, vjepa2) |
+| `--plan-horizon N` | Planning horizon in steps (default: 10) |
+| `--plan-samples N` | CEM sample count (default: 100) |
+| `--prediction-fps N` | Prediction update rate (default: 30) |
+| `--occlusion-frames N` | Max frames to predict through occlusion |
+| `--safety-predict` | Enable predictive safety evaluation |
+
+### Performance
+
+| Flag | Description |
+|:-----|:------------|
+| `--turbo` | Aggressive frame skipping for max FPS |
+| `--no-face` | Disable face detection |
+| `--no-gesture` | Disable gesture recognition |
+| `--no-pose` | Disable pose estimation |
+| `--no-depth` | Disable depth estimation |
+| `--no-tracking` | Disable object tracking |
+| `--depth-model M` | Depth model (midas-small, da3-small, da3-base) |
+
+### Industry Templates
+
+| Flag | Description |
+|:-----|:------------|
+| `--template NAME` | Industry template (warehouse, manufacturing-qa, agriculture, retail) |
+
+### Fleet Management
+
+| Command | Description |
+|:--------|:------------|
+| `openeyes fleet register --name robot-01 --group warehouse` | Register device |
+| `openeyes fleet list` | List all devices |
+| `openeyes fleet deploy --model yolo26n --version v1.2 --group warehouse` | Deploy model |
+| `openeyes fleet telemetry --device robot-01` | View device telemetry |
+
+### Benchmarking
+
+| Command | Description |
+|:--------|:------------|
+| `python -m benchmarks.run_benchmarks --all` | Benchmark all models |
+| `python -m benchmarks.run_benchmarks --model yolo11n` | Benchmark specific model |
+| `python -m benchmarks.run_benchmarks --report` | Generate JSON report |
+
+---
+
+## 🏭 Industry Templates
+
+OpenEyes ships with pre-configured pipelines for the highest-demand industries:
+
+| Template | Use Case | Key Features |
+|:---------|:---------|:-------------|
+| **warehouse** | Logistics, fulfillment | Package detection, pallet counting, forklift safety |
+| **manufacturing-qa** | Quality assurance | Defect detection, PPE compliance, assembly verification |
+| **agriculture** | Farming, crop monitoring | Weed detection, crop health, yield estimation |
+| **retail** | Store analytics | Shelf monitoring, inventory counting, customer analytics |
 
 ```bash
-# Multi-Modal Sensing (v0.7.0)
-python src/main.py --lidar --lidar-topic /scan
-python src/main.py --realsense
-python src/main.py --multi-camera
-
-# VLA & Performance (v0.8.0)
-python src/main.py --int8 --dla
-python src/main.py --diffusion-policy
-python src/main.py --action-chunking --control-freq 20
-
-# Safety & Reliability (v1.0.0)
-python src/main.py --safety --max-velocity 1.0 --min-distance 0.3
-python src/main.py --health-monitor
-python src/main.py --ota-update
+# Start with warehouse template
+python -m src.main --camera 0 --template warehouse --debug
 ```
 
 ---
 
-## 📦 Models
+## 🧠 World Models
 
-| Model | Type | Size | Platform |
-|:------|:-----|:-----|:---------|
-| YOLO11n | Detection | 5.4MB | Orin Nano |
-| MiDaS v2.1 | Depth | 350MB | Orin Nano |
-| MediaPipe | Face/Gesture/Pose | ~20MB | Orin Nano |
-| SmolVLA | VLA | ~450M | Orin Nano (optimized) |
-| OpenVLA | VLA | 7B | Orin AGX |
+OpenEyes integrates world models for **predictive intelligence** — going beyond reactive vision to anticipate and plan.
+
+### LeWorldModel (15M params)
+- Latent-space planning at **100-200 Hz**
+- Predictive tracking through occlusions (5-10 frames)
+- Safety evaluation before action execution
+- Online learning from observation history
+- Memory: <100MB, Power: 3-5W
+
+### V-JEPA 2 (80M-600M params)
+- Spatiotemporal feature extraction from video clips
+- Enhances detection accuracy with temporal context
+- ViT-B: 10-20 FPS, ViT-L: 3-6 FPS on Orin Nano
+
+```bash
+# Enable world model with predictive tracking
+python -m src.main --camera 0 --world-model lewm --follow
+
+# With safety evaluation
+python -m src.main --camera 0 --world-model lewm --safety-predict
+```
+
+See [docs/WORLD_MODELS.md](docs/WORLD_MODELS.md) for complete documentation.
 
 ---
 
-## 📅 Version History
+## 🖥️ Hardware Support
 
-| Version | Milestone |
-|:--------|:----------|
-| v1.0.0 | Safety & Reliability, Diffusion Policy, Health Monitor |
-| v0.8.0 | VLA Integration, Action Chunking, TensorRT Optimizer |
-| v0.7.0 | Multi-Modal Sensing, LIDAR, Sensor Fusion |
-| v0.6.0 | Real VLA models, Nav2, SLAM |
-| v0.5.0 | Visual odometry, SLAM |
-| v0.4.x | VLA, event camera |
-| v0.3.x | Model selection |
-| v0.2.x | Tracking, ROS2, performance |
-| v0.1.x | Core vision |
+| Platform | TOPS | Power | Price | Backend |
+|:---------|:-----|:------|:------|:--------|
+| Jetson Orin Nano | 40 | 5-15W | $199-249 | TensorRT |
+| Jetson Orin NX | 100 | 10-25W | $399-499 | TensorRT |
+| Raspberry Pi 5 + AI HAT+ 2 | 40 | ~12W | ~$150 | Hailo DFC |
+| Intel Core Ultra | 48 | 15-45W | $300-600 | OpenVINO |
+| Hailo-8 | 26 | 3.5W | $150-200 | Hailo DFC |
+| Qualcomm RB5/RB6 | 15-30 | 5-15W | $600-800 | QNN |
+
+---
+
+## 🐳 Production Deployment
+
+### Docker
+
+```bash
+cd docker
+docker compose up -d
+```
+
+### Systemd
+
+```bash
+sudo cp docker/openeyes.service /etc/systemd/system/
+sudo systemctl enable openeyes
+sudo systemctl start openeyes
+```
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|:---------|:------------|
+| [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
+| [INSTALL.md](INSTALL.md) | Installation instructions |
+| [COMMANDS.md](COMMANDS.md) | Complete CLI reference |
+| [USER_GUIDE.md](USER_GUIDE.md) | User guide |
+| [OPTIMIZATION.md](OPTIMIZATION.md) | Performance optimization |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
+| [ROADMAP.md](ROADMAP.md) | Development roadmap |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
+| [docs/WORLD_MODELS.md](docs/WORLD_MODELS.md) | World models documentation |
+| [docs/TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) | Technical specification |
+| [WORLD_MODELS_PLAN.md](WORLD_MODELS_PLAN.md) | Implementation plan |
+| [AGENTS.md](AGENTS.md) | Developer guidelines |
 
 ---
 
 ## 🧪 Testing
 
-See [TEST_RESULTS.md](TEST_RESULTS.md) for complete test results on Jetson Orin Nano Super.
-
 ```bash
 # Run all tests
-pytest tests/
+pytest tests/ -v
 
-# Run with coverage
+# With coverage
 pytest tests/ --cov=src --cov-report=html
 
-# Verify installation
-python src/main.py --version
+# Current: 119 tests passing
 ```
-
----
-
-## 🤝 Contribute
-
-OpenEyes is built by people like you. See [CONTRIBUTING.md](CONTRIBUTING.md) to join us.
 
 ---
 
 ## 📄 License
 
-Apache 2.0 — See [LICENSE](LICENSE).
+Apache 2.0 — see [LICENSE](LICENSE)
 
-> The future of robotics is open. Let's build it together. 🤖
+---
+
+## 🙏 Acknowledgments
+
+- **Ultralytics** — YOLO models
+- **Meta FAIR** — V-JEPA 2, DINOv2, SAM 3
+- **ByteDance** — Depth Anything V3
+- **Hugging Face** — LeRobot, transformers
+- **NVIDIA** — TensorRT, Jetson platform
+- **MediaPipe** — Face, gesture, pose models
+- **Mila/NYU** — LeWorldModel (arXiv:2603.19312)

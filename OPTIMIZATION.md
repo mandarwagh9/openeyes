@@ -1,151 +1,218 @@
 # Performance Optimization Guide
 
-This guide covers optimization techniques to achieve 30+ FPS on Jetson Orin Nano.
+> **Version**: v2.5.0-dev | **Last Updated**: 2026-04-03
 
-## Quick Start - Enable Max Performance
+---
+
+## Quick Start
 
 ```bash
-# Maximum performance mode
-sudo nvpmodel -m 0
+# One-command optimization (recommended)
+sudo bash scripts/jetson_perf.sh
+
+# Run with turbo mode for max FPS
+python -m src.main --camera 0 --turbo --debug
+```
+
+---
+
+## Performance Overview
+
+| Configuration | FPS (Orin Nano) | Latency | Power |
+|:--------------|:----------------|:--------|:------|
+| Detection only (TensorRT FP16) | 35-40 | ~28ms | 5-8W |
+| Full pipeline (default) | 4-6 | ~200ms | 10-15W |
+| Full pipeline + turbo | 8-12 | ~100ms | 10-15W |
+| Minimal (--no-face --no-gesture --no-pose) | 15-20 | ~60ms | 8-12W |
+| World model planning (LeWM) | 100-200 Hz | <10ms | 3-5W |
+
+---
+
+## 1. Jetson System Optimization
+
+### MAXN SUPER Mode + jetson_clocks
+
+```bash
+# One-command optimization (recommended)
+sudo bash scripts/jetson_perf.sh
+```
+
+This script:
+- Sets MAXN SUPER power mode (GPU 1020MHz, CPU 1.7GHz)
+- Locks all clocks with `jetson_clocks` (prevents DVFS dips)
+- Sets CPU governor to performance
+- Optimizes memory (swappiness=10, overcommit=1)
+- Disables unnecessary services (cups, bluetooth, ModemManager)
+
+**Expected gain: +50-80% FPS**
+
+### Manual Optimization
+
+```bash
+# Power mode
+sudo nvpmodel -m 2  # MAXN SUPER (or -m 0 for MAX 15W)
+
+# Lock clocks
 sudo jetson_clocks
 
-# Verify
-nvpmodel -q
-jetson_clocks --show
+# Check status
+tegrastats  # Monitor thermals and performance
 ```
 
-## Model Selection
+---
 
-| Model | Size | FP16 FPS | INT8 FPS | Recommended |
-|-------|------|----------|----------|-------------|
-| YOLO11n | 5.4MB | 139 | 180 | Best speed |
-| YOLOv10n | 4.7MB | 139 | 180 | Good alternative |
-| YOLO11s | 18.6MB | 100 | 133 | Higher accuracy |
+## 2. TensorRT Engine Optimization
 
-### Export Commands
+### Rebuild with SOTA Flags
 
 ```bash
-# YOLO11n - FP16 (recommended)
-yolo export model=yolo11n.pt format=engine half=True
+# FP16 engine with --best and --useCudaGraph
+python scripts/export_tensorrt_optimized.py --model models/yolo11n.pt
 
-# YOLO11n - INT8 (fastest)
-yolo export model=yolo11n.pt format=engine int8=True
+# INT8 engine with calibration (1.6-1.9x faster than FP16)
+python scripts/export_tensorrt_optimized.py --model models/yolo11n.pt --int8 --calib-dir /path/to/images
 ```
 
-## v0.8.0+ Performance: INT8 + DLA
+### Optimization Flags
 
-With v0.8.0's TensorRT optimizer, you can now use INT8 quantization and DLA offloading:
+| Flag | Effect | Speedup |
+|------|--------|---------|
+| `--best` | Exhaustive tactic search | +5-15% |
+| `--useCudaGraph` | CUDA graph capture (0.5ms → 0.02ms enqueue) | +10-20% |
+| `--fp16` | Half-precision inference | +2x vs FP32 |
+| `--int8` | INT8 quantization | +1.6-1.9x vs FP16 |
+| `--noDataTransfers` | Skip host-device transfers | +5-10% |
+| `--useSpinWait` | Reduce latency variance | Lower p99 |
+
+---
+
+## 3. Turbo Mode
 
 ```bash
-# INT8 quantization (~2x faster)
-python src/main.py --int8
-
-# INT8 + DLA offloading (~3x faster)
-python src/main.py --int8 --dla
-
-# Full optimization for maximum FPS
-python src/main.py --no-face --no-gesture --no-pose --no-depth --int8 --dla
+python -m src.main --turbo
 ```
 
-### Performance with INT8 + DLA
+Turbo mode uses aggressive frame skipping:
 
-| Configuration | FPS |
-|:--------------|:----|
-| All models (default) | 10-12 |
-| Minimal (no extra models) | 22-25 |
-| INT8 | 30-35 |
-| INT8 + DLA | 40-50 |
+| Model | Default Skip | Turbo Skip |
+|-------|-------------|------------|
+| Detection | 1 (every frame) | 1 (every frame) |
+| Depth | 8 | 16 |
+| Face | 6 | 12 |
+| Gesture | 6 | 12 |
+| Pose | 6 | 12 |
 
-## Frame Skipping
+**Expected gain: +50-100% FPS**
 
-The system includes adaptive frame skipping that automatically adjusts based on motion:
+---
 
-### Default Intervals (v0.1.1)
+## 4. MediaPipe Optimization
 
-```python
-skip_intervals = {
-    'detector': 1,   # Process every frame (most important)
-    'depth': 8,       # Process every 8th frame (expensive)
-    'face': 6,       # Process every 6th frame
-    'gesture': 6,    # Process every 6th frame
-    'pose': 6        # Process every 6th frame
-}
-```
+### Applied Optimizations (Default)
 
-### Adaptive Skipping
+| Setting | Before | After | Impact |
+|---------|--------|-------|--------|
+| Face max_faces | 3 | 1 | -60% face detection time |
+| Face confidence | 0.3 | 0.5 | Fewer false positives |
+| Gesture model_complexity | 1 | 0 | -50% gesture time |
+| Gesture max_hands | 2 | 1 | -50% gesture time |
+| Pose model_complexity | 1 | 0 | -40% pose time |
 
-The `AdaptiveFrameSkipper` automatically adjusts skip interval based on motion:
-- Low motion (static scene): skip more frames (up to 4)
-- High motion (active scene): process every frame
+These are applied automatically — no flags needed.
 
-### Manual Configuration
+---
 
-Edit `src/main.py` to customize:
+## 5. GStreamer Pipeline Optimization
 
-```python
-self._adaptive_skipper = AdaptiveFrameSkipper(
-    base_skip=2,           # Default skip interval (v0.1.1: was 3)
-    motion_threshold=5000, # Motion detection threshold
-    min_skip=1,            # Minimum skip (1 = every frame) (v0.1.1: was 2)
-    max_skip=4             # Maximum skip (v0.1.1: was 5)
-)
-```
+### Optimized Pipeline
 
-## Disable Models for Speed
+The camera pipeline now:
+- Captures at 1280x720 (saves NVMM memory vs 1920x1080)
+- Uses hardware scaling via nvvidconv (VIC engine, zero CPU)
+- `sync=false drop=true max-buffers=2` for lowest latency
 
-The fastest way to increase FPS is to disable models you don't need:
+**Fixes**: NvMapMemAllocInternalTagged OOM errors on Orin Nano
+
+---
+
+## 6. Model Selection
+
+### Detection Models (Orin Nano, TensorRT FP16)
+
+| Model | Params | GFLOPs | FPS | mAP |
+|-------|--------|--------|-----|-----|
+| YOLO26n | 2.57M | 6.1 | 35-40 | 40.9% |
+| YOLO11n | 2.6M | 6.5 | 30-35 | 39.5% |
+| YOLO12n | 2.6M | 6.5 | 30-35 | 40.0% |
+| YOLO11s | 9.5M | 20.7 | 15-20 | 45.5% |
+
+### Depth Models (Orin Nano)
+
+| Model | Params | FPS | Quality |
+|-------|--------|-----|---------|
+| MiDaS Small | 5M | 15-20 | Good |
+| Depth Anything V3 Small | 25M | 10-15 | **Best** |
+| Depth Anything V3 Base | 98M | 5-8 | SOTA |
+
+---
+
+## 7. Disable Models for Speed
 
 ```bash
-# Disable face detection (~+2 FPS)
-python src/main.py --no-face
+# Disable face detection
+python -m src.main --no-face
 
-# Disable gesture recognition (~+2 FPS)
-python src/main.py --no-gesture
+# Disable gesture recognition
+python -m src.main --no-gesture
 
-# Disable pose estimation (~+2 FPS)
-python src/main.py --no-pose
+# Disable pose estimation
+python -m src.main --no-pose
 
-# Disable depth estimation (~+2 FPS, NEW in v0.1.1)
-python src/main.py --no-depth
+# Disable depth estimation
+python -m src.main --no-depth
 
-# Maximum speed - disable all extra models
-python src/main.py --no-face --no-gesture --no-pose --no-depth
+# Maximum speed
+python -m src.main --no-face --no-gesture --no-pose --no-depth
 ```
 
 ### Model Combinations
 
 | Command | Expected FPS |
 |:--------|:------------|
-| All models (default) | ~10-12 |
-| --no-face | ~12-14 |
-| --no-face --no-gesture --no-pose | ~18-22 |
-| --no-face --no-gesture --no-pose --no-depth | ~22-25 |
-| + Jetson max performance | +20-30% |
+| All models (default) | 4-6 |
+| --no-face | 5-7 |
+| --no-face --no-gesture --no-pose | 8-12 |
+| --no-face --no-gesture --no-pose --no-depth | 15-20 |
+| + turbo mode | +50-100% |
+| + jetson_perf.sh | +50-80% |
 
-## Memory Management
+---
 
-### Enable Memory Optimization
+## 8. World Model Performance
 
-```python
-import gc
-import torch
+### LeWorldModel (15M params)
 
-# After each inference cycle
-gc.collect()
-torch.cuda.empty_cache()
-```
+| Metric | Value |
+|--------|-------|
+| Encoding latency | 1-2ms |
+| Prediction latency | 0.5ms |
+| Planning (100 samples) | 3-5ms |
+| Total loop | 5-10ms |
+| Control rate | 100-200 Hz |
+| Memory | <100MB |
+| Power | 3-5W |
 
-### System Memory
+### V-JEPA 2 (80M params)
 
-Increase swap space for model loading:
-```bash
-sudo fallocate -l 4G /swapfile
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
-```
+| Frames | FPS (TensorRT FP16) | Memory |
+|--------|---------------------|--------|
+| 7 | 20-30 | ~710MB |
+| 16 | 10-20 | ~710MB |
+| 32 | 3-5 | ~710MB |
 
-## Input Resolution
+---
+
+## 9. Input Resolution
 
 Lower resolution = faster inference:
 
@@ -162,34 +229,65 @@ camera:
   height: 416
 ```
 
-## Performance Comparison
+---
 
-| Configuration | All Models FPS | Object Only FPS |
-|:--------------|----------------|-----------------|
-| YOLO11n + Default | 10-12 | 25-35 |
-| YOLO11n + --no-face/gesture/pose | 18-22 | 40-50 |
-| YOLO11n + All disabled | 22-25 | 50-60 |
-| **YOLO11n + INT8 (v0.8.0+)** | **30-35** | **60-80** |
-| **YOLO11n + INT8 + DLA (v0.8.0+)** | **40-50** | **80-100** |
-| YOLO11n + Jetson max + INT8 | 50-60 | 100-120 |
+## 10. Benchmarking
 
-## Troubleshooting
+```bash
+# All models
+python -m benchmarks.run_benchmarks --all
+
+# Specific model
+python -m benchmarks.run_benchmarks --model yolo11n
+
+# Generate report
+python -m benchmarks.run_benchmarks --report
+```
+
+---
+
+## 11. Memory Management
+
+### System Memory
+
+```bash
+# Increase swap space for model loading
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+```
+
+### GPU Memory
+
+```bash
+# Monitor GPU memory
+tegrastats
+
+# Clear cache (if needed)
+python -c "import torch; torch.cuda.empty_cache()"
+```
+
+---
+
+## 12. Troubleshooting
 
 ### Low FPS
 
-1. Check Jetson power mode: `nvpmodel -q`
-2. Verify clocks: `jetson_clocks --show`
-3. Check memory: `tegrastats`
+1. Run `sudo bash scripts/jetson_perf.sh`
+2. Use `--turbo` mode
+3. Disable unused models: `--no-face --no-gesture --no-pose`
+4. Check thermals: `watch -n 1 tegrastats`
 
-### Out of Memory
+### Out of Memory (NvMapMemAllocInternalTagged error 12)
 
-1. Reduce input resolution
-2. Use smaller model (YOLO11n vs YOLO11s)
-3. Enable frame skipping
+1. GStreamer pipeline now captures at 1280x720 (fixed)
+2. Reduce input resolution in config.yaml
+3. Use smaller models
 4. Increase swap space
 
 ### Model Loading Errors
 
-1. Ensure ONNX file is in `models/` directory
+1. Ensure model file is in `models/` directory
 2. Check TensorRT version compatibility
 3. Try PyTorch fallback (slower but more compatible)

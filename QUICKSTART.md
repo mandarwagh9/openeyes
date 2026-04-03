@@ -1,6 +1,6 @@
 # QUICKSTART.md - Quick Start Guide for OpenEyes
 
-> **Version**: v1.0.0  
+> **Version**: v2.5.0-dev  
 > **Estimated Time**: 5 minutes
 
 ---
@@ -9,7 +9,7 @@
 
 | Requirement | Check |
 |:------------|:------|
-| NVIDIA Jetson Orin Nano | ☐ |
+| NVIDIA Jetson Orin Nano (or Pi 5, Intel NPU, Hailo, Qualcomm) | ☐ |
 | CSI Camera (IMX219) or USB Webcam | ☐ |
 | Ubuntu 22.04 installed | ☐ |
 | Internet connection | ☐ |
@@ -47,131 +47,119 @@ For best performance on Jetson Orin Nano:
 sudo bash scripts/jetson_perf.sh
 
 # Or manually:
-sudo nvpmodel -m 0
+sudo nvpmodel -m 2  # MAXN SUPER
 sudo jetson_clocks
 ```
 
 ---
 
-## Step 4: Verify Camera
+## Step 4: Run OpenEyes
 
-### For CSI Camera (IMX219)
+### Basic Vision Pipeline
+
 ```bash
-# Check camera device
-ls -la /dev/video*
-
-# Test with GStreamer
-gst-launch-1.0 nvarguscamerasrc sensor-id=0 ! fakesink
+python -m src.main --camera 0 --debug
 ```
 
-### For USB Webcam
-```bash
-# Check camera is detected
-ls /dev/video*
+### With Person Following
 
-# Test with Python
-python3 -c "import cv2; cap = cv2.VideoCapture(0); print('Camera OK' if cap.isOpened() else 'Camera Error'); cap.release()"
+```bash
+python -m src.main --camera 0 --follow --debug
 ```
 
----
-
-## Step 5: Run the Vision System
+### With World Model (Predictive Tracking)
 
 ```bash
-# Run with debug/display output
-python src/main.py --debug
-
-# Run headless (no display)
-python src/main.py
-
-# Run with ROS2 publishing
-python src/main.py --ros2
-
-# Show version
-python src/main.py --version
+python -m src.main --camera 0 --world-model lewm --follow --debug
 ```
 
-You should see:
-- Camera feed window (with --debug)
-- Object detection boxes (green)
-- Face detection boxes (blue)
-- Console output with FPS (15-25 FPS with all models)
-
----
-
-## Step 6: Customize (Optional)
-
-### Change Camera
+### Turbo Mode (Maximum FPS)
 
 ```bash
-# Use different CSI sensor (CAM1)
-python src/main.py --camera 1
-
-# Or USB camera
-python src/main.py --camera 0
+python -m src.main --camera 0 --world-model lewm --follow --turbo --debug
 ```
 
-### Enable Debug Mode
+### Industry Template
 
 ```bash
-python src/main.py --debug
-```
+# Warehouse/Logistics
+python -m src.main --camera 0 --template warehouse --debug
 
-### Performance Tuning
+# Manufacturing QA
+python -m src.main --camera 0 --template manufacturing-qa --debug
 
-```bash
-# Disable parallel processing (more stable, slower)
-python src/main.py --no-parallel
+# Agriculture
+python -m src.main --camera 0 --template agriculture --debug
 
-# Run pose estimation every 3 frames (faster)
-python src/main.py --pose-every 3
-
-# Disable all extra models for maximum FPS
-python src/main.py --no-face --no-gesture --no-pose --no-depth
-
-# Enable max Jetson performance (recommended)
-sudo nvpmodel -m 0 && sudo jetson_clocks
-```
-
-### Change Output Target
-
-```bash
-# Send to different host
-python src/main.py --host 192.168.1.100 --port 5000
+# Retail
+python -m src.main --camera 0 --template retail --debug
 ```
 
 ---
 
-## Performance Info
+## Step 5: Verify Performance
 
-| Configuration | Expected FPS |
-|:--------------|:------------|
-| All models enabled (default) | 10-12 FPS |
-| Without face/gesture/pose | 18-22 FPS |
-| Without all extras + Jetson max | 22-28 FPS |
-| Object detection only | 40-60 FPS |
-| INT8 (v0.8.0+) | 30-40 FPS |
-| INT8 + DLA (v0.8.0+) | 40-50 FPS |
-| YOLO11n TensorRT INT8 | 80-100 FPS |
+```bash
+# Run benchmarks
+python -m benchmarks.run_benchmarks --all --report
+```
 
-> **Tip**: See [OPTIMIZATION.md](OPTIMIZATION.md) for more performance tuning options.
+Expected FPS on Jetson Orin Nano:
 
----
-
-## Common Issues
-
-| Issue | Solution |
-|:------|:---------|
-| `ModuleNotFoundError` | Run `pip install -r requirements.txt` |
-| Camera not found | Check `ls /dev/video*` or restart nvargus-daemon |
-| Low FPS | Use `--no-parallel` or reduce resolution |
-| Display not showing | Ensure DISPLAY=:0 is set (auto-detected) |
-| GTK errors | These are harmless warnings, ignore them |
+| Configuration | FPS |
+|:--------------|:----|
+| Full pipeline (default) | 4-6 |
+| Full pipeline + turbo | 8-12 |
+| Minimal (--no-face --no-gesture --no-pose) | 15-20 |
+| World model planning | 100-200 Hz |
 
 ---
 
 ## Next Steps
 
-- Read [INSTALL.md](INSTALL.md) for detailed installation
-- Read [USER_GUIDE.md](USER_GUIDE.md) for usage guide
-- Check [TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) for technical details
+- **[COMMANDS.md](COMMANDS.md)** - Complete CLI reference
+- **[OPTIMIZATION.md](OPTIMIZATION.md)** - Performance optimization guide
+- **[USER_GUIDE.md](USER_GUIDE.md)** - Full user guide
+- **[docs/WORLD_MODELS.md](docs/WORLD_MODELS.md)** - World models documentation
+- **[docs/TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md)** - Technical specification
+
+---
+
+## Troubleshooting
+
+### No Camera Detected
+```bash
+# Check camera
+ls /dev/video*
+
+# For CSI camera on Jetson:
+ls /dev/video0
+```
+
+### Low FPS
+```bash
+# Enable MAXN SUPER mode
+sudo bash scripts/jetson_perf.sh
+
+# Use turbo mode
+python -m src.main --camera 0 --turbo
+
+# Disable unused models
+python -m src.main --camera 0 --no-face --no-gesture --no-pose
+```
+
+### Out of Memory
+```bash
+# GStreamer pipeline now captures at 1280x720 (fixed in v1.5.0)
+# If still OOM, reduce resolution in config.yaml
+```
+
+### Depth Anything V3 Requires HuggingFace Token
+```bash
+# DA3 is gated - use MiDaS by default
+python -m src.main --camera 0 --depth-model midas-small
+
+# Or login to HuggingFace for DA3
+huggingface-cli login
+python -m src.main --camera 0 --depth-model da3-small
+```

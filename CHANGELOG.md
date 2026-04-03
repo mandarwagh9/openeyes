@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v1.0.0  
-> **Last Updated**: 2026-04-01
+> **Version**: v2.5.0 (Development)  
+> **Last Updated**: 2026-04-03
 
 ---
 
@@ -855,7 +855,150 @@ Given a version number `MAJOR.MINOR.PATCH`:
 |:--------|:-----|:-------|
 | v0.0.1 | Initial | March 2026 |
 | v0.0.2 | Minor | March 2026 |
-| v1.0.0 | Major | June 2026 |
+| v1.0.0 | Major | April 2026 |
+| v1.1.0 | Minor | April 2026 |
+| v1.5.0 | Major | Q2 2026 |
+| v2.0.0 | Major | Q3 2026 |
+| v2.5.0 | Major | Q4 2026 |
+
+---
+
+## [v2.5.0] - In Development (Q4 2026)
+
+### Added - World Models & Predictive Intelligence
+
+- **World Models Module** (`src/world_model/`)
+  - `WorldModel` abstract interface (encode/predict/plan)
+  - `LeWorldModel` - 15M param latent-space world model
+  - `CEMPlanner` - Cross-Entropy Method for latent-space MPC
+  - `SafetyEvaluator` - Predictive safety evaluation before action execution
+  - Predictive tracking with occlusion handling (5-10 frame prediction)
+  - Bounding box trajectory prediction for all tracked objects
+  - Online learning from observation history
+  - Debug visualization: ghost boxes showing predicted future positions
+
+- **V-JEPA 2 Perception** (`src/models/vjepa2_extractor.py`)
+  - V-JEPA 2 ViT-B/L/H feature extractor (80M-600M params)
+  - Spatiotemporal feature extraction from video clips
+  - Frame buffer for streaming feature extraction
+  - Ready for feature fusion with YOLO detection
+
+- **Edge-Cloud Split Architecture** (planned)
+  - Adaptive routing between edge and cloud inference
+  - Cloud API for heavy model offloading
+
+### Changed
+- World model integrated into frame processor pipeline
+- Tracker now supports predicted positions during occlusion
+- VisionResult now includes predictions list
+
+---
+
+## [v2.0.0] - In Development (Q3 2026)
+
+### Added - Hardware-Agnostic Edge Vision Framework
+
+- **Hardware Abstraction Layer** (`src/backends/`)
+  - `Backend` abstract interface for all inference engines
+  - `BackendRegistry` with auto-selection
+  - Support for TensorRT, OpenVINO, TVM, Hailo DFC, QNN, ONNXRuntime
+  - Unified model export across backends
+
+- **Platform Detection** (`src/platforms/`)
+  - Auto-detects Jetson, Raspberry Pi, Intel NPU, Hailo, Qualcomm
+  - Platform-specific optimization profiles
+  - `PlatformInfo` dataclass with hardware capabilities
+
+- **Industry Templates** (`src/templates/`)
+  - `TemplateManager` with 4 pre-configured pipelines
+  - Warehouse/Logistics: package detection, damage inspection, pallet counting
+  - Manufacturing QA: defect detection, PPE compliance, assembly verification
+  - Agriculture: weed detection, crop health, yield estimation
+  - Retail: shelf monitoring, inventory counting, customer analytics
+  - Template save/load from YAML files
+  - CLI: `--template warehouse`
+
+- **Fleet Management** (`src/fleet/`)
+  - `DeviceHeartbeat` protocol with FPS, latency, CPU/GPU/memory/temperature
+  - `ModelDeployment` with device/group targeting and rollback
+  - `ModelRegistry` with SHA256 checksums and deployment tracking
+  - `FleetClient` for edge device communication
+  - CLI commands: `fleet register`, `fleet list`, `fleet deploy`, `fleet telemetry`
+
+- **Benchmarking Suite** (`benchmarks/`)
+  - Comprehensive FPS/latency benchmarking across all models
+  - Mean, p50, p95, p99 latency measurements
+  - JSON report generation with summary statistics
+  - CLI: `python -m benchmarks.run_benchmarks --all --report`
+
+- **Production Toolkit** (`docker/`)
+  - `Dockerfile.jetson-orin-nano` for containerized deployment
+  - `docker-compose.yml` for easy multi-container setup
+  - `openeyes.service` systemd unit with security hardening
+  - Prometheus metrics endpoint (port 9090)
+  - Health checks, resource limits, auto-restart
+
+### Changed
+- Version: v1.0.0 → v2.0.0
+- Hardware support expanded from Jetson-only to multi-platform
+
+---
+
+## [v1.5.0] - In Development (Q2 2026)
+
+### Added - YOLO26 + Depth Anything V3 + Fleet Foundation
+
+- **YOLO26n Support**
+  - Latest SOTA detection model (2.57M params, 6.1 GFLOPs)
+  - NMS-free end-to-end predictions
+  - 43% faster CPU inference vs YOLO11
+  - Added to model registry with `--model yolo26n`
+
+- **Depth Anything V3 Integration**
+  - `DepthAnythingV3` class with da3-small/base/large variants
+  - 35.7% better camera pose accuracy vs MiDaS
+  - Depth-ray representation for improved geometric accuracy
+  - Multi-view depth support capability
+  - Unified `DepthEstimator` supporting both MiDaS and DA3
+  - CLI: `--depth-model da3-small` (default: midas-small)
+
+- **Performance Optimizations**
+  - `--turbo` mode: aggressive frame skipping (depth=16, face/gesture/pose=12)
+  - GStreamer pipeline: hardware scaling via nvvidconv (1280x720 capture)
+  - MediaPipe: complexity=0, max_hands=1, max_faces=1
+  - Thread pool: optimized from 5 to 4 workers
+  - `scripts/jetson_perf.sh`: MAXN SUPER mode, jetson_clocks, disable unnecessary services
+  - `scripts/export_tensorrt_optimized.py`: `--best` and `--useCudaGraph` engine building
+
+### Changed
+- Default depth model: midas-small (DA3 requires HuggingFace token)
+- GStreamer capture: 1920x1080 → 1280x720 (fixes NVMM OOM on Orin Nano)
+- MediaPipe: max_faces 3→1, max_hands 2→1, complexity=0
+
+---
+
+## [v1.1.0] - 2026-04-02
+
+### Added - World Models Phase 1
+
+- **LeWorldModel Integration**
+  - 15M parameter latent-space world model
+  - CEM planner for goal-conditioned planning
+  - Predictive tracking with occlusion handling
+  - Safety evaluation before action execution
+  - CLI: `--world-model lewm`, `--plan-horizon`, `--plan-samples`, `--safety-predict`
+  - Debug visualization: predicted future positions as ghost boxes
+
+- **World Model Documentation**
+  - `docs/WORLD_MODELS.md`: Complete technical documentation
+  - `WORLD_MODELS_PLAN.md`: 4-phase implementation plan
+  - `AGENTS.md`: World Model Development Guidelines
+
+### Changed
+- 40 new tests for world model module (total: 76 passing)
+- Tracker now supports `update_with_predictions()` for occlusion handling
+
+---
 
 ---
 

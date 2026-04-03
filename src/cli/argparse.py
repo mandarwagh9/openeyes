@@ -245,9 +245,15 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--depth-model",
         type=str,
-        default="da3-small",
+        default="midas-small",
         choices=["da3-small", "da3-base", "midas-small"],
-        help="Depth estimation model (default: da3-small)",
+        help="Depth estimation model (default: midas-small)",
+    )
+    parser.add_argument(
+        "--template",
+        type=str,
+        default=None,
+        help="Industry template (warehouse, manufacturing-qa, agriculture, retail)",
     )
     parser.add_argument(
         "--int8",

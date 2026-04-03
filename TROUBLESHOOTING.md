@@ -1,7 +1,7 @@
 # TROUBLESHOOTING.md - Common Issues and Solutions for OpenEyes
 
-> **Version**: v1.0.0  
-> **Last Updated**: 2026-04-01
+> **Version**: v2.5.0-dev  
+> **Last Updated**: 2026-04-03
 
 ---
 
@@ -696,3 +696,74 @@ Assertion failure when using vision_msgs
 **Solutions:**
 
 The system automatically falls back to JSON mode using std_msgs/String. This is expected behavior and provides full functionality.
+
+### Issue: GStreamer OOM (NvMapMemAllocInternalTagged error 12)
+
+**Symptoms:**
+```
+NvMapMemAllocInternalTagged: error 12
+(Argus) Error InsufficientMemory
+```
+
+**Solution:**
+The GStreamer pipeline now captures at 1280x720 instead of 1920x1080 (fixed in v1.5.0). If you still see this error:
+1. Reduce resolution in config.yaml
+2. Increase swap space
+3. Close other GPU applications
+
+### Issue: Depth Anything V3 401 Unauthorized
+
+**Symptoms:**
+```
+Failed to load Depth Anything V3: 401 Client Error
+```
+
+**Solution:**
+DA3 is a gated HuggingFace repository. Options:
+1. Use MiDaS (default): `--depth-model midas-small`
+2. Login to HuggingFace: `huggingface-cli login` and request access to DA3
+3. Set HF token: `export HUGGING_FACE_HUB_TOKEN=your_token`
+
+### Issue: Low FPS After Optimization
+
+**Symptoms:**
+FPS stays below 4 even with `--turbo` and `jetson_perf.sh`
+
+**Solutions:**
+1. Verify MAXN SUPER: `nvpmodel -q`
+2. Check thermals: `tegrastats` (throttling if >85°C)
+3. Disable heavy models: `--no-face --no-gesture --no-pose`
+4. Rebuild TensorRT engine: `python scripts/export_tensorrt_optimized.py --model models/yolo11n.pt`
+
+### Issue: World Model Not Loading
+
+**Symptoms:**
+No "LeWorldModel loaded" message in logs
+
+**Solution:**
+1. Check flag: `--world-model lewm` (not `--world-model none`)
+2. Verify CUDA: `python -c "import torch; print(torch.cuda.is_available())"`
+3. Check logs for errors: `--debug` flag
+
+### Issue: Fleet Connectivity
+
+**Symptoms:**
+Devices not showing up in fleet dashboard
+
+**Solution:**
+1. Verify server URL: `openeyes fleet register --server-url http://your-server:8080`
+2. Check network connectivity
+3. Verify device ID is unique
+4. Check heartbeat interval (default: 30 seconds)
+
+### Issue: MediaPipe Memory Errors
+
+**Symptoms:**
+```
+MediaPipe out of memory
+```
+
+**Solution:**
+MediaPipe is now optimized with `model_complexity=0` and `max_hands=1` by default. If issues persist:
+1. Disable face/gesture/pose: `--no-face --no-gesture --no-pose`
+2. Reduce camera resolution

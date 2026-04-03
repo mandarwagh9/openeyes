@@ -134,6 +134,36 @@ def main() -> None:
             system._turbo_mode = True
             print("TURBO MODE: Aggressive frame skipping for max FPS")
 
+        if args.template:
+            from src.templates import TemplateManager
+            tm = TemplateManager()
+            template = tm.get_template(args.template)
+            if template:
+                print(f"Loading template: {template.name}")
+                print(f"  {template.description}")
+                system._use_face = template.face_enabled
+                system._use_gesture = template.gesture_enabled
+                system._use_pose = template.pose_enabled
+                system._use_depth = template.depth_enabled
+                system._use_tracking = template.tracking_enabled
+                system._use_world_model = template.world_model_enabled
+                config._config["models"]["yolo"]["confidence"] = template.confidence_threshold
+                config._config["models"]["yolo"]["iou_threshold"] = template.iou_threshold
+                config._config["depth"]["model"] = template.depth_model
+                config._config["depth"]["enabled"] = template.depth_enabled
+                config._config["depth"]["skip_frames"] = template.depth_skip_frames
+                if template.world_model_enabled:
+                    system._world_model_type = template.world_model_type
+                    system._wm_horizon = template.plan_horizon
+                    system._wm_samples = template.plan_samples
+                if template.safety_enabled:
+                    print(f"  Safety: max_vel={template.max_velocity}, min_dist={template.min_distance}")
+                if template.classes_filter:
+                    print(f"  Classes: {', '.join(template.classes_filter[:5])}...")
+            else:
+                print(f"Warning: Template '{args.template}' not found")
+                print(f"Available: {', '.join(tm.list_templates())}")
+
         if args.no_monitoring and system._perf_monitor:
             system._perf_monitor.enabled = False
 

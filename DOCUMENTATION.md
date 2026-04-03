@@ -2,7 +2,7 @@
 
 Welcome to the OpenEyes documentation. This index helps you find the right document for your needs.
 
-> **Version**: v1.0.0
+> **Version**: v2.5.0-dev
 
 ## Quick Links
 

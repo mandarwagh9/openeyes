@@ -1,7 +1,7 @@
 # USER_GUIDE.md - User Guide for OpenEyes
 
-> **Version**: v1.0.0  
-> **Last Updated**: 2026-04-01
+> **Version**: v2.5.0-dev  
+> **Last Updated**: 2026-04-03
 
 ---
 
@@ -517,3 +517,107 @@ tail -f logs/openeyes.log
 | `h` | Show help |
 | `f` | Toggle fullscreen |
 | `1-5` | Switch visualization mode |
+
+---
+
+## Appendix: New Features (v1.1.0 - v2.5.0)
+
+### World Models (v1.1.0+)
+
+World models add predictive intelligence to your vision pipeline. Instead of just reacting to what's in the current frame, the system predicts what will happen next.
+
+```bash
+# Enable world model with predictive tracking
+python -m src.main --camera 0 --world-model lewm --follow --debug
+
+# With safety evaluation (predicts collisions before they happen)
+python -m src.main --camera 0 --world-model lewm --safety-predict --debug
+```
+
+In debug mode, you'll see:
+- **Green boxes** = detected objects
+- **Orange boxes** = predicted/occluded objects
+- **Magenta/Yellow/Cyan ghost boxes** = predicted future positions (+1 through +5 steps)
+- **WM stats** at bottom showing latent dimension and planning time
+
+### Turbo Mode (v1.5.0+)
+
+Turbo mode uses aggressive frame skipping to maximize FPS:
+
+```bash
+python -m src.main --camera 0 --turbo --debug
+```
+
+| Model | Default | Turbo |
+|-------|---------|-------|
+| Depth | Every 8 frames | Every 16 frames |
+| Face/Gesture/Pose | Every 6 frames | Every 12 frames |
+| Detection | Every frame | Every frame |
+
+### Industry Templates (v2.0.0+)
+
+Pre-configured pipelines for specific industries:
+
+```bash
+# Warehouse: package detection, pallet counting, forklift safety
+python -m src.main --camera 0 --template warehouse --debug
+
+# Manufacturing QA: defect detection, PPE compliance
+python -m src.main --camera 0 --template manufacturing-qa --debug
+
+# Agriculture: weed detection, crop health
+python -m src.main --camera 0 --template agriculture --debug
+
+# Retail: shelf monitoring, inventory counting
+python -m src.main --camera 0 --template retail --debug
+```
+
+### Depth Model Selection (v1.5.0+)
+
+```bash
+# MiDaS Small (default, works offline)
+python -m src.main --camera 0 --depth-model midas-small
+
+# Depth Anything V3 (requires HuggingFace token, 35.7% better accuracy)
+python -m src.main --camera 0 --depth-model da3-small
+```
+
+### Fleet Management (v2.0.0+)
+
+Manage multiple OpenEyes devices from a central server:
+
+```bash
+# Register a device
+openeyes fleet register --name robot-01 --group warehouse
+
+# Deploy a model update to all warehouse devices
+openeyes fleet deploy --model yolo26n --version v1.2 --group warehouse
+
+# View telemetry
+openeyes fleet telemetry --device robot-01
+```
+
+### Benchmarking (v2.0.0+)
+
+```bash
+# Benchmark all models
+python -m benchmarks.run_benchmarks --all
+
+# Generate JSON report
+python -m benchmarks.run_benchmarks --report
+```
+
+### Docker Deployment (v2.0.0+)
+
+```bash
+cd docker
+docker compose up -d
+```
+
+### Production Systemd Service (v2.0.0+)
+
+```bash
+sudo cp docker/openeyes.service /etc/systemd/system/
+sudo systemctl enable openeyes
+sudo systemctl start openeyes
+```
