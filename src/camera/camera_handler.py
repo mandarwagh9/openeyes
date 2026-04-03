@@ -89,16 +89,23 @@ class CameraHandler:
         raise CameraError("Failed to open camera. No available camera found.")
 
     def _get_jetson_pipeline(self, width: int, height: int, fps: int) -> str:
-        """Build GStreamer pipeline for Jetson CSI camera."""
+        """Build GStreamer pipeline for Jetson CSI camera.
+
+        Optimized for Jetson Orin Nano:
+        - Hardware scaling via nvvidconv (VIC engine, zero CPU)
+        - sync=false drop=true max-buffers=2 for lowest latency
+        - Captures at native sensor res, scales to target on GPU
+        """
         return (
             f"nvarguscamerasrc sensor-id={self._source} ! "
-            f"video/x-raw(memory:NVMM),width={width},height={height},format=NV12,framerate={fps}/1 ! "
-            "nvvidconv flip-method=0 ! "
-            "video/x-raw,format=BGRx ! "
-            "videoconvert ! "
-            "video/x-raw,format=BGR ! "
-            "queue ! "
-            "appsink drop=True"
+            f"video/x-raw(memory:NVMM),width=1920,height=1080,format=NV12,framerate={fps}/1 ! "
+            f"nvvidconv ! "
+            f"video/x-raw(memory:NVMM),width={width},height={height},format=NV12 ! "
+            f"nvvidconv ! "
+            f"video/x-raw,format=BGRx ! "
+            f"videoconvert ! "
+            f"video/x-raw,format=BGR ! "
+            f"appsink sync=false drop=true max-buffers=2"
         )
 
     def _try_jetson_csi(self) -> bool:

@@ -27,9 +27,10 @@ class GestureRecognizer:
             self._mp_drawing = mp.solutions.drawing_utils
             self._hands = self._mp_hands.Hands(
                 static_image_mode=False,
-                max_num_hands=2,
-                min_detection_confidence=self._min_confidence,
-                min_tracking_confidence=0.1,
+                model_complexity=0,
+                max_num_hands=1,
+                min_detection_confidence=0.5,
+                min_tracking_confidence=0.5,
             )
             self._logger.info("Gesture recognizer loaded successfully")
         except Exception as e:
@@ -39,8 +40,7 @@ class GestureRecognizer:
         if self._hands is None:
             raise ModelError("Model not loaded. Call load() first.")
 
-        frame_small = cv2.resize(frame, (640, 480), interpolation=cv2.INTER_LINEAR)
-        frame_rgb = cv2.cvtColor(frame_small, cv2.COLOR_BGR2RGB)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self._hands.process(frame_rgb)
 
         gestures = []

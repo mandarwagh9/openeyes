@@ -102,7 +102,7 @@ class FrameProcessor:
         self._occlusion_frames = occlusion_frames
         self._safety_predict = safety_predict
 
-        self._executor = ThreadPoolExecutor(max_workers=5)
+        self._executor = ThreadPoolExecutor(max_workers=4)
         
         self._last_depth: Optional[np.ndarray] = None
         self._last_pose: Optional[PoseData] = None
@@ -116,6 +116,9 @@ class FrameProcessor:
         self._wm_prediction_interval: int = max(1, 30 // prediction_fps) if prediction_fps > 0 else 30
         self._last_predictions: dict = {}
         self._current_latent: Optional[np.ndarray] = None
+
+        self._bgr_cache: Optional[np.ndarray] = None
+        self._rgb_cache: Optional[np.ndarray] = None
 
     @property
     def frame_id(self) -> int:

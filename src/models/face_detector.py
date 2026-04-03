@@ -29,9 +29,9 @@ class FaceDetector:
             self._mp_drawing = mp.solutions.drawing_utils
             self._face_mesh = self._mp_face_mesh.FaceMesh(
                 static_image_mode=False,
-                max_num_faces=3,
+                max_num_faces=1,
                 refine_landmarks=False,
-                min_detection_confidence=self._min_confidence,
+                min_detection_confidence=0.5,
                 min_tracking_confidence=0.5,
             )
             self._logger.info("Face detector loaded successfully")
