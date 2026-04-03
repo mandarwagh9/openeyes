@@ -83,6 +83,14 @@ class VisionSystem:
         self._tracker: Optional[ObjectTracker] = None
         self._follow_target = config.follow_enabled
 
+        self._world_model = None
+        self._use_world_model = False
+        self._wm_horizon = 10
+        self._wm_samples = 100
+        self._prediction_fps = 30
+        self._occlusion_frames = 5
+        self._safety_predict = False
+
         self._frame_scheduler: Optional[MultiModelFrameScheduler] = None
         self._adaptive_skipper: Optional[AdaptiveFrameSkipper] = None
         self._frame_processor: Optional[FrameProcessor] = None
@@ -406,6 +414,13 @@ class VisionSystem:
                 frame_scheduler=self._frame_scheduler,
                 adaptive_skipper=self._adaptive_skipper,
                 logger=self._logger,
+                world_model=self._world_model,
+                use_world_model=self._use_world_model,
+                world_model_horizon=self._wm_horizon,
+                world_model_samples=self._wm_samples,
+                prediction_fps=self._prediction_fps,
+                occlusion_frames=self._occlusion_frames,
+                safety_predict=self._safety_predict,
             )
             self._frame_processor.set_follow_target(self._follow_target)
             self._frame_processor.set_pose_skip_frames(self._pose_skip_frames)

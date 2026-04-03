@@ -220,6 +220,29 @@ def main() -> None:
                 else:
                     print(f"VLA enabled (mode: {'advanced-ai' if args.advanced_ai else 'basic'})")
 
+        if args.world_model and args.world_model != "none":
+            from src.world_model.lewm import LeWorldModel
+            wm_device = "cuda" if platform.machine() == "aarch64" else "cpu"
+            system._use_world_model = True
+            system._wm_horizon = args.plan_horizon
+            system._wm_samples = args.plan_samples
+            system._prediction_fps = args.prediction_fps
+            system._occlusion_frames = args.occlusion_frames
+            system._safety_predict = args.safety_predict
+
+            if args.world_model == "lewm":
+                world_model = LeWorldModel(
+                    device=wm_device,
+                    precision="fp16",
+                    latent_dim=384,
+                    use_dinov2=False,
+                )
+                world_model.load()
+                system._world_model = world_model
+                logger.info(f"LeWorldModel loaded (device={wm_device}, latent_dim=384)")
+            else:
+                logger.warning(f"World model '{args.world_model}' not yet implemented")
+
         system.start()
 
     except KeyboardInterrupt:
