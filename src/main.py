@@ -115,7 +115,15 @@ def main() -> None:
             log_file=args.log_file,
         )
 
-        system = VisionSystem(config, use_ros2=args.ros2, log_file=args.log_file)
+        if args.video:
+            print(f"Video mode: processing {args.video}")
+            if args.output:
+                print(f"Output video: {args.output}")
+
+        system = VisionSystem(
+            config, use_ros2=args.ros2, log_file=args.log_file,
+            video_path=args.video, output_path=args.output,
+        )
 
         if args.no_parallel:
             system._use_parallel = False

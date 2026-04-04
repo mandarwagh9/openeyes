@@ -345,6 +345,18 @@ def create_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Turbo mode: aggressive frame skipping for max FPS (depth=16, face/gesture/pose=12)",
     )
+    parser.add_argument(
+        "--video",
+        type=str,
+        default=None,
+        help="Path to input video file (mp4, avi, mkv) instead of live camera",
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default=None,
+        help="Path to output video file for annotated demo recording",
+    )
 
     return parser
 

@@ -40,6 +40,8 @@ A robot needs to see, predict, and plan — not just react. OpenEyes delivers th
 
 ## 🏗️ Architecture
 
+![System Architecture](docs/system-architecture.png)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    OpenEyes v2.5.0 Pipeline                  │

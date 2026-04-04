@@ -30,12 +30,15 @@ except ImportError:
 class VisionSystem:
     """Optimized vision system with parallel processing and modular architecture."""
 
-    def __init__(self, config: Config, use_ros2: bool = False, log_file: Optional[str] = None):
+    def __init__(self, config: Config, use_ros2: bool = False, log_file: Optional[str] = None,
+                 video_path: Optional[str] = None, output_path: Optional[str] = None):
         import logging
         import logging.handlers
         
         self._config = config
         self._use_ros2 = use_ros2
+        self._video_path = video_path
+        self._output_path = output_path
         self._logger = logging.getLogger("openeyes")
         self._logger.setLevel(logging.DEBUG if config.debug else logging.INFO)
         
@@ -53,7 +56,8 @@ class VisionSystem:
                 format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             )
 
-        self._camera: Optional[CameraHandler] = None
+        self._camera: Any = None
+        self._video_writer = None
         self._detector = None
         self._depth_estimator = None
         self._face_detector = None
@@ -124,6 +128,10 @@ class VisionSystem:
 
         if self._camera:
             self._camera.release()
+
+        if self._video_writer is not None:
+            self._video_writer.release()
+            self._logger.info(f"Output video saved")
 
         if self._udp_sender:
             self._udp_sender.close()
@@ -199,12 +207,22 @@ class VisionSystem:
         self._logger.info(f"Frame scheduler initialized: {skip_intervals}")
 
     def _init_camera(self) -> None:
-        self._camera = CameraHandler(
-            source=self._config.camera_source,
-            width=self._config.camera_width,
-            height=self._config.camera_height,
-            fps=self._config.camera_fps,
-        )
+        if self._video_path:
+            from src.camera.video_source import VideoSource
+            self._camera = VideoSource(
+                path=self._video_path,
+                width=self._config.camera_width,
+                height=self._config.camera_height,
+                fps=self._config.camera_fps,
+            )
+            self._logger.info(f"Using video source: {self._video_path}")
+        else:
+            self._camera = CameraHandler(
+                source=self._config.camera_source,
+                width=self._config.camera_width,
+                height=self._config.camera_height,
+                fps=self._config.camera_fps,
+            )
         try:
             self._camera.open()
         except Exception as e:
@@ -345,12 +363,30 @@ class VisionSystem:
 
     def _process_loop(self) -> None:
         frame_time = 1.0 / self._config.target_fps
+        is_video = self._video_path is not None
+
+        if self._output_path:
+            import cv2
+            out_w = self._camera.width
+            out_h = self._camera.height
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            self._video_writer = cv2.VideoWriter(
+                self._output_path, fourcc, self._config.camera_fps, (out_w, out_h)
+            )
+            if not self._video_writer.isOpened():
+                self._logger.warning(f"Failed to open video writer for {self._output_path}")
+                self._video_writer = None
+            else:
+                self._logger.info(f"Recording output video to {self._output_path}")
 
         while self._running:
             loop_start = time.time()
 
             frame = self._camera.read()
             if frame is None:
+                if is_video:
+                    self._logger.info("Video playback complete")
+                    break
                 self._logger.warning("No frame received, skipping")
                 time.sleep(0.1)
                 continue
@@ -367,17 +403,23 @@ class VisionSystem:
                 except Exception:
                     pass
 
-            if self._config.debug:
+            if self._config.debug or is_video:
                 self._debug_display(frame, result)
+
+            if self._video_writer is not None:
+                self._video_writer.write(frame)
 
             self._fps_counter += 1
             elapsed_total = time.time() - self._fps_start_time
             if elapsed_total >= 1.0:
                 fps = self._fps_counter / elapsed_total
                 stats = self._perf_monitor.get_stats() if self._perf_monitor else {}
+                progress = ""
+                if is_video and hasattr(self._camera, 'progress'):
+                    progress = f" | Progress: {self._camera.progress*100:.1f}%"
                 self._logger.info(
                     f"FPS: {fps:.1f} | Objects: {len(result.objects)} | "
-                    f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)}"
+                    f"Faces: {len(result.faces)} | Gestures: {len(result.gestures)}{progress}"
                 )
                 if self._ros2_pub:
                     self._ros2_pub.publish_status(
