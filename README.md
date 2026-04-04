@@ -115,29 +115,17 @@ sudo bash scripts/jetson_perf.sh
 
 ## 🎬 Demos
 
-### Warehouse Worker — Detection + Tracking + Follow Decisions
+### Warehouse — Detection + Tracking + Follow Decisions
 
-![Warehouse Worker](demo/demo-warehouse-worker.gif)
+![Warehouse Follow](demo/demo-warehouse-follow.gif)
 
 Real-time object detection, persistent tracking IDs, and autonomous follow decisions (`FORWARD`/`STOP`/`LEFT`/`RIGHT`/`BACKWARD`) with VLA-style reasoning.
 
-### Man Lifting Boxes — Multi-Object Tracking
+### Multi-Object Tracking
 
-![Man Lifting Boxes](demo/demo-man-lifting-boxes.gif)
+![Multi-Object Track](demo/demo-multi-object-track.gif)
 
 Simultaneous tracking of person + multiple objects with distance-aware decision making. The system maintains persistent IDs across frames and adjusts movement commands based on target proximity.
-
-### Inventory Check — Persistent Tracking Stability
-
-![Inventory Check](demo/demo-man-checking-inventory.gif)
-
-Stable tracking with smooth decision transitions. The robot locks onto the target person and follows steadily as they move through the warehouse.
-
-### Person Walking Away — Autonomous Follow (FORWARD)
-
-![Man Walking Away](demo/demo-man-walking-away.gif)
-
-The system detects a person walking away from the camera and issues `FORWARD` commands to follow — demonstrating the core person-following capability with real-time distance estimation via bounding box height ratio.
 
 ### Run Demos Yourself
 
