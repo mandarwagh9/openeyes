@@ -117,11 +117,11 @@ sudo bash scripts/jetson_perf.sh
 
 ### Demo 1
 
-![Demo 1](demo/demo-warehouse-follow.gif)
+![Demo 1](demo/demo1.gif)
 
 ### Demo 2
 
-![Demo 2](demo/demo-multi-object-track.gif)
+![Demo 2](demo/demo2.gif)
 
 ### Run Demos Yourself
 
