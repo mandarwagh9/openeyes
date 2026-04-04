@@ -113,6 +113,38 @@ sudo bash scripts/jetson_perf.sh
 
 ---
 
+## 🎬 Demos
+
+### Warehouse Worker — Detection + Tracking + Follow Decisions
+
+![Warehouse Worker](demo/demo-warehouse-worker.gif)
+
+Real-time object detection, persistent tracking IDs, and autonomous follow decisions (`FORWARD`/`STOP`/`LEFT`/`RIGHT`/`BACKWARD`) with VLA-style reasoning.
+
+### Man Lifting Boxes — Multi-Object Tracking
+
+![Man Lifting Boxes](demo/demo-man-lifting-boxes.gif)
+
+Simultaneous tracking of person + multiple objects with distance-aware decision making. The system maintains persistent IDs across frames and adjusts movement commands based on target proximity.
+
+### Inventory Check — Persistent Tracking Stability
+
+![Inventory Check](demo/demo-man-checking-inventory.gif)
+
+Stable tracking with smooth decision transitions. The robot locks onto the target person and follows steadily as they move through the warehouse.
+
+### Run Demos Yourself
+
+```bash
+# Process any video through the pipeline
+python demo/process_demo.py
+
+# Or use the main pipeline with video input
+python -m src.main --video path/to/video.mp4 --output output.mp4 --no-face --no-gesture --no-pose
+```
+
+---
+
 ## 🎮 CLI Reference
 
 ### Core Commands
