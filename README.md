@@ -115,17 +115,13 @@ sudo bash scripts/jetson_perf.sh
 
 ## 🎬 Demos
 
-### Warehouse — Detection + Tracking + Follow Decisions
+### Demo 1
 
-![Warehouse Follow](demo/demo-warehouse-follow.gif)
+![Demo 1](demo/demo-warehouse-follow.gif)
 
-Real-time object detection, persistent tracking IDs, and autonomous follow decisions (`FORWARD`/`STOP`/`LEFT`/`RIGHT`/`BACKWARD`) with VLA-style reasoning.
+### Demo 2
 
-### Multi-Object Tracking
-
-![Multi-Object Track](demo/demo-multi-object-track.gif)
-
-Simultaneous tracking of person + multiple objects with distance-aware decision making. The system maintains persistent IDs across frames and adjusts movement commands based on target proximity.
+![Demo 2](demo/demo-multi-object-track.gif)
 
 ### Run Demos Yourself
 
