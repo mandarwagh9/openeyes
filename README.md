@@ -133,6 +133,12 @@ Simultaneous tracking of person + multiple objects with distance-aware decision 
 
 Stable tracking with smooth decision transitions. The robot locks onto the target person and follows steadily as they move through the warehouse.
 
+### Person Walking Away — Autonomous Follow (FORWARD)
+
+![Man Walking Away](demo/demo-man-walking-away.gif)
+
+The system detects a person walking away from the camera and issues `FORWARD` commands to follow — demonstrating the core person-following capability with real-time distance estimation via bounding box height ratio.
+
 ### Run Demos Yourself
 
 ```bash
