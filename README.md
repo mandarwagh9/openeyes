@@ -135,12 +135,6 @@ python -m src.main --video path/to/video.mp4 --output output.mp4 --no-face --no-
 
 ---
 
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=mandarwagh9/openeyes&type=Date)](https://www.star-history.com/#mandarwagh9/openeyes&Date)
-
----
-
 ## 🎮 CLI Reference
 
 ### Core Commands
@@ -328,3 +322,9 @@ Apache 2.0 — see [LICENSE](LICENSE)
 - **NVIDIA** — TensorRT, Jetson platform
 - **MediaPipe** — Face, gesture, pose models
 - **Mila/NYU** — LeWorldModel (arXiv:2603.19312)
+
+---
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=mandarwagh9/openeyes&type=Date)](https://www.star-history.com/#mandarwagh9/openeyes&Date)
