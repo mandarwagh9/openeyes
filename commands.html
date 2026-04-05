@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commands - OpenEyes</title>
+  <title>Commands - OpenEyes v2.5.0</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -134,10 +134,45 @@ python src/main.py --ota-update</code></pre>
         </tbody>
       </table>
     </div>
+
+    <h2>World Models (v2.5.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --world-model lewm
+python src/main.py --world-model lewm --follow
+python src/main.py --world-model lewm --safety-predict
+python src/main.py --plan-horizon 20 --plan-samples 200
+python src/main.py --occlusion-frames 10</code></pre>
+    </div>
+
+    <h2>Industry Templates (v2.5.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --template warehouse
+python src/main.py --template manufacturing-qa
+python src/main.py --template agriculture
+python src/main.py --template retail</code></pre>
+    </div>
+
+    <h2>Video Processing (v2.5.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --video input.mp4 --output output.mp4
+python src/main.py --video input.mp4 --output output.mp4 --turbo</code></pre>
+    </div>
+
+    <h2>Fleet Management (v2.5.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>openeyes fleet register --name robot-01 --group warehouse
+openeyes fleet list
+openeyes fleet deploy --model yolo26n --version v1.2 --group warehouse
+openeyes fleet telemetry --device robot-01</code></pre>
+    </div>
   </main>
 
   <footer class="footer">
-    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <p>OpenEyes v2.5.0-dev — Hardware-agnostic edge robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="index.html">Home</a>

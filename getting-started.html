@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Getting Started - OpenEyes</title>
+  <title>Getting Started - OpenEyes v2.5.0</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,8 +40,8 @@
   <main class="content">
     <h2>Prerequisites</h2>
     <ul>
-      <li>NVIDIA Jetson Orin Nano (4GB or 8GB)</li>
-      <li>CSI Camera (IMX219) or USB Webcam</li>
+      <li>NVIDIA Jetson Orin Nano (4GB or 8GB), Raspberry Pi 5, Intel NPU, Hailo, or Qualcomm</li>
+      <li>CSI Camera (IMX219), USB Webcam, or RealSense D455</li>
       <li>Ubuntu 22.04 installed</li>
       <li>Internet connection</li>
     </ul>
@@ -91,7 +91,19 @@ python src/main.py --debug
 python src/main.py
 
 # With ROS2
-python src/main.py --ros2</code></pre>
+python src/main.py --ros2
+
+# With world model (predictive tracking)
+python src/main.py --world-model lewm --follow
+
+# With industry template
+python src/main.py --template warehouse --debug
+
+# Turbo mode for max FPS
+python src/main.py --turbo --world-model lewm
+
+# Process video files
+python src/main.py --video input.mp4 --output output.mp4</code></pre>
     </div>
 
     <h2>Jetson Optimization</h2>
@@ -100,8 +112,8 @@ python src/main.py --ros2</code></pre>
         <span class="code-lang">bash</span>
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
       </div>
-      <pre><code>sudo nvpmodel -m 0
-sudo jetson_clocks</code></pre>
+      <pre><code>sudo bash scripts/jetson_perf.sh
+# Sets MAXN SUPER mode + jetson_clocks</code></pre>
     </div>
 
     <h2>Next Steps</h2>
@@ -111,6 +123,26 @@ sudo jetson_clocks</code></pre>
       <li><a href="ros2.html">Set up ROS2 integration</a></li>
       <li><a href="hardware.html">View hardware specs</a></li>
     </ul>
+
+    <h2>v2.5.0 — World Models & Predictive Intelligence</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># LeWM world model (15M params, 100-200 Hz planning)
+python src/main.py --world-model lewm --follow
+
+# With predictive safety evaluation
+python src/main.py --world-model lewm --safety-predict
+
+# Industry templates (warehouse, manufacturing-qa, agriculture, retail)
+python src/main.py --template warehouse
+python src/main.py --template manufacturing-qa
+
+# Depth model selection (midas-small, da3-small, da3-base)
+python src/main.py --depth-model da3-small</code></pre>
+    </div>
 
     <h2>v0.7.0+ New Features</h2>
     <h3>Multi-Modal Sensing</h3>
@@ -163,7 +195,7 @@ python src/main.py --safety --health-monitor --ota-update</code></pre>
   </main>
 
   <footer class="footer">
-    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <p>OpenEyes v2.5.0-dev — Hardware-agnostic edge robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="index.html">Home</a>

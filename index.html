@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenEyes — Robot Vision System v1.0.0</title>
-  <meta name="description" content="Open-source vision system for humanoid robots on NVIDIA Jetson">
+  <title>OpenEyes — Robot Vision System v2.5.0</title>
+  <meta name="description" content="Hardware-agnostic edge robot vision framework with world models for predictive intelligence">
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,7 +37,7 @@
     <div class="hero-content">
       <img src="assets/images/logo.svg" alt="OpenEyes" class="hero-logo">
       <h1>We Give Robots Vision</h1>
-      <p class="hero-tagline">Open-source vision system for humanoid robots. Runs entirely on NVIDIA Jetson — no cloud, no dependencies.</p>
+      <p class="hero-tagline">Hardware-agnostic edge robot vision framework with world models for predictive intelligence. Runs on Jetson, Pi, Intel, Hailo & Qualcomm.</p>
       <div class="hero-buttons">
         <a href="getting-started.html" class="btn btn-primary">Get Started</a>
         <a href="https://github.com/mandarwagh9/openeyes" class="btn btn-secondary">GitHub</a>
@@ -130,6 +130,36 @@
         <h3>OTA Updates</h3>
         <p>Model updates + rollback</p>
       </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🧠</span>
+        <h3>World Models</h3>
+        <p>Predictive planning at 200 Hz</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🔮</span>
+        <h3>V-JEPA 2</h3>
+        <p>Spatiotemporal perception</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">📐</span>
+        <h3>Depth Anything V3</h3>
+        <p>35.7% better than MiDaS</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🏭</span>
+        <h3>Industry Templates</h3>
+        <p>Warehouse, QA, Agriculture, Retail</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🚀</span>
+        <h3>Fleet Management</h3>
+        <p>Multi-device deployment</p>
+      </div>
+      <div class="grid-item new-feature">
+        <span class="icon">🔧</span>
+        <h3>Hardware Abstraction</h3>
+        <p>TensorRT, OpenVINO, TVM, Hailo, QNN</p>
+      </div>
     </div>
   </section>
 
@@ -148,24 +178,29 @@
         </thead>
         <tbody>
           <tr>
-            <td>All models</td>
-            <td><span class="badge">10-15</span></td>
-            <td>Full capability</td>
+            <td>Detection only (TensorRT)</td>
+            <td><span class="badge badge-int8">35-40</span></td>
+            <td>YOLO11n FP16</td>
+          </tr>
+          <tr>
+            <td>Full pipeline (default)</td>
+            <td><span class="badge">4-6</span></td>
+            <td>All models enabled</td>
+          </tr>
+          <tr>
+            <td>Full pipeline + turbo</td>
+            <td><span class="badge">8-12</span></td>
+            <td>Aggressive frame skipping</td>
           </tr>
           <tr>
             <td>Minimal</td>
-            <td><span class="badge">25-30</span></td>
-            <td>Speed critical</td>
+            <td><span class="badge">15-20</span></td>
+            <td>Detection + depth + tracking</td>
           </tr>
           <tr>
-            <td>INT8</td>
-            <td><span class="badge badge-int8">30-40</span></td>
-            <td>Production</td>
-          </tr>
-          <tr>
-            <td>INT8 + DLA</td>
-            <td><span class="badge badge-dla">40-50</span></td>
-            <td>Maximum performance</td>
+            <td>World model (LeWM 15M)</td>
+            <td><span class="badge badge-dla">100-200 Hz</span></td>
+            <td>Planning only, &lt;10ms</td>
           </tr>
         </tbody>
       </table>
@@ -179,19 +214,27 @@
     <div class="hw-grid">
       <div class="hw-item">
         <h3>Jetson Orin Nano</h3>
-        <p>4GB / 8GB</p>
+        <p>40 TOPS, 5-15W</p>
+      </div>
+      <div class="hw-item">
+        <h3>Raspberry Pi 5</h3>
+        <p>+ AI HAT 26 TOPS</p>
+      </div>
+      <div class="hw-item">
+        <h3>Intel Core Ultra</h3>
+        <p>48 TOPS NPU</p>
+      </div>
+      <div class="hw-item">
+        <h3>Hailo-8</h3>
+        <p>26 TOPS, 3.5W</p>
+      </div>
+      <div class="hw-item">
+        <h3>Qualcomm RB5</h3>
+        <p>15-30 TOPS</p>
       </div>
       <div class="hw-item">
         <h3>Camera</h3>
-        <p>CSI or USB</p>
-      </div>
-      <div class="hw-item">
-        <h3>OS</h3>
-        <p>Ubuntu 22.04</p>
-      </div>
-      <div class="hw-item">
-        <h3>Power</h3>
-        <p>7-15W</p>
+        <p>CSI, USB, RealSense</p>
       </div>
     </div>
   </section>
@@ -209,6 +252,28 @@
 cd openeyes
 pip install -r requirements.txt
 python src/main.py --debug</code></pre>
+    </div>
+
+    <h3>World Models & Predictive Intelligence (v2.5.0)</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><code># World model with predictive tracking
+python src/main.py --world-model lewm --follow
+
+# With safety evaluation
+python src/main.py --world-model lewm --safety-predict
+
+# Industry template (warehouse)
+python src/main.py --template warehouse --debug
+
+# Turbo mode for maximum FPS
+python src/main.py --turbo --world-model lewm
+
+# Process video files
+python src/main.py --video input.mp4 --output output.mp4</code></pre>
     </div>
 
     <h3>New in v0.7.0 - v1.0.0</h3>
@@ -248,9 +313,11 @@ python src/main.py --ota-update</code></pre>
           </tr>
         </thead>
         <tbody>
-          <tr><td>YOLO11n</td><td>Detection</td><td>5.4MB</td></tr>
-          <tr><td>MiDaS v2.1</td><td>Depth</td><td>350MB</td></tr>
+          <tr><td>YOLO11n/12n/26n</td><td>Detection</td><td>2.6-5.4MB</td></tr>
+          <tr><td>MiDaS + Depth Anything V3</td><td>Depth</td><td>350MB</td></tr>
           <tr><td>MediaPipe</td><td>Face/Gesture/Pose</td><td>~20MB</td></tr>
+          <tr><td>LeWM</td><td>World Model</td><td>15M params</td></tr>
+          <tr><td>V-JEPA 2</td><td>Perception</td><td>80-600M params</td></tr>
           <tr><td>SmolVLA</td><td>VLA</td><td>450M params</td></tr>
           <tr><td>OpenVLA</td><td>VLA</td><td>7B params</td></tr>
         </tbody>
@@ -259,7 +326,7 @@ python src/main.py --ota-update</code></pre>
   </section>
 
   <footer class="footer">
-    <p>OpenEyes v1.0.0 — Open-source robot vision</p>
+    <p>OpenEyes v2.5.0-dev — Hardware-agnostic edge robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="getting-started.html">Docs</a>
