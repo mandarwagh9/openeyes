@@ -135,6 +135,12 @@ python -m src.main --video path/to/video.mp4 --output output.mp4 --no-face --no-
 
 ---
 
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=mandarwagh9/openeyes&type=Date)](https://www.star-history.com/#mandarwagh9/openeyes&Date)
+
+---
+
 ## 🎮 CLI Reference
 
 ### Core Commands
