@@ -1,7 +1,7 @@
 # AGENTS.md - Developer Guidelines for OpenEyes
 
-> AI agent guidelines for OpenEyes - vision system for humanoid robots running on Jetson Orin Nano with full ROS2 integration.
-> **Version**: v1.0.0
+> AI agent guidelines for OpenEyes - hardware-agnostic edge robot vision framework with world models
+> **Version**: v2.5.0-dev
 
 ---
 
@@ -10,41 +10,62 @@
 ```bash
 # Install & Run
 pip install -r requirements.txt
-python src/main.py --camera 0 --debug
+python -m src.main --camera 0 --debug
 
 # Run with ROS2 publishing
-python src/main.py --ros2
+python -m src.main --ros2
 
 # Show version
-python src/main.py --version
+python -m src.main --version
 
 # Show system info
-python src/main.py --info
+python -m src.main --info
 
 # Performance options (v0.2.0)
-python src/main.py --precision int8 --batch-size 2
-python src/main.py --dla
+python -m src.main --precision int8 --batch-size 2
+python -m src.main --dla
+
+# Video file processing (v2.5.0)
+python -m src.main --video path/to/video.mp4 --output output.mp4
+python -m src.main --video path/to/video.mp4 --output demo.mp4 --follow
 
 # Tracking options (v0.2.1)
-python src/main.py --follow
-python src/main.py --no-tracking
-python src/main.py --follow --track-max-age 60
+python -m src.main --follow
+python -m src.main --no-tracking
+python -m src.main --follow --track-max-age 60
 
 # Model selection (v0.3.0)
-python src/main.py --list-models
-python src/main.py --model yolo12n
-python src/main.py --model rtmdet_nano
+python -m src.main --list-models
+python -m src.main --model yolo12n
+python -m src.main --model rtmdet_nano
+python -m src.main --model yolo26n
+
+# World Models (v2.5.0)
+python -m src.main --world-model lewm
+python -m src.main --world-model vjepa2
+python -m src.main --world-model lewm --follow --turbo
+
+# Industry Templates (v2.5.0)
+python -m src.main --template warehouse
+python -m src.main --template manufacturing-qa
+python -m src.main --template agriculture
+python -m src.main --template retail
 
 # Advanced AI (v0.4.0)
-python src/main.py --vla
-python src/main.py --event-camera
-python src/main.py --advanced-ai
+python -m src.main --vla
+python -m src.main --event-camera
+python -m src.main --advanced-ai
+
+# Depth model selection (v2.5.0)
+python -m src.main --depth-model da3-small
+python -m src.main --depth-model da3-base
+python -m src.main --depth-model midas-small
 
 # Disable models for speed
-python src/main.py --no-face --no-gesture --no-pose --no-depth
+python -m src.main --no-face --no-gesture --no-pose --no-depth
 
 # Enable file logging with rotation
-python src/main.py --log-file logs/openeyes.log
+python -m src.main --log-file logs/openeyes.log
 
 # Jetson optimization (requires sudo)
 sudo bash scripts/jetson_perf.sh
@@ -66,9 +87,9 @@ black src/
 isort src/
 
 # SLAM & Navigation (v0.5.0)
-python src/main.py --visual-odom          # Enable visual odometry
-python src/main.py --depth-to-scan      # Convert depth to laser scan
-python src/main.py --slam              # Enable full SLAM mode
+python -m src.main --visual-odom          # Enable visual odometry
+python -m src.main --depth-to-scan      # Convert depth to laser scan
+python -m src.main --slam              # Enable full SLAM mode
 
 # Launch SLAM with Isaac ROS
 ros2 launch openeyes cuvslam.launch.py
@@ -77,40 +98,40 @@ ros2 launch openeyes cuvslam.launch.py
 ros2 launch openeyes nav2.launch.py map:=/path/to/map.yaml
 
 # VLA Commands (v0.5.0)
-python src/main.py --vla               # Enable VLA processing
-python src/main.py --advanced-ai       # Enable all AI features
+python -m src.main --vla               # Enable VLA processing
+python -m src.main --advanced-ai       # Enable all AI features
 
 # Real VLA Models (v0.6.0)
-python src/main.py --real-vla smolvla  # Use SmolVLA (~450M params)
-python src/main.py --real-vla openvla  # Use OpenVLA (7B params, needs AGX)
-python src/main.py --real-vla octo     # Use Octo (~93M params)
+python -m src.main --real-vla smolvla  # Use SmolVLA (~450M params)
+python -m src.main --real-vla openvla  # Use OpenVLA (7B params, needs AGX)
+python -m src.main --real-vla octo     # Use Octo (~93M params)
 
 # Navigation (v0.6.0)
-python src/main.py --nav2              # Enable Nav2 with obstacle avoidance
+python -m src.main --nav2              # Enable Nav2 with obstacle avoidance
 ros2 launch openeyes unified.launch.py # Full autonomous navigation
 
 # Navigation goals
 ros2 topic pub /navigation/goal std_msgs/String "data: '2.0 1.0 0.0'"  # x, y, yaw
 
 # Multi-Modal Sensing (v0.7.0)
-python src/main.py --lidar                         # Enable LIDAR processing
-python src/main.py --lidar-topic /scan             # LIDAR topic
-python src/main.py --realsense                     # Enable RealSense D455
-python src/main.py --multi-camera                  # Multi-camera mode
+python -m src.main --lidar                         # Enable LIDAR processing
+python -m src.main --lidar-topic /scan             # LIDAR topic
+python -m src.main --realsense                     # Enable RealSense D455
+python -m src.main --multi-camera                  # Multi-camera mode
 
 # VLA & Performance (v0.8.0)
-python src/main.py --int8                         # INT8 quantization
-python src/main.py --dla                          # DLA offloading
-python src/main.py --diffusion-policy             # Enable Diffusion Policy
-python src/main.py --action-chunking              # Enable action chunking
-python src/main.py --control-freq 20              # Control frequency (Hz)
+python -m src.main --int8                         # INT8 quantization
+python -m src.main --dla                          # DLA offloading
+python -m src.main --diffusion-policy             # Enable Diffusion Policy
+python -m src.main --action-chunking              # Enable action chunking
+python -m src.main --control-freq 20              # Control frequency (Hz)
 
 # Safety & Reliability (v1.0.0)
-python src/main.py --safety                      # Enable safety controller
-python src/main.py --health-monitor              # Enable health monitoring
-python src/main.py --max-velocity 1.0            # Max velocity (m/s)
-python src/main.py --min-distance 0.3            # Min distance (m)
-python src/main.py --ota-update                   # Enable OTA updates
+python -m src.main --safety                      # Enable safety controller
+python -m src.main --health-monitor              # Enable health monitoring
+python -m src.main --max-velocity 1.0            # Max velocity (m/s)
+python -m src.main --min-distance 0.3            # Min distance (m)
+python -m src.main --ota-update                   # Enable OTA updates
 ```
 
 ---
@@ -197,6 +218,9 @@ logger.info(f"Detected {len(detections)} objects")
 ```
 src/
 ├── camera/           # CameraHandler, types, CSI device detection
+│   ├── video_source.py      # v2.5.0 - Video file input support
+├── cli/              # argparse.py - All CLI flags
+├── core/             # VisionSystem - Main pipeline orchestration
 ├── models/           # ObjectDetector, depth_estimator, VLA, etc.
 │   ├── action_chunker.py      # v0.8.0 - Real-time control
 │   ├── lora_finetuning.py     # v0.8.0 - VLA customization
@@ -207,24 +231,37 @@ src/
 │   ├── lidar_processing.py    # v0.7.0 - LIDAR point cloud
 │   ├── sensor_fusion.py       # v0.7.0 - Multi-sensor fusion
 │   └── multi_camera.py        # v0.7.0 - Multi-camera support
-├── utils/            # config, logger
+├── utils/            # config, logger, tracker
 │   ├── health_monitor.py      # v1.0.0 - 24/7 operation
 │   ├── ota_update.py          # v1.0.0 - Model updates
-│   └── safety_controller.py  # v1.0.0 - Safety features
+│   ├── safety_controller.py  # v1.0.0 - Safety features
+│   └── tracker.py             # Person following with distance logic
+├── world_model/      # v2.5.0 - Predictive planning
+│   ├── base.py              # WorldModel abstract interface
+│   ├── lewm.py              # LeWorldModel (15M params)
+│   ├── planner.py           # CEM planner
+│   └── safety_evaluator.py  # Predictive safety checks
 └── main.py           # Entry point with all CLI flags
 ```
 
+### Entry Point
+- **Use**: `python -m src.main` (NOT `python src/main.py`)
+- Video mode: `--video <path>` + `--output <path>`
+- Follow mode: `--follow` with `--turbo` for max FPS
+
 ### Data Flow
-Camera → ObjectDetector → JSON Formatter → UDP Sender + ROS2 Publisher
+Camera/Video → ObjectDetector → Tracker → Depth → [World Model] → JSON/UDP/ROS2
 
 ### Vision Pipeline
-1. CSI Camera capture (IMX219 at 1920x1080)
-2. YOLO11n object detection
-3. MiDaS depth estimation (now wired to pipeline)
-4. Face detection (MediaPipe - confidence lowered to 0.3)
-5. Gesture recognition (MediaPipe - confidence lowered to 0.3)
-6. Pose estimation
-7. Output via UDP + ROS2 (7 topics + command subscription)
+1. CSI Camera or Video file capture (1920x1080 or configured)
+2. YOLO11n/12n/26n object detection (TensorRT optimized)
+3. ByteTrack tracking with IoU association
+4. MiDaS/DA3 depth estimation
+5. Face detection (MediaPipe - confidence 0.3)
+6. Gesture recognition (MediaPipe - confidence 0.1, resized to 640x480)
+7. Pose estimation (MediaPipe - confidence 0.3)
+8. World model prediction (optional, v2.5.0)
+9. Output via UDP + ROS2 (7+ topics) + Video writer (if --output)
 
 ---
 
@@ -368,9 +405,13 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ## Modified Files Reference
 
-### Core Code Files
+### Core Code Files (v2.5.0)
 | File | Changes |
 |:-----|:--------|
+| `src/cli/argparse.py` | Added `--video` and `--output` flags |
+| `src/camera/video_source.py` | New VideoSource class for video file input |
+| `src/core/vision_system.py` | Wired video mode, video writer support |
+| `src/main.py` | Entry point with video/output path support |
 | `src/main.py` | Entry point with ROS2 integration, --ros2 and --version flags, depth estimator wired |
 | `src/ros2/vision_node.py` | VisionPublisher with all publishers, command callback, JSON fallback |
 | `src/ros2/__init__.py` | Try/except for services import |
@@ -384,11 +425,22 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 | `launch/openeyes.launch.py` | ROS2 launch file (NEW) |
 | `package.xml` | ROS2 package manifest (NEW) |
 
+### Demo Files (v2.5.0)
+| File | Changes |
+|:-----|:--------|
+| `demo/process_demo.py` | Standalone demo processing script |
+| `demo/demo1.gif` | Warehouse follow demo (user-provided) |
+| `demo/demo2.gif` | Multi-object tracking demo (user-provided) |
+
 ### Documentation Files
 | File | Changes |
 |:-----|:--------|
-| `CHANGELOG.md` | v0.1.0 with all changes |
-| `README.md` | Version badge, command subscription feature |
+| `CHANGELOG.md` | v2.5.0 with all changes |
+| `README.md` | System architecture diagram, Demos section, Star History |
+| `index.html` | v2.5.0 updates with new features, performance, hardware |
+| `getting-started.html` | v2.5.0 commands, templates, video processing |
+| `commands.html` | World models, templates, video, fleet sections |
+| `hardware.html` | Supported platforms table |
 | `USER_GUIDE.md` | ROS2 Integration section, CLI options |
 | `QUICKSTART.md` | --ros2/--version examples |
 | `TROUBLESHOOTING.md` | ROS2 Issues section |
@@ -410,25 +462,79 @@ Types: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`
 
 ---
 
-## v0.7.0 - v1.0.0 New Features
+## v2.5.0 New Features
 
-### Multi-Modal Sensing (v0.7.0)
-- LIDAR processing with obstacle detection
-- Sensor fusion (camera + depth + LIDAR)
-- Multi-camera support
-- RealSense D455 integration
+### Video Processing (v2.5.0)
+- `--video` flag for video file input (mp4, avi, mkv)
+- `--output` flag for annotated output recording
+- `VideoSource` class in `src/camera/video_source.py`
+- Wired into `VisionSystem` with OpenCV VideoWriter
 
-### VLA & Performance (v0.8.0)
-- Action chunking for 10-30 Hz control
-- LoRA fine-tuning for VLA customization
-- TensorRT INT8 quantization
-- DLA offloading
+### Demo Pipeline
+- `demo/process_demo.py` - Standalone demo processing script
+- Full pipeline: detection → tracking → depth → decision → overlay
+- Decision logic: FORWARD/STOP/LEFT/RIGHT/BACKWARD based on bbox height ratio
+- VLA-style reasoning overlay with confidence scores
 
-### Safety & Reliability (v1.0.0)
-- Health monitor for 24/7 operation
-- Safety controller with E-STOP
-- OTA updates with rollback
-- Safe velocity/distance limits
+### Industry Templates (v2.5.0)
+- `--template warehouse` - Warehouse person following
+- `--template manufacturing-qa` - Manufacturing QA inspection
+- `--template agriculture` - Agricultural monitoring
+- `--template retail` - Retail analytics
+
+### World Models (v2.5.0)
+- LeWM (15M params) for 100-200 Hz predictive planning
+- V-JEPA 2 for spatiotemporal perception
+- CEM planner with configurable horizon/samples
+- Predictive safety evaluation
+
+### Depth Anything V3 (v2.5.0)
+- `--depth-model da3-small` or `da3-base`
+- 35.7% better than MiDaS
+- Smaller model for edge deployment
+
+### Hardware Abstraction Layer
+- TensorRT (NVIDIA), OpenVINO (Intel), TVM, Hailo, QNN
+
+### Supported Platforms
+- Jetson Orin Nano/AGX
+- Raspberry Pi 5
+- Intel NPU
+- Hailo-8L
+- Qualcomm Snapdragon
+
+---
+
+## Demo Processing
+
+### Create Demo Video
+```bash
+# Process video with full overlay
+python demo/process_demo.py --input video.mp4 --output demo_out.mp4
+
+# Convert to optimized GIF for GitHub
+ffmpeg -i demo_out.mp4 -vf "fps=8,scale=400:-1" -loop 0 demo.gif
+
+# Or with imageio (better optimization)
+python -c "
+import imageio
+reader = imageio.get_reader('demo_out.mp4')
+frames = []
+for i, frame in enumerate(reader):
+    if i % 8 == 0:  # 8 FPS
+        from PIL import Image
+        img = Image.fromarray(frame).resize((400, int(400 * frame.shape[0] / frame.shape[1])))
+        frames.append(np.array(img))
+imageio.mimsave('demo.gif', frames, fps=8, loop=0)
+"
+```
+
+### GIF Optimization for GitHub (<2MB)
+- Width: 400px
+- FPS: 6-8
+- Colors: max_colors=64
+- Dither: bayer
+- Use: `python -m imageio --mpeg-rewrite filename.gif output.gif`
 
 ---
 
