@@ -193,7 +193,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v1.0.0",
+        version="OpenEyes v2.5.0",
     )
     parser.add_argument(
         "--info",
@@ -356,6 +356,30 @@ def create_parser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="Path to output video file for annotated demo recording",
+    )
+    parser.add_argument(
+        "--log-format",
+        type=str,
+        default="console",
+        choices=["console", "json"],
+        help="Log format: console (human-readable) or json (structured)",
+    )
+    parser.add_argument(
+        "--api",
+        action="store_true",
+        help="Enable REST API server",
+    )
+    parser.add_argument(
+        "--api-port",
+        type=int,
+        default=8000,
+        help="REST API server port (default: 8000)",
+    )
+    parser.add_argument(
+        "--api-host",
+        type=str,
+        default="127.0.0.1",
+        help="REST API server host (default: 127.0.0.1)",
     )
 
     return parser
