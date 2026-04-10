@@ -60,7 +60,7 @@ def show_system_info() -> None:
     print("=" * 50)
     print("OpenEyes System Information")
     print("=" * 50)
-    print(f"  Version: v0.6.0")
+    print(f"  Version: v2.5.0")
     print(f"  Python: {platform.python_version()}")
     print(f"  Platform: {platform.system()} {platform.machine()}")
 

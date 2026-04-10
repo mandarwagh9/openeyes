@@ -1,7 +1,7 @@
 # AGENTS.md - Developer Guidelines for OpenEyes
 
 > AI agent guidelines for OpenEyes - hardware-agnostic edge robot vision framework with world models
-> **Version**: v2.5.0-dev
+> **Version**: v2.5.0
 
 ---
 
