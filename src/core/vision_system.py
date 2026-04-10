@@ -30,6 +30,8 @@ except ImportError:
 class VisionSystem:
     """Optimized vision system with parallel processing and modular architecture."""
 
+    _instance: Optional["VisionSystem"] = None
+
     def __init__(self, config: Config, use_ros2: bool = False, log_file: Optional[str] = None,
                  video_path: Optional[str] = None, output_path: Optional[str] = None):
         import logging
@@ -106,6 +108,8 @@ class VisionSystem:
 
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
+
+        VisionSystem._instance = self
 
     def _signal_handler(self, signum, frame):
         self._logger.info("Shutdown signal received")

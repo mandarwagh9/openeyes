@@ -34,6 +34,20 @@ from src.utils.config import Config
 from src.utils.logger import setup_logger
 from src.core.vision_system import VisionSystem
 
+
+def _start_api(host: str, port: int) -> None:
+    """Start the REST API server."""
+    import threading
+    import uvicorn
+
+    def run():
+        from src.api import create_api
+        app = create_api()
+        uvicorn.run(app, host=host, port=port, log_level="info")
+
+    thread = threading.Thread(target=run, daemon=True)
+    thread.start()
+
 try:
     from src.ros2.visual_odometry import VisualOdometry as VO
 except ImportError:
@@ -113,7 +127,12 @@ def main() -> None:
             "openeyes",
             level=logging.DEBUG if config.debug else logging.INFO,
             log_file=args.log_file,
+            log_format=args.log_format,
         )
+
+        if args.api:
+            _start_api(args.api_host, args.api_port)
+            print(f"REST API started at http://{args.api_host}:{args.api_port}")
 
         if args.video:
             print(f"Video mode: processing {args.video}")
