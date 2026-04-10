@@ -3,190 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Commands - OpenEyes v2.5.0</title>
+  <title>Commands — OpenEyes</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
-<body>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="index.html" class="navbar-logo">
-        <img src="assets/images/logo.svg" alt="OpenEyes">
-        <span>OpenEyes</span>
-      </a>
-      <ul class="navbar-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="getting-started.html">Getting Started</a></li>
-        <li><a href="commands.html">Commands</a></li>
-        <li><a href="ros2.html">ROS2</a></li>
-        <li><a href="hardware.html">Hardware</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        <li><a href="contributing.html">Contribute</a></li>
-        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
-      </ul>
-      <div class="navbar-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-    </div>
+<body class="page-wrapper">
+  <nav class="nav-minimal">
+    <a href="index.html" class="logo">
+      <img src="assets/images/logo.svg" alt="OpenEyes">
+      OpenEyes
+    </a>
+    <a href="https://github.com/mandarwagh9/openeyes" target="_blank">GitHub</a>
   </nav>
 
-  <header class="page-header">
+  <main class="content-minimal">
     <h1>Commands</h1>
-    <p>Complete reference for all CLI options</p>
-  </header>
 
-  <main class="content">
     <h2>Basic</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --debug
-python src/main.py --version
-python src/main.py --info</code></pre>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --debug<br>
+      <span class="prompt">$</span>python src/main.py --version<br>
+      <span class="prompt">$</span>python src/main.py --info
     </div>
 
-    <h2>Camera Options</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
-        <tbody>
-          <tr><td><code>--camera</code></td><td>Camera index or RTSP URL</td><td>0</td></tr>
-          <tr><td><code>--width</code></td><td>Frame width</td><td>640</td></tr>
-          <tr><td><code>--height</code></td><td>Frame height</td><td>480</td></tr>
-          <tr><td><code>--fps</code></td><td>Target FPS</td><td>30</td></tr>
-        </tbody>
-      </table>
+    <h2>Camera</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --camera 0<br>
+      <span class="prompt">$</span>python src/main.py --width 640 --height 480 --fps 30
     </div>
 
-    <h2>Model Options</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --no-face --no-gesture --no-pose --no-depth
-python src/main.py --pose-every 3
-python src/main.py --model yolo12n</code></pre>
+    <h2>World Models</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --world-model lewm<br>
+      <span class="prompt">$</span>python src/main.py --world-model lewm --follow<br>
+      <span class="prompt">$</span>python src/main.py --depth-model da3-small
+    </div>
+
+    <h2>Templates</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --template warehouse<br>
+      <span class="prompt">$</span>python src/main.py --template manufacturing-qa<br>
+      <span class="prompt">$</span>python src/main.py --template agriculture
+    </div>
+
+    <h2>Video</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --video input.mp4 --output output.mp4<br>
+      <span class="prompt">$</span>python src/main.py --video input.mp4 --output out.mp4 --turbo
     </div>
 
     <h2>Performance</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --precision fp32
-python src/main.py --precision fp16
-python src/main.py --precision int8
-python src/main.py --dla</code></pre>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --int8<br>
+      <span class="prompt">$</span>python src/main.py --precision fp16<br>
+      <span class="prompt">$</span>python src/main.py --dla
     </div>
 
-    <h2>Advanced AI</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --vla
-python src/main.py --advanced-ai
-python src/main.py --real-vla smolvla
-python src/main.py --event-camera</code></pre>
+    <h2>Safety</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --safety --max-velocity 1.0<br>
+      <span class="prompt">$</span>python src/main.py --health-monitor<br>
+      <span class="prompt">$</span>python src/main.py --ota-update
     </div>
 
     <h2>ROS2</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --ros2
-python src/main.py --nav2
-python src/main.py --visual-odom
-python src/main.py --slam</code></pre>
-    </div>
-
-    <h2>Multi-Modal Sensing (v0.7.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --lidar
-python src/main.py --lidar-topic /scan
-python src/main.py --realsense
-python src/main.py --multi-camera</code></pre>
-    </div>
-
-    <h2>VLA & Performance (v0.8.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --int8
-python src/main.py --dla
-python src/main.py --diffusion-policy
-python src/main.py --action-chunking
-python src/main.py --control-freq 20</code></pre>
-    </div>
-
-    <h2>Safety & Reliability (v1.0.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --safety
-python src/main.py --health-monitor
-python src/main.py --max-velocity 1.0
-python src/main.py --min-distance 0.3
-python src/main.py --ota-update</code></pre>
-    </div>
-
-    <h2>Safety Options</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Option</th><th>Description</th><th>Default</th></tr></thead>
-        <tbody>
-          <tr><td><code>--safety</code></td><td>Enable safety controller</td><td>false</td></tr>
-          <tr><td><code>--health-monitor</code></td><td>Enable health monitoring</td><td>false</td></tr>
-          <tr><td><code>--max-velocity</code></td><td>Max velocity (m/s)</td><td>1.0</td></tr>
-          <tr><td><code>--min-distance</code></td><td>Min obstacle distance (m)</td><td>0.3</td></tr>
-          <tr><td><code>--ota-update</code></td><td>Enable OTA updates</td><td>false</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>World Models (v2.5.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --world-model lewm
-python src/main.py --world-model lewm --follow
-python src/main.py --world-model lewm --safety-predict
-python src/main.py --plan-horizon 20 --plan-samples 200
-python src/main.py --occlusion-frames 10</code></pre>
-    </div>
-
-    <h2>Industry Templates (v2.5.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --template warehouse
-python src/main.py --template manufacturing-qa
-python src/main.py --template agriculture
-python src/main.py --template retail</code></pre>
-    </div>
-
-    <h2>Video Processing (v2.5.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --video input.mp4 --output output.mp4
-python src/main.py --video input.mp4 --output output.mp4 --turbo</code></pre>
-    </div>
-
-    <h2>REST API (v2.5.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>python src/main.py --api
-python src/main.py --api --api-port 8000 --api-host 0.0.0.0</code></pre>
-    </div>
-    <p>Endpoints: <code>/health</code>, <code>/metrics</code>, <code>/models</code>, <code>/control</code></p>
-
-    <h2>Fleet Management (v2.5.0)</h2>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>openeyes fleet register --name robot-01 --group warehouse
-openeyes fleet list
-openeyes fleet deploy --model yolo26n --version v1.2 --group warehouse
-openeyes fleet telemetry --device robot-01</code></pre>
+    <div class="code-minimal">
+      <span class="prompt">$</span>python src/main.py --ros2<br>
+      <span class="prompt">$</span>python src/main.py --nav2<br>
+      <span class="prompt">$</span>python src/main.py --slam
     </div>
   </main>
 
-  <footer class="footer">
-    <p>OpenEyes v2.5.0 — Hardware-agnostic edge robot vision</p>
-    <div class="footer-links">
-      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
-      <a href="index.html">Home</a>
-      <a href="safety.html">Safety</a>
-    </div>
+  <footer class="footer-minimal">
+    <a href="getting-started.html">Docs</a>
+    <a href="hardware.html">Hardware</a>
+    <a href="safety.html">Safety</a>
+    <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
   </footer>
-  <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>
 </html>

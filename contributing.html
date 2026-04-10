@@ -3,96 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contribute - OpenEyes v2.5.0</title>
+  <title>Contribute — OpenEyes</title>
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
-<body>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="index.html" class="navbar-logo">
-        <img src="assets/images/logo.svg" alt="OpenEyes">
-        <span>OpenEyes</span>
-      </a>
-      <ul class="navbar-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="getting-started.html">Getting Started</a></li>
-        <li><a href="commands.html">Commands</a></li>
-        <li><a href="ros2.html">ROS2</a></li>
-        <li><a href="hardware.html">Hardware</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        <li><a href="contributing.html">Contribute</a></li>
-        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
-      </ul>
-      <div class="navbar-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
-    </div>
+<body class="page-wrapper">
+  <nav class="nav-minimal">
+    <a href="index.html" class="logo">
+      <img src="assets/images/logo.svg" alt="OpenEyes">
+      OpenEyes
+    </a>
+    <a href="https://github.com/mandarwagh9/openeyes" target="_blank">GitHub</a>
   </nav>
 
-  <header class="page-header">
+  <main class="content-minimal">
     <h1>Contribute</h1>
-    <p>Join the OpenEyes community and help build the future of robotics</p>
-  </header>
 
-  <main class="content">
-    <h2>Welcome</h2>
-    <p>Thank you for your interest in contributing to OpenEyes!</p>
-
-    <h2>How to Contribute</h2>
-    <h3>1. Fork & Clone</h3>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>git clone https://github.com/YOUR_USERNAME/openeyes.git
-cd openeyes</code></pre>
+    <h2>Fork</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>git clone https://github.com/mandarwagh9/openeyes.git
     </div>
 
-    <h3>2. Create Branch</h3>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>git checkout -b feature/your-feature</code></pre>
+    <h2>Branch</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>git checkout -b feat/your-feature
     </div>
 
-    <h3>3. Make Changes</h3>
-    <p>Follow our coding standards - type hints required, Google-style docstrings.</p>
-
-    <h3>4. Test & Commit</h3>
-    <div class="code-block">
-      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-      <pre><code>pytest tests/
-git add .
-git commit -m "feat: add new feature"</code></pre>
+    <h2>Test</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>pytest tests/ -v
     </div>
 
-    <h3>5. Submit PR</h3>
-    <p>Push to your fork and submit a pull request on GitHub.</p>
+    <h2>Commit</h2>
+    <div class="code-minimal">
+      <span class="prompt">$</span>git add .<br>
+      <span class="prompt">$</span>git commit -m "feat: add feature"<br>
+      <span class="prompt">$</span>git push origin feat/your-feature
+    </div>
 
-    <h2>Code Standards</h2>
-    <ul>
-      <li>Type hints required on all functions</li>
-      <li>Google-style docstrings</li>
-      <li>snake_case for variables, PascalCase for classes</li>
-      <li>Use isort for imports</li>
-    </ul>
-
-    <h2>Commit Messages</h2>
-    <p>Follow Conventional Commits: <code>feat:</code>, <code>fix:</code>, <code>docs:</code>, <code>refactor:</code></p>
-
-    <h2>Questions?</h2>
-    <ul>
-      <li><a href="https://github.com/mandarwagh9/openeyes/issues">GitHub Issues</a></li>
-      <li><a href="https://github.com/mandarwagh9/openeyes/discussions">Discussions</a></li>
-    </ul>
+    <h2>Pull Request</h2>
+    <p>Open a PR on GitHub. Ensure all tests pass.</p>
   </main>
 
-  <footer class="footer">
-    <p>OpenEyes v2.5.0 — Hardware-agnostic edge robot vision</p>
-    <div class="footer-links">
-      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
-      <a href="index.html">Home</a>
-      <a href="safety.html">Safety</a>
-    </div>
+  <footer class="footer-minimal">
+    <a href="getting-started.html">Docs</a>
+    <a href="commands.html">Commands</a>
+    <a href="hardware.html">Hardware</a>
+    <a href="safety.html">Safety</a>
   </footer>
-  <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>
 </html>

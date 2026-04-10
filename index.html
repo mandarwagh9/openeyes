@@ -3,338 +3,83 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenEyes — Robot Vision System v2.5.0</title>
-  <meta name="description" content="Hardware-agnostic edge robot vision framework with world models for predictive intelligence">
+  <title>OpenEyes — Give Robots Vision</title>
+  <meta name="description" content="Hardware-agnostic edge robot vision framework with world models">
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="index.html" class="navbar-logo">
-        <img src="assets/images/logo.svg" alt="OpenEyes">
-        <span>OpenEyes</span>
-      </a>
-      <ul class="navbar-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#performance">Performance</a></li>
-        <li><a href="#hardware">Hardware</a></li>
-        <li><a href="#models">Models</a></li>
-        <li><a href="getting-started.html">Docs</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        <li><a href="https://github.com/mandarwagh9/openeyes">GitHub</a></li>
-      </ul>
-      <div class="navbar-toggle" onclick="toggleMenu()">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
+  <nav class="nav-minimal">
+    <a href="index.html" class="logo">
+      <img src="assets/images/logo.svg" alt="OpenEyes">
+      OpenEyes
+    </a>
+    <a href="https://github.com/mandarwagh9/openeyes" target="_blank">GitHub</a>
   </nav>
 
-  <section class="hero">
-    <div class="hero-content">
-      <img src="assets/images/logo.svg" alt="OpenEyes" class="hero-logo">
-      <h1>We Give Robots Vision</h1>
-      <p class="hero-tagline">Hardware-agnostic edge robot vision framework with world models for predictive intelligence. Runs on Jetson, Pi, Intel, Hailo & Qualcomm.</p>
-      <div class="hero-buttons">
-        <a href="getting-started.html" class="btn btn-primary">Get Started</a>
-        <a href="https://github.com/mandarwagh9/openeyes" class="btn btn-secondary">GitHub</a>
+  <section class="hero-minimal">
+    <div class="humanoid-container">
+      <div class="humanoid">
+        <!-- Head -->
+        <div class="head">
+          <div class="face front"></div>
+          <div class="face back"></div>
+          <div class="face left"></div>
+          <div class="face right"></div>
+          <div class="face top"></div>
+          <div class="face bottom"></div>
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="fov-cone"></div>
+          <div class="scan-line"></div>
+        </div>
+        
+        <!-- Torso -->
+        <div class="torso">
+          <div class="face front"></div>
+          <div class="face back"></div>
+          <div class="face left"></div>
+          <div class="face right"></div>
+        </div>
+        
+        <!-- Arms -->
+        <div class="arm left">
+          <div class="segment upper"></div>
+          <div class="segment lower"></div>
+        </div>
+        <div class="arm right">
+          <div class="segment upper"></div>
+          <div class="segment lower"></div>
+        </div>
+        
+        <!-- Legs -->
+        <div class="leg left">
+          <div class="segment upper"></div>
+          <div class="segment lower"></div>
+        </div>
+        <div class="leg right">
+          <div class="segment upper"></div>
+          <div class="segment lower"></div>
+        </div>
       </div>
     </div>
+
+    <h1>Give Robots Vision</h1>
+    <p class="tagline">Edge robot vision framework with world models</p>
+    <a href="getting-started.html" class="cta">Get Started</a>
   </section>
 
-  <section id="features" class="section">
-    <div class="section-header">
-      <h2>Features</h2>
-    </div>
-    <div class="grid">
-      <div class="grid-item">
-        <span class="icon">◎</span>
-        <h3>Object Detection</h3>
-        <p>80+ object classes in real-time</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">◐</span>
-        <h3>Depth Estimation</h3>
-        <p>Measure distance to everything</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">◉</span>
-        <h3>Face Detection</h3>
-        <p>Identify and track faces</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">✋</span>
-        <h3>Gesture Recognition</h3>
-        <p>Stop, wave, point commands</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">⬡</span>
-        <h3>Pose Estimation</h3>
-        <p>Detect body positions</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">⟡</span>
-        <h3>Object Tracking</h3>
-        <p>Follow objects across frames</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">⬢</span>
-        <h3>Visual SLAM</h3>
-        <p>Build maps, navigate autonomously</p>
-      </div>
-      <div class="grid-item">
-        <span class="icon">⟁</span>
-        <h3>VLA Models</h3>
-        <p>Vision-Language-Action</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🔦</span>
-        <h3>LIDAR Processing</h3>
-        <p>Point cloud obstacle detection</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🔀</span>
-        <h3>Sensor Fusion</h3>
-        <p>Camera + Depth + LIDAR</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">📸</span>
-        <h3>Multi-Camera</h3>
-        <p>Multiple camera support</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">⚡</span>
-        <h3>Action Chunking</h3>
-        <p>10-30 Hz real-time control</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🧠</span>
-        <h3>Diffusion Policy</h3>
-        <p>Robot manipulation AI</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🛡️</span>
-        <h3>Safety Controller</h3>
-        <p>E-STOP, velocity limits</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">❤️</span>
-        <h3>Health Monitor</h3>
-        <p>24/7 with auto-recovery</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">⬆️</span>
-        <h3>OTA Updates</h3>
-        <p>Model updates + rollback</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🧠</span>
-        <h3>World Models</h3>
-        <p>Predictive planning at 200 Hz</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🔮</span>
-        <h3>V-JEPA 2</h3>
-        <p>Spatiotemporal perception</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">📐</span>
-        <h3>Depth Anything V3</h3>
-        <p>35.7% better than MiDaS</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🏭</span>
-        <h3>Industry Templates</h3>
-        <p>Warehouse, QA, Agriculture, Retail</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🚀</span>
-        <h3>Fleet Management</h3>
-        <p>Multi-device deployment</p>
-      </div>
-      <div class="grid-item new-feature">
-        <span class="icon">🔧</span>
-        <h3>Hardware Abstraction</h3>
-        <p>TensorRT, OpenVINO, TVM, Hailo, QNN</p>
-      </div>
-    </div>
-  </section>
+  <div class="code-minimal">
+    <span class="prompt">$</span>python src/main.py --debug
+  </div>
 
-  <section id="performance" class="section">
-    <div class="section-header">
-      <h2>Performance</h2>
-    </div>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Configuration</th>
-            <th>FPS</th>
-            <th>Use Case</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Detection only (TensorRT)</td>
-            <td><span class="badge badge-int8">35-40</span></td>
-            <td>YOLO11n FP16</td>
-          </tr>
-          <tr>
-            <td>Full pipeline (default)</td>
-            <td><span class="badge">4-6</span></td>
-            <td>All models enabled</td>
-          </tr>
-          <tr>
-            <td>Full pipeline + turbo</td>
-            <td><span class="badge">8-12</span></td>
-            <td>Aggressive frame skipping</td>
-          </tr>
-          <tr>
-            <td>Minimal</td>
-            <td><span class="badge">15-20</span></td>
-            <td>Detection + depth + tracking</td>
-          </tr>
-          <tr>
-            <td>World model (LeWM 15M)</td>
-            <td><span class="badge badge-dla">100-200 Hz</span></td>
-            <td>Planning only, &lt;10ms</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section id="hardware" class="section">
-    <div class="section-header">
-      <h2>Hardware</h2>
-    </div>
-    <div class="hw-grid">
-      <div class="hw-item">
-        <h3>Jetson Orin Nano</h3>
-        <p>40 TOPS, 5-15W</p>
-      </div>
-      <div class="hw-item">
-        <h3>Raspberry Pi 5</h3>
-        <p>+ AI HAT 26 TOPS</p>
-      </div>
-      <div class="hw-item">
-        <h3>Intel Core Ultra</h3>
-        <p>48 TOPS NPU</p>
-      </div>
-      <div class="hw-item">
-        <h3>Hailo-8</h3>
-        <p>26 TOPS, 3.5W</p>
-      </div>
-      <div class="hw-item">
-        <h3>Qualcomm RB5</h3>
-        <p>15-30 TOPS</p>
-      </div>
-      <div class="hw-item">
-        <h3>Camera</h3>
-        <p>CSI, USB, RealSense</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-header">
-      <h2>Quick Start</h2>
-    </div>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code>git clone https://github.com/mandarwagh9/openeyes.git
-cd openeyes
-pip install -r requirements.txt
-python src/main.py --debug</code></pre>
-    </div>
-
-    <h3>World Models & Predictive Intelligence (v2.5.0)</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code># World model with predictive tracking
-python src/main.py --world-model lewm --follow
-
-# With safety evaluation
-python src/main.py --world-model lewm --safety-predict
-
-# Industry template (warehouse)
-python src/main.py --template warehouse --debug
-
-# Turbo mode for maximum FPS
-python src/main.py --turbo --world-model lewm
-
-# Process video files
-python src/main.py --video input.mp4 --output output.mp4</code></pre>
-    </div>
-
-    <h3>New in v0.7.0 - v1.0.0</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-lang">bash</span>
-        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><code># Multi-Modal Sensing (v0.7.0)
-python src/main.py --lidar --lidar-topic /scan
-python src/main.py --realsense
-python src/main.py --multi-camera
-
-# VLA & Performance (v0.8.0)
-python src/main.py --int8 --dla
-python src/main.py --diffusion-policy
-python src/main.py --action-chunking --control-freq 20
-
-# Safety & Reliability (v1.0.0)
-python src/main.py --safety --max-velocity 1.0 --min-distance 0.3
-python src/main.py --health-monitor
-python src/main.py --ota-update</code></pre>
-    </div>
-  </section>
-
-  <section id="models" class="section">
-    <div class="section-header">
-      <h2>Models</h2>
-    </div>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Type</th>
-            <th>Size</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>YOLO11n/12n/26n</td><td>Detection</td><td>2.6-5.4MB</td></tr>
-          <tr><td>MiDaS + Depth Anything V3</td><td>Depth</td><td>350MB</td></tr>
-          <tr><td>MediaPipe</td><td>Face/Gesture/Pose</td><td>~20MB</td></tr>
-          <tr><td>LeWM</td><td>World Model</td><td>15M params</td></tr>
-          <tr><td>V-JEPA 2</td><td>Perception</td><td>80-600M params</td></tr>
-          <tr><td>SmolVLA</td><td>VLA</td><td>450M params</td></tr>
-          <tr><td>OpenVLA</td><td>VLA</td><td>7B params</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <p>OpenEyes v2.5.0 — Hardware-agnostic edge robot vision</p>
-    <div class="footer-links">
-      <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
-      <a href="getting-started.html">Docs</a>
-      <a href="safety.html">Safety</a>
-      <a href="hardware.html">Hardware</a>
-    </div>
+  <footer class="footer-minimal">
+    <a href="getting-started.html">Docs</a>
+    <a href="hardware.html">Hardware</a>
+    <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
   </footer>
-
-  <script src="js/main.js"></script>
 </body>
 </html>
