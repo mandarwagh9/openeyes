@@ -1,6 +1,6 @@
 # OpenEyes
 
-**v2.5.0-dev** · 🤖 Hardware-Agnostic Edge Vision Framework with World Models
+**v2.5.0** · 🤖 Hardware-Agnostic Edge Vision Framework with World Models
 
 [![GitHub stars](https://img.shields.io/github/stars/mandarwagh9/openeyes?style=social)](https://github.com/mandarwagh9/openeyes)
 [![License](https://img.shields.io/github/license/mandarwagh9/openeyes)](LICENSE)

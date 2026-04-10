@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v2.5.0 (Development)  
-> **Last Updated**: 2026-04-03
+> **Version**: v2.5.0  
+> **Last Updated**: 2026-04-10
 
 ---
 
@@ -9,6 +9,53 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v2.5.0] - 2026-04-10
+
+### Added - Production Infrastructure
+
+- **Structured Logging** (`src/utils/logger.py`)
+  - JSON logging with structlog
+  - `--log-format json|console` CLI flag
+  - Log fields: timestamp, level, logger, message, frame, detections, latency_ms
+
+- **REST API** (`src/api/`)
+  - FastAPI server with uvicorn
+  - `--api`, `--api-port`, `--api-host` CLI flags
+  - GET `/health` - Health check with uptime, FPS
+  - GET `/metrics` - Prometheus metrics
+  - GET `/models` - List registered models
+  - POST `/models` - Register model
+  - GET/POST `/control` - Get/update control state
+
+- **Prometheus Metrics** (`src/utils/prometheus_exporter.py`)
+  - openeyes_fps (gauge)
+  - openeyes_latency_ms (histogram)
+  - openeyes_detections_total (counter)
+  - openeyes_frames_total (counter)
+  - openeyes_memory_mb (gauge)
+  - openeyes_errors_total (counter)
+  - openeyes_model_inference_ms (histogram)
+
+- **INT8 Conversion** (`scripts/convert_int8.py`)
+  - TensorRT INT8 model conversion
+  - `--model`, `--all`, `--calibrate` options
+  - Calibration dataset generation
+
+### Changed
+
+- Updated version to v2.5.0
+- Fixed `--version` CLI flag to show v2.5.0
+- Added `VisionSystem._instance` singleton for API access
+
+### Dependencies Added
+
+- structlog>=24.0.0
+- prometheus-client>=0.19.0
+- fastapi>=0.109.0
+- uvicorn>=0.27.0
 
 ---
 

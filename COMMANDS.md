@@ -1,6 +1,6 @@
 # OpenEyes Command Reference
 
-> **Version**: v2.5.0-dev | **Last Updated**: 2026-04-03
+> **Version**: v2.5.0 | **Last Updated**: 2026-04-10
 
 ---
 
@@ -180,6 +180,24 @@ python -m benchmarks.run_benchmarks --output-dir ./results   # Custom output dir
 python -m src.main --version                      # Show version
 python -m src.main --info                         # Show system info
 python -m src.main --log-file logs/openeyes.log   # File logging with rotation
+python -m src.main --log-format json          # JSON structured logs
+python -m src.main --log-format console       # Console logs (default)
+```
+
+## REST API (v2.5.0)
+
+```bash
+python -m src.main --api                        # Enable REST API server
+python -m src.main --api-port 8000            # API port (default: 8000)
+python -m src.main --api-host 0.0.0.0         # API host (default: 127.0.0.1)
+```
+
+## Video Processing (v2.5.0)
+
+```bash
+python -m src.main --video input.mp4          # Process video file
+python -m src.main --video input.mp4 --output output.mp4  # Process and save
+python -m src.main --video input.mp4 --follow  # Follow person in video
 ```
 
 ## Jetson Optimization

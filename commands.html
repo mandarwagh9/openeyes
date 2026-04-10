@@ -161,6 +161,14 @@ python src/main.py --template retail</code></pre>
 python src/main.py --video input.mp4 --output output.mp4 --turbo</code></pre>
     </div>
 
+    <h2>REST API (v2.5.0)</h2>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+      <pre><code>python src/main.py --api
+python src/main.py --api --api-port 8000 --api-host 0.0.0.0</code></pre>
+    </div>
+    <p>Endpoints: <code>/health</code>, <code>/metrics</code>, <code>/models</code>, <code>/control</code></p>
+
     <h2>Fleet Management (v2.5.0)</h2>
     <div class="code-block">
       <div class="code-header"><span class="code-lang">bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
@@ -172,7 +180,7 @@ openeyes fleet telemetry --device robot-01</code></pre>
   </main>
 
   <footer class="footer">
-    <p>OpenEyes v2.5.0-dev — Hardware-agnostic edge robot vision</p>
+    <p>OpenEyes v2.5.0 — Hardware-agnostic edge robot vision</p>
     <div class="footer-links">
       <a href="https://github.com/mandarwagh9/openeyes">GitHub</a>
       <a href="index.html">Home</a>

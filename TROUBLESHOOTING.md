@@ -1,7 +1,7 @@
 # TROUBLESHOOTING.md - Common Issues and Solutions for OpenEyes
 
-> **Version**: v2.5.0-dev  
-> **Last Updated**: 2026-04-03
+> **Version**: v2.5.0  
+> **Last Updated**: 2026-04-10
 
 ---
 
