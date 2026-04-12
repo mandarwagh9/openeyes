@@ -192,7 +192,21 @@ python -m src.main --api-port 8000            # API port (default: 8000)
 python -m src.main --api-host 0.0.0.0         # API host (default: 127.0.0.1)
 ```
 
-## Video Processing (v2.5.0)
+## ROS2 Topics
+
+```bash
+/vision/detections    # Object detections (JSON)
+/vision/depth         # Depth map (JSON)
+/vision/faces         # Face detections (JSON)
+/vision/gestures      # Gesture detections (JSON)
+/vision/pose         # Pose landmarks (JSON)
+/vision/status       # System status (JSON)
+/vision/predictions  # Predicted positions (world model)
+/vision/plan         # Current action plan (world model)
+/vision/safety       # Safety evaluation (world model)
+```
+
+## Video Processing
 
 ```bash
 python -m src.main --video input.mp4          # Process video file

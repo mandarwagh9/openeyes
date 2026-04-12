@@ -745,6 +745,16 @@ No "LeWorldModel loaded" message in logs
 2. Verify CUDA: `python -c "import torch; print(torch.cuda.is_available())"`
 3. Check logs for errors: `--debug` flag
 
+### Issue: Predictions Not Appearing in ROS2
+
+**Symptoms:**
+`/vision/predictions` topic not showing
+
+**Solution:**
+1. Enable world model: `--world-model lewm`
+2. Enable ROS2: `--ros2`
+3. Verify world model is generating predictions: check debug window for ghost boxes
+
 ### Issue: Fleet Connectivity
 
 **Symptoms:**

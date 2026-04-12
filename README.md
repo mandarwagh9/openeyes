@@ -44,7 +44,7 @@ Camera → Detection → Tracking → Depth → [World Model] → Planning → C
 | 🧠 **World Models** | LeWM (15M) for 100-200 Hz predictive planning |
 | 🔮 **V-JEPA 2** | Spatiotemporal features for perception enhancement |
 | 🛡️ **Safety** | Predictive collision avoidance, E-STOP, health monitoring |
-| 📡 **ROS2** | Full integration with 7+ topics |
+| 📡 **ROS2** | Full integration with 10+ topics |
 | 🚀 **Fleet Management** | Multi-device deployment with OTA updates |
 | 🏭 **Industry Templates** | Warehouse, Manufacturing, Agriculture, Retail |
 | 🐳 **Docker** | Production-ready containerized deployment |
@@ -194,7 +194,7 @@ python demo/process_demo.py --input video.mp4 --output output.mp4
 
 | Endpoint | Method | Description |
 |:---------|:-------|:------------|
-| `/health` | GET | Health check |
+| `/health` | GET | Health check with uptime, FPS |
 | `/health/live` | GET | Liveness probe |
 | `/health/ready` | GET | Readiness probe |
 | `/metrics` | GET | Prometheus metrics |

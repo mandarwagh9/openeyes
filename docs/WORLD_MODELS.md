@@ -321,6 +321,8 @@ If cloud is unavailable:
 | Power consumption | <10W additional | `jetson-stats` |
 | Memory usage | <1GB additional | `nvidia-smi` |
 | Control rate | 100+ Hz | Timing benchmarks |
+| LeWM model size | 15M params | ~60MB FP16 |
+| Memory footprint | <100MB | Full model + planner |
 
 ### 8.2 Benchmark Commands
 
