@@ -5,16 +5,22 @@
 
 ---
 
-## Critical Commands
+## Entry Point
 
 ```bash
-# Entry point - MUST use -m flag
+# MUST use -m flag (not python src/main.py)
 python -m src.main --camera 0 --debug
+```
 
-# Video processing (v2.5.0)
+---
+
+## Key Commands
+
+```bash
+# Video processing
 python -m src.main --video path/to/video.mp4 --output output.mp4
 
-# Person following with world model
+# World model + person following
 python -m src.main --world-model lewm --follow --turbo
 
 # REST API server
@@ -34,38 +40,24 @@ ros2 launch openeyes openeyes.launch.py device:=cuda ros2:=true
 
 ```
 src/
-├── main.py              # Entry point (use python -m src.main)
-├── cli/argparse.py      # All CLI flags
-├── camera/             # CameraHandler, video_source
-├── core/               # VisionSystem, frame_processor
-├── models/              # ObjectDetector, depth_estimator
-├── ros2/                # VisionPublisher
-├── utils/               # config, logger, tracker, safety_controller
-└── world_model/         # LeWorldModel, V-JEPA
+├── main.py           # Entry point
+├── cli/argparse.py  # All CLI flags
+├── camera/         # CameraHandler
+├── core/          # VisionSystem, frame_processor
+├── models/        # ObjectDetector, depth_estimator
+├── ros2/          # VisionPublisher
+├── utils/         # config, logger, tracker, safety_controller
+└── world_model/  # LeWorldModel, planner, safety_evaluator
 ```
-
-### Data Flow
-Camera/Video → Detection → Tracking → Depth → [World Model] → Output
 
 ---
 
-## Key Discoveries
+## Hard-Earned Discoveries
 
-### CSI Camera Not Available
-- **Fix**: Check `/dev/video0` exists, add queue to GStreamer pipeline, reboot
-- **File**: `src/camera/camera_handler.py`
-
-### ROS2 Topics Not Publishing
-- **Fix**: Use MultiThreadedExecutor in separate thread, add `time.sleep(0.5)` after init
-- **File**: `src/ros2/vision_node.py`
-
-### MediaPipe Empty Results
-- **Fix**: Lower confidence to 0.3 for face/pose, 0.1 for hands, resize to 640x480
-- **Files**: `src/models/face_detector.py`, `src/models/gesture_recognizer.py`
-
-### Person Following Distance
-- **Fix**: Use bounding box HEIGHT RATIO (% of frame): forward <60%, stop 60-95%, backward >95%
-- **File**: `src/utils/tracker.py`
+- **CSI camera not available**: Check `/dev/video0`, add queue to GStreamer pipeline, reboot
+- **ROS2 topics not publishing**: Use MultiThreadedExecutor in separate thread, add `time.sleep(0.5)` after init
+- **MediaPipe empty results**: Lower confidence to 0.3 for face/pose, 0.1 for hands, resize to 640x480
+- **Person following distance**: Use bounding box HEIGHT RATIO (% of frame): forward <60%, stop 60-95%, backward >95%
 
 ---
 
@@ -74,23 +66,6 @@ Camera/Video → Detection → Tracking → Depth → [World Model] → Output
 - Python 3.10+, type hints required
 - Custom exceptions: `src/exceptions.py`
 - Logging: `from src.utils.logger import get_logger`
-- Entry point: ALWAYS `python -m src.main` (not `python src/main.py`)
-
----
-
-## Testing
-
-```python
-# Quick test structure
-import pytest
-from src.models.object_detector import ObjectDetector
-
-def test_detector():
-    detector = ObjectDetector(model_path="models/yolov8n.pt")
-    frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    result = detector.detect(frame)
-    assert isinstance(result, list)
-```
 
 ---
 
