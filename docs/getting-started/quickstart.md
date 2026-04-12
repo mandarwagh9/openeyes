@@ -117,11 +117,11 @@ Expected FPS on Jetson Orin Nano:
 
 ## Next Steps
 
-- **[COMMANDS.md](COMMANDS.md)** - Complete CLI reference
-- **[OPTIMIZATION.md](OPTIMIZATION.md)** - Performance optimization guide
-- **[USER_GUIDE.md](USER_GUIDE.md)** - Full user guide
-- **[docs/WORLD_MODELS.md](docs/WORLD_MODELS.md)** - World models documentation
-- **[docs/TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md)** - Technical specification
+- **[CLI Reference](../reference/cli.md)** - Complete CLI reference
+- **[Optimization Guide](../guides/optimization.md)** - Performance optimization guide
+- **[User Guide](user-guide.md)** - Full user guide
+- **[World Models](../concepts/world-models.md)** - World models documentation
+- **[Technical Spec](../concepts/technical-spec.md)** - Technical specification
 
 ---
 

@@ -301,20 +301,18 @@ ros2 launch openeyes openeyes.launch.py
 
 ## Documentation
 
-| Document | Description |
-|:---------|:------------|
-| [QUICKSTART.md](QUICKSTART.md) | Getting started guide |
-| [INSTALL.md](INSTALL.md) | Installation instructions |
-| [COMMANDS.md](COMMANDS.md) | Complete CLI reference |
-| [USER_GUIDE.md](USER_GUIDE.md) | User guide |
-| [OPTIMIZATION.md](OPTIMIZATION.md) | Performance optimization |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
-| [ROADMAP.md](ROADMAP.md) | Development roadmap |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | How to contribute |
-| [docs/WORLD_MODELS.md](docs/WORLD_MODELS.md) | World models documentation |
-| [docs/TECHNICAL_SPEC.md](docs/TECHNICAL_SPEC.md) | Technical specification |
-| [WORLD_MODELS_PLAN.md](WORLD_MODELS_PLAN.md) | World models implementation plan |
-| [AGENTS.md](AGENTS.md) | Developer guidelines (for AI agents) |
+All documentation is organized in the `docs/` folder:
+
+| Document | Location |
+|:---------|:---------|
+| Getting Started | [docs/getting-started/](docs/getting-started/) |
+| CLI Reference | [docs/reference/cli.md](docs/reference/cli.md) |
+| Troubleshooting | [docs/troubleshooting/](docs/troubleshooting/) |
+| Technical Spec | [docs/concepts/technical-spec.md](docs/concepts/technical-spec.md) |
+| World Models | [docs/concepts/world-models.md](docs/concepts/world-models.md) |
+| Developer Guide | [docs/guides/agents.md](docs/guides/agents.md) |
+| Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Version History | [CHANGELOG.md](CHANGELOG.md) |
 
 ---
 

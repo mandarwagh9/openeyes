@@ -429,7 +429,7 @@ ros2 topic echo /vision/status
 
 ## 8. Troubleshooting
 
-See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
+See [Troubleshooting Guide](../troubleshooting/index.md) for common issues and solutions.
 
 ---
 
