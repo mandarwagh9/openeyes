@@ -22,3 +22,15 @@ psutil>=5.9.0
 
 # Communication
 pyserial>=3.5
+
+# ROS2 (Optional)
+rclpy>=0.3.0
+sensor_msgs>=0.3.0
+vision_msgs>=0.3.0
+geometry_msgs>=0.3.0
+cv_bridge>=0.3.0
+image_transport>=0.3.0
+
+# Build tools
+colcon-core>=0.3.0
+colcon-common-extensions>=0.3.0
