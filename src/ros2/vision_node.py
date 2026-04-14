@@ -21,7 +21,7 @@ from std_msgs.msg import Header, String
 
 try:
     from vision_msgs.msg import Detection2DArray, Detection2D, BoundingBox2D, ObjectHypothesis
-    VISION_MSGS_AVAILABLE = False  # Force JSON mode due to compatibility issues
+    VISION_MSGS_AVAILABLE = True
 except (ImportError, Exception) as e:
     VISION_MSGS_AVAILABLE = False
 
