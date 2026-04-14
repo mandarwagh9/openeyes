@@ -38,6 +38,21 @@ class FaceDetection:
 
 
 @dataclass
+class GestureDetection:
+    gesture_name: str
+    hand_type: str
+    bbox: BoundingBox
+    confidence: float
+
+
+@dataclass
+class PoseDetection:
+    bbox: BoundingBox
+    keypoints: dict
+    confidence: float
+
+
+@dataclass
 class Gesture:
     gesture_type: str
     handedness: str
