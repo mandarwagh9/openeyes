@@ -172,7 +172,7 @@ class ObjectDetector:
 
     def __init__(
         self,
-        model_path: str = "models/yolov10n.pt",
+        model_path: str = "yolo11n.pt",
         confidence: float = 0.5,
         iou_threshold: float = 0.45,
     ):
@@ -197,7 +197,7 @@ class ObjectDetector:
         if not model_file.exists():
             self._logger.warning(
                 f"Model file not found: {self._model_path}. "
-                "Will attempt to use YOLOv10 from ultralytics."
+                "Will attempt to use YOLO11n from ultralytics."
             )
 
         if self._prefer_engine:
@@ -676,7 +676,9 @@ class ObjectDetector:
     def name(self) -> str:
         if self._using_tensorrt:
             return "YOLO11n-TensorRT"
-        return "YOLOv10"
+        elif self._using_onnx:
+            return "YOLO11n-ONNX"
+        return "YOLO11n"
 
     @property
     def is_loaded(self) -> bool:

@@ -1,9 +1,4 @@
-# AGENTS.md - OpenEyes Developer Guidelines
-
-> Hardware-agnostic edge robot vision framework with world models  
-> **Version**: v2.5.0
-
----
+# OpenEyes Agent Instructions
 
 ## Entry Point
 
@@ -11,8 +6,6 @@
 # MUST use -m flag (not python src/main.py)
 python -m src.main --camera 0 --debug
 ```
-
----
 
 ## Key Commands
 
@@ -34,23 +27,19 @@ pytest tests/test_camera.py -x  # Stop on first failure
 ros2 launch openeyes openeyes.launch.py device:=cuda ros2:=true
 ```
 
----
-
 ## Architecture
 
 ```
 src/
 ├── main.py           # Entry point
 ├── cli/argparse.py  # All CLI flags
-├── camera/         # CameraHandler
-├── core/          # VisionSystem, frame_processor
-├── models/        # ObjectDetector, depth_estimator
-├── ros2/          # VisionPublisher
-├── utils/         # config, logger, tracker, safety_controller
-└── world_model/  # LeWorldModel, planner, safety_evaluator
+├── camera/          # CameraHandler
+├── core/           # VisionSystem, frame_processor
+├── models/         # ObjectDetector, depth_estimator
+├── ros2/           # VisionPublisher
+├── utils/          # config, logger, tracker, safety_controller
+└── world_model/   # LeWorldModel, planner, safety_evaluator
 ```
-
----
 
 ## Hard-Earned Discoveries
 
@@ -59,15 +48,11 @@ src/
 - **MediaPipe empty results**: Lower confidence to 0.3 for face/pose, 0.1 for hands, resize to 640x480
 - **Person following distance**: Use bounding box HEIGHT RATIO (% of frame): forward <60%, stop 60-95%, backward >95%
 
----
-
 ## Style
 
 - Python 3.10+, type hints required
 - Custom exceptions: `src/exceptions.py`
 - Logging: `from src.utils.logger import get_logger`
-
----
 
 ## ROS2 Topics (10 Publishers)
 
@@ -83,8 +68,6 @@ src/
 | `/vision/predictions` | JSON |
 | `/vision/plan` | JSON |
 | `/vision/safety` | JSON |
-
----
 
 ## Known Issues
 
