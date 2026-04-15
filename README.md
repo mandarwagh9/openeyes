@@ -156,10 +156,9 @@ pytest tests/ -v
 
 ## Demos
 
-| Demo | Description |
-|:----|:------------|
-| ![Demo 1](demo/demo1.gif) | |
-| ![Demo 2](demo/demo2.gif) | |
+| | |
+|---|---|
+| ![Demo 1](demo/demo1.gif) | ![Demo 2](demo/demo2.gif) |
 
 Run demo on your own video:
 ```bash
