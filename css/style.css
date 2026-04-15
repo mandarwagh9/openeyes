@@ -712,16 +712,41 @@ code {
 }
 
 .grid-item.new-feature::before {
-  content: 'v1.0.0';
-  position: absolute;
-  top: -8px;
-  right: 12px;
-  background: var(--accent);
-  color: var(--bg-primary);
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
+  content: "NEW";
+}
+
+/* ===== Demo Grid ===== */
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.demo-item {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  text-align: center;
+}
+
+.demo-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+.demo-item p {
+  margin-top: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .demo-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Badge Variations ===== */
