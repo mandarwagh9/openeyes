@@ -154,12 +154,47 @@
 
 ## Execution Plan
 
-| Day | Action |
-|:----|:-------|
-| 1-2 | Publish viral launch video on YouTube + Reddit r/robotics |
-| 3 | Post on Hacker News, Twitter/X, LinkedIn |
-| 4-5 | Engage with comments, grow Discord |
-| 6-7 | Follow-up content, collect community feedback |
+### Day 1-2: Video Launch
+| Time | Action |
+|:-----|:-------|
+| Hour 1 | Publish viral launch video on YouTube (short + long) |
+| Hour 2 | Post on Reddit r/robotics, r/MachineLearning, r/ROS |
+| Hour 3 | Share on Twitter/X with hashtag #OpenEyes #Robotics |
+| Hour 4 | Share on LinkedIn (Robotics + AI communities) |
+| Day 2 | Monitor, reply to all comments within 1 hour |
+
+### Day 3: Hacker News + Amplify
+| Time | Action |
+|:-----|:-------|
+| Morning | Submit to Hacker News (Show HN) |
+| Afternoon | Share in Discord servers: ROS, NVIDIA, Raspberry Pi |
+| Evening | Reach out to 10 tech YouTubers with demo footage |
+
+### Day 4-5: Community Growth
+| Time | Action |
+|:-----|:-------|
+| Morning | Respond to all GitHub issues |
+| Afternoon | Host Q&A in Discord |
+| Evening | Post update: "Day 3 results + what's next" |
+
+### Day 6-7: Feedback Loop
+| Time | Action |
+|:-----|:-------|
+| Day 6 | Collect feature requests from community |
+| Day 7 | Publish roadmap based on community input |
+
+---
+
+## Content Plan
+
+| Content | Platform | When |
+|:--------|:---------|:-----|
+| Launch Video | YouTube | Day 1 |
+| Demo Reel (15s) | Twitter/X, LinkedIn | Day 1 |
+| "How it works" Thread | Reddit | Day 2 |
+| Show HN Post | Hacker News | Day 3 |
+| Behind the Scenes | YouTube | Day 4 |
+| Community Spotlight | Discord, Twitter | Day 6 |
 
 ---
 
