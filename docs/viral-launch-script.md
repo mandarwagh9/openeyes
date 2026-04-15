@@ -121,3 +121,48 @@
 > "I gave this robot eyes. Watch what it can do now."
 
 > "The $199 device that gives robots real vision."
+
+---
+
+# Canopy Accelerator — 1-Week Goal
+
+> **Goal: Launch & Initial Traction**
+
+**"Achieve 500 GitHub stars and 50 active community members within the first week of acceptance."**
+
+---
+
+## Week 1 Targets
+
+| Metric | Current | Week 1 Target |
+|:-------|:--------|:--------------|
+| GitHub Stars | ~100+ | 500+ |
+| Discord Members | ~10 | 50+ |
+| Demo Videos | 2 | 5 |
+| Documentation | Core | Full API reference |
+
+---
+
+## Why This Works for Canopy
+
+1. **Specific & measurable** — Numbers don't lie
+2. **Achievable** — 500 stars is realistic with viral video + Reddit/HN
+3. **Shows traction** — Community growth = product-market fit signal
+4. **Proves execution** — Hitting week 1 = credibility for week 2+
+
+---
+
+## Execution Plan
+
+| Day | Action |
+|:----|:-------|
+| 1-2 | Publish viral launch video on YouTube + Reddit r/robotics |
+| 3 | Post on Hacker News, Twitter/X, LinkedIn |
+| 4-5 | Engage with comments, grow Discord |
+| 6-7 | Follow-up content, collect community feedback |
+
+---
+
+## The Ask
+
+> "We need mentorship on community building and viral content distribution to hit our Week 1 targets and establish OpenEyes as the go-to open-source robot vision framework."
