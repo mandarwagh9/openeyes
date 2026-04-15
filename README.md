@@ -27,6 +27,14 @@ Camera → Detection → Tracking → Depth → Control
 
 ---
 
+## Demos
+
+| | |
+|---|---|
+| ![Demo 1](demo/demo1.gif) | ![Demo 2](demo/demo2.gif) |
+
+---
+
 ## Features
 
 | Capability | Description |
@@ -153,17 +161,6 @@ pytest tests/ -v
 | Troubleshooting | [docs/troubleshooting/](docs/troubleshooting/) |
 | Technical Spec | [docs/concepts/technical-spec.md](docs/concepts/technical-spec.md) |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md) |
-
-## Demos
-
-| | |
-|---|---|
-| ![Demo 1](demo/demo1.gif) | ![Demo 2](demo/demo2.gif) |
-
-Run demo on your own video:
-```bash
-python demo/process_demo.py --input video.mp4 --output output.mp4 --debug
-```
 
 ---
 
