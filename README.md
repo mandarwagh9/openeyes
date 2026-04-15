@@ -158,8 +158,8 @@ pytest tests/ -v
 
 | Demo | Description |
 |:----|:------------|
-| ![Demo 1](demo/demo1.gif) | Person following |
-| ![Demo 2](demo/demo2.gif) | Multi-object tracking |
+| ![Demo 1](demo/demo1.gif) | |
+| ![Demo 2](demo/demo2.gif) | |
 
 Run demo on your own video:
 ```bash
