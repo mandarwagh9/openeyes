@@ -156,6 +156,11 @@ pytest tests/ -v
 
 ## Demos
 
+| Demo | Description |
+|:----|:------------|
+| ![Demo 1](demo/demo1.gif) | Person following |
+| ![Demo 2](demo/demo2.gif) | Multi-object tracking |
+
 Run demo on your own video:
 ```bash
 python demo/process_demo.py --input video.mp4 --output output.mp4 --debug
