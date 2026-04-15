@@ -6,7 +6,7 @@
 
 ## The Problem
 
-Robots are everywhere, but most are blind. The ones that see depend on cloud services that lag, fail, and spy. The alternatives are locked behind proprietary hardware costing thousands. We wanted something different.
+cRobots are everywhere, but most are blind. The ones that see depend on cloud services that lag, fail, and spy. The alternatives are locked behind proprietary hardware costing thousands. We wanted something different.
 
 We asked: *Why can't a robot see like a human - locally, instantly, privately?*
 
