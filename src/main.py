@@ -241,6 +241,9 @@ def main() -> None:
             config._config["performance"]["tensorrt"]["dla_enabled"] = True
             print("DLA offloading enabled")
 
+        if args.deepstream:
+            print("DeepStream pipeline mode enabled")
+
         if args.diffusion_policy:
             from src.models.diffusion_policy import DiffusionPolicy
             print("Diffusion policy enabled")
