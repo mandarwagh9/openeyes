@@ -64,13 +64,13 @@ python -m src.main --camera 0 --precision fp16 --debug
 
 ---
 
-## 7. Depth Estimation
+## 7. Depth Estimation (MiDaS - works without auth)
 
 ```bash
-python -m src.main --camera 0 --depth-model da3-small --debug
+python -m src.main --camera 0 --depth-model midas-small --debug
 ```
 
-**What it shows:** Depth Anything V3 for accurate depth sensing.
+**What it shows:** Depth map overlay with colored visualization.
 
 ---
 
