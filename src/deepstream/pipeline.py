@@ -12,6 +12,7 @@ import sys
 import os
 import time
 import json
+import cv2
 from typing import Optional, Callable, List, Dict, Any
 
 import gi
@@ -224,6 +225,10 @@ class DeepStreamPipeline:
         """Create pipeline string for multi-model DeepStream pipeline."""
         configs = self._get_all_configs()
         
+        # Check if we need appsink for Python model processing
+        need_appsink = (self.enable_face or self.enable_gesture or 
+                       self.enable_pose or self.enable_depth)
+        
         # Build pipeline with multiple nvinfer instances
         pipeline_parts = [
             f"nvarguscamerasrc sensor-id={self.camera} ! ",
@@ -243,12 +248,23 @@ class DeepStreamPipeline:
             "nvdsosd name=nvdsosd display-text=1 display-bbox=1 display-mask=1 ! ",
             "nvvidconv ! ",
             "video/x-raw,format=RGBA ! ",
-            'textoverlay name=osdfps text="FPS: 0 | Obj: 0" valignment=top halignment=right ! ',
-            "queue ! nv3dsink sync=0",
         ])
+        
+        # Add appsink branch for Python models (tee)
+        if need_appsink:
+            pipeline_parts.extend([
+                "tee name=t ! ",
+                "queue ! nv3dsink sync=0 t. ! ",
+                "queue ! appsink name=python-appsink emit-signals=true",
+            ])
+            logger.info(f"Appsink enabled for Python models")
+        else:
+            pipeline_parts.append("queue ! nv3dsink sync=0")
         
         # Log enabled models
         enabled = [name for name, _, _ in configs]
+        if need_appsink:
+            enabled.append("python-models")
         logger.info(f"Enabled models: {enabled}")
         logger.info(f"Resolution: {self.width}x{self.height} @ {self.fps} FPS")
         
@@ -267,6 +283,16 @@ class DeepStreamPipeline:
         
         if not self.pipeline:
             raise RuntimeError("Failed to create DeepStream pipeline")
+        
+        # Setup appsink for Python models if enabled
+        need_appsink = (self.enable_face or self.enable_gesture or 
+                       self.enable_pose or self.enable_depth)
+        
+        if need_appsink and self.pipeline:
+            appsink = self.pipeline.get_by_name("python-appsink")
+            if appsink:
+                appsink.connect("new-sample", self._on_appsink_sample)
+                logger.info("Appsink connected for Python models")
         
         self._setup_bus()
         
@@ -565,7 +591,7 @@ class DeepStreamPipeline:
         return Gst.FlowReturn.OK
     
     def _on_appsink_sample(self, appsink):
-        """Handle new sample from appsink."""
+        """Handle new sample from appsink - extract frame for Python models."""
         sample = appsink.emit("pull-sample")
         if not sample:
             return Gst.FlowReturn.OK
@@ -576,29 +602,60 @@ class DeepStreamPipeline:
         
         self._calculate_fps()
         
-        if not PYDS_AVAILABLE:
-            return Gst.FlowReturn.OK
-        
+        # Extract frame for Python models
         try:
-            batch_meta = pyds.NvDsBatchMeta.cast(buf)
-            if batch_meta:
-                frame_meta = batch_meta.frame_meta_list
-                while frame_meta is not None:
+            # Map buffer to read
+            success, buf_map = buf.map(Gst.MapFlags.READ)
+            if success:
+                # Create numpy array from buffer
+                frame = np.ndarray(
+                    shape=(self.height, self.width, 3),
+                    dtype=np.uint8,
+                    buffer=buf_map.data
+                )
+                
+                # Run Python models if enabled
+                faces = []
+                gestures = []
+                poses = []
+                
+                # Face detection (every 3rd frame for performance)
+                if self.enable_face and self._face_detector and self._face_count % 3 == 0:
                     try:
-                        frame = pyds.NvDsFrameMeta.cast(frame_meta.data)
-                        detections = self._parse_detections(frame)
-                        self._detections = detections
-                        
-                        for callback in self._callbacks:
-                            callback(detections, self._current_fps)
-                            
-                    except StopIteration:
-                        break
-                    finally:
-                        frame_meta = frame_meta.next
-                        
+                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        results = self._face_detector._face_mesh.process(frame_rgb)
+                        if results.multi_face_landmarks:
+                            for lm in results.multi_face_landmarks:
+                                # Get bounding box from landmarks
+                                h, w = frame.shape[:2]
+                                xs = [p.x * w for p in lm.landmark]
+                                ys = [p.y * h for p in lm.landmark]
+                                face_x, face_y = int(min(xs)), int(min(ys))
+                                face_w, face_h = int(max(xs) - face_x), int(max(ys) - face_y)
+                                faces.append(FaceResult(face_x, face_y, face_w, face_h))
+                    except Exception as e:
+                        logger.debug(f"Face detection error: {e}")
+                
+                # Gesture detection
+                if self.enable_gesture and self._face_count % 3 == 0:
+                    gestures = []  # Would run gesture recognizer here
+                
+                # Pose detection
+                if self.enable_pose and self._face_count % 3 == 0:
+                    poses = []  # Would run pose estimator here
+                
+                self._faces = faces
+                self._face_count += 1
+                
+                # Call face callbacks
+                for callback in self._face_callbacks:
+                    callback(faces, self._current_fps)
+                
+                # Unmap buffer
+                buf.unmap(buf_map)
+                
         except Exception as e:
-            logger.debug(f"Probe error: {e}")
+            logger.debug(f"Appsink frame error: {e}")
         
         return Gst.FlowReturn.OK
     
