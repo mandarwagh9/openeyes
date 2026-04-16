@@ -6,6 +6,9 @@ import time
 from queue import Queue, Empty
 from typing import Optional, Any
 
+import numpy as np
+import cv2
+
 from src.camera.camera_handler import CameraHandler
 from src.camera.types import VisionResult
 from src.output.json_formatter import format_vision_result
@@ -547,6 +550,21 @@ class VisionSystem:
             cv2.rectangle(frame, (5, overlay_y - text_h - 5), (text_w + 20, overlay_y + 5), (0, 0, 0), -1)
             cv2.putText(frame, line, (10, overlay_y), cv2.FONT_HERSHEY_SIMPLEX, 0.6, text_color, 2)
             overlay_y += line_height
+
+        if result.depth and result.depth.enabled and result.depth.depth_map is not None:
+            depth_map = result.depth.depth_map
+            if depth_map is not None and depth_map.size > 0:
+                depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
+                depth_normalized = depth_normalized.astype(np.uint8)
+                depth_colored = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
+                dh, dw = depth_colored.shape[:2]
+                fw = w // 4
+                fh = int(dh * (fw / dw))
+                depth_resized = cv2.resize(depth_colored, (fw, fh))
+                depth_bg = np.zeros((fh + 30, fw, 3), dtype=np.uint8)
+                depth_bg[0:fh, 0:fw] = depth_resized
+                cv2.putText(depth_bg, "DEPTH", (10, fh + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+                frame[h - fh - 40:h - 40, 10:10 + fw] = depth_bg
 
         for det in result.objects:
             bbox = det.bbox
