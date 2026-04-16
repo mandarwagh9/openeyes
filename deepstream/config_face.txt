@@ -1,20 +1,5 @@
 [property]
 gpu-id=0
-net-scale-factor=0.0039215697906911373
-model-color-format=0
-model-engine-file=../models/yolov8n-face.engine
-labelfile-path=labels_face.txt
-batch-size=1
-network-mode=2
-num-detected-classes=1
-interval=2
-gie-unique-id=2
-process-mode=1
-network-type=0
-cluster-mode=2
-maintain-aspect-ratio=1
-symmetric-padding=1
-
-[class-attrs-all]
-pre-cluster-threshold=0.5
-topk=300
+# Disabled for now - face model has different output format
+# Use Python face detector instead (via --enable-face loads src.models.face_detector)
+enable=0

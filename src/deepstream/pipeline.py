@@ -160,8 +160,8 @@ class DeepStreamPipeline:
         configs.append(("yolov10n", os.path.join(config_dir, "config_yolov10n.txt"), 1))
         
         # Optional secondary models (gie-unique-id >= 2)
-        if self.enable_face:
-            configs.append(("face", os.path.join(config_dir, "config_face.txt"), 2))
+        # Note: enable_face uses Python face detector, not DeepStream
+        # DeepStream face needs custom output parser for landmarks
         if self.enable_gesture:
             configs.append(("gesture", os.path.join(config_dir, "config_gesture.txt"), 3))
         if self.enable_pose:
