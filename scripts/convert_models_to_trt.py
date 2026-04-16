@@ -49,7 +49,14 @@ def convert_onnx_to_engine(onnx_path, engine_path, fp16=True):
     engine = builder.build_serialized_network(network, config)
     
     if engine:
-        engine_data = engine.serialize()
+        # TensorRT 10.x returns IHostMemory directly
+        # Use engine.tobytes() or cast to bytes
+        if hasattr(engine, 'tobytes'):
+            engine_data = engine.tobytes()
+        else:
+            # For older TensorRT
+            engine_data = bytes(engine)
+        
         with open(engine_path, 'wb') as f:
             f.write(engine_data)
         print(f"✅ Saved: {engine_path} ({len(engine_data)/1e6:.1f} MB)")
