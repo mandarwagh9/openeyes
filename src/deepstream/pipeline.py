@@ -883,9 +883,17 @@ def run_deepstream(
                         "bbox": [det.bbox_left, det.bbox_top, det.bbox_width, det.bbox_height]
                     })
             
+            # Get faces from pipeline
+            faces_list = []
+            if use_face and hasattr(pipeline, '_faces'):
+                for face in pipeline._faces:
+                    faces_list.append({
+                        "bbox": [face.x, face.y, face.w, face.h]
+                    })
+            
             result = {
                 "objects": detections_list,
-                "faces": [],  # To add face detection, integrate FaceDetector in probe
+                "faces": faces_list,
                 "gestures": [],
                 "poses": [],
                 "fps": round(current_fps, 1),
@@ -894,7 +902,10 @@ def run_deepstream(
             
             try:
                 _udp_sender.send(json.dumps(result))
-                logger.info(f"UDP: {len(detections_list)} objects -> {output_host}:{output_port}")
+                if faces_list:
+                    logger.info(f"UDP: {len(detections_list)} objects, {len(faces_list)} faces -> {output_host}:{output_port}")
+                else:
+                    logger.info(f"UDP: {len(detections_list)} objects -> {output_host}:{output_port}")
             except Exception as e:
                 logger.warning(f"UDP error: {e}")
             
