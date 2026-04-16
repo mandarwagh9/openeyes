@@ -779,7 +779,7 @@ def run_deepstream(
             
             result = {
                 "objects": detections_list,
-                "faces": [],
+                "faces": [],  # To add face detection, integrate FaceDetector in probe
                 "gestures": [],
                 "poses": [],
                 "fps": round(current_fps, 1),
