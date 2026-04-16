@@ -109,29 +109,25 @@ sudo bash scripts/jetson_perf.sh
 | Minimal (no face/gesture/pose) | 25-40 | Detection + depth + tracking |
 | DLA mode | 20-30 | GPU + DLA offload |
 
-### How We Achieved 30 FPS (vs 2 FPS)
+### How We Went from 2 FPS to 30 FPS
 
-The original OpenCV pipeline was slow because:
-```
-cv2.VideoCapture → CPU decode → YOLO (CPU) → cv2.rectangle (CPU)
-= ~2 FPS on Jetson
-```
+Okay, here's what happened...
 
-DeepStream uses **hardware-accelerated** GPU pipeline:
-```
-nvarguscamerasrc → NVMM → nvinfer (TensorRT/GPU) → nvdsosd (GPU) → nv3dsink
-= ~30 FPS on Jetson
-```
+**The problem:**
+Our original pipeline used OpenCV (cv2) which does everything on CPU. The CSI camera feed, running YOLO detection, and drawing boxes - all on CPU = only 2 FPS. Terrible!
 
-**Key optimizations:**
-1. **nvarguscamerasrc** - CSI camera hardware decode
-2. **NVMM** - Zero-copy video memory
-3. **nvinfer** - TensorRT inference (not ONNX Runtime)
-4. **nvdsosd** - GPU-accelerated drawing
-5. **nv3dsink** - Hardware display output
+**What we did:**
+We switched to NVIDIA's **DeepStream** which uses the GPU for everything:
+- `nvarguscamerasrc` - Grab camera directly (no CPU overhead)
+- `nvinfer` - Run YOLO on GPU with TensorRT (10x faster)
+- `nvdsosd` - Draw boxes on GPU
+- `nv3dsink` - Display on screen (no copying back to CPU)
 
-Run benchmark:
+**Result:**
+30 FPS. 15x faster. Just by using the right tools.
+
 ```bash
+# Try it yourself
 python -m benchmarks.run_deepstream_benchmark --compare
 ```
 
