@@ -731,16 +731,16 @@ class DeepStreamPipeline:
                     except Exception as e:
                         logger.debug(f"Face detection error: {e}")
                 
-                # Gesture detection (every frame for better results)
-                if self.enable_gesture and self._gesture_recognizer:
+                # Gesture detection (every 3rd frame for lower latency)
+                if self.enable_gesture and self._gesture_recognizer and self._face_count % 3 == 0:
                     try:
                         gestures = self._gesture_recognizer.recognize(frame_bgr)
                     except Exception as e:
                         logger.debug(f"Gesture detection error: {e}")
                         gestures = []
                 
-                # Pose detection (every 3rd frame for performance)
-                if self.enable_pose and self._pose_estimator and self._face_count % 3 == 0:
+                # Pose detection (every 6th frame)
+                if self.enable_pose and self._pose_estimator and self._face_count % 6 == 0:
                     try:
                         poses = self._pose_estimator.estimate(frame_bgr)
                     except Exception as e:
