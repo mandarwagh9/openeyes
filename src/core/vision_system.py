@@ -554,17 +554,23 @@ class VisionSystem:
         if result.depth and result.depth.enabled and result.depth.depth_map is not None:
             depth_map = result.depth.depth_map
             if depth_map is not None and depth_map.size > 0:
+                dh, dw = depth_map.shape[:2]
+                if dh != h or dw != w:
+                    depth_map = cv2.resize(depth_map, (w, h))
+                    dh, dw = h, w
                 depth_normalized = cv2.normalize(depth_map, None, 0, 255, cv2.NORM_MINMAX)
                 depth_normalized = depth_normalized.astype(np.uint8)
                 depth_colored = cv2.applyColorMap(depth_normalized, cv2.COLORMAP_JET)
-                dh, dw = depth_colored.shape[:2]
                 fw = w // 4
                 fh = int(dh * (fw / dw))
                 depth_resized = cv2.resize(depth_colored, (fw, fh))
                 depth_bg = np.zeros((fh + 30, fw, 3), dtype=np.uint8)
                 depth_bg[0:fh, 0:fw] = depth_resized
                 cv2.putText(depth_bg, "DEPTH", (10, fh + 22), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-                frame[h - fh - 40:h - 40, 10:10 + fw] = depth_bg
+                target_h = min(fh + 40, h)
+                target_fh = target_h - 40
+                depth_bg_resized = cv2.resize(depth_bg, (fw, target_h))
+                frame[h - target_h:h, 10:10 + fw] = depth_bg_resized
 
         for det in result.objects:
             bbox = det.bbox
