@@ -465,24 +465,7 @@ class DeepStreamPipeline:
     def _update_osd_text(self):
         """Update terminal with current stats."""
         if self.running:
-            try:
-                det_count = len(self._detections) if self._detections else 0
-                face_count = len(self._faces) if self._faces else 0
-                gest_count = len(self._gestures) if self._gestures else 0
-                pose_count = len(self._poses) if self._poses else 0
-                
-                text = f"FPS: {self._current_fps:.0f} | Obj: {det_count}"
-                if face_count > 0:
-                    text += f" | Face: {face_count}"
-                if gest_count > 0:
-                    gest_names = ", ".join([g.gesture_type for g in self._gestures])
-                    text += f" | Hand: {gest_names}"
-                if pose_count > 0:
-                    text += f" | Pose: {pose_count}"
-                
-                logger.info(text)
-            except Exception as e:
-                logger.debug(f"Stats update: {e}")
+            self._print_fps_timer()
         return True
     
     def run(self):
@@ -526,9 +509,20 @@ class DeepStreamPipeline:
                 self._last_fps_time = current_time
             
             det_count = len(self._detections) if self._detections else 0
-            det_names = [d.class_name for d in self._detections[:3]] if self._detections else []
+            face_count = len(self._faces) if self._faces else 0
+            gest_count = len(self._gestures) if self._gestures else 0
+            pose_count = len(self._poses) if self._poses else 0
             
-            logger.info(f"FPS: {self._current_fps:.1f} | Objects: {det_count} | Detected: {', '.join(det_names) if det_names else 'scanning...'}")
+            text = f"FPS: {self._current_fps:.0f} | Obj: {det_count}"
+            if face_count > 0:
+                text += f" | Face: {face_count}"
+            if gest_count > 0:
+                gest_names = ", ".join([g.gesture_type for g in self._gestures])
+                text += f" | Hand: {gest_names}"
+            if pose_count > 0:
+                text += f" | Pose: {pose_count}"
+            
+            logger.info(text)
         return True
     
     def _osd_probe(self, pad, info):
@@ -731,18 +725,19 @@ class DeepStreamPipeline:
                     except Exception as e:
                         logger.debug(f"Face detection error: {e}")
                 
-                # Gesture detection (every 3rd frame for lower latency)
-                if self.enable_gesture and self._gesture_recognizer and self._face_count % 3 == 0:
+                # Gesture detection every frame
+                if self.enable_gesture and self._gesture_recognizer:
                     try:
                         gestures = self._gesture_recognizer.recognize(frame_bgr)
                     except Exception as e:
                         logger.debug(f"Gesture detection error: {e}")
                         gestures = []
                 
-                # Pose detection (every 6th frame)
-                if self.enable_pose and self._pose_estimator and self._face_count % 6 == 0:
+                # Pose detection every frame
+                if self.enable_pose and self._pose_estimator:
                     try:
-                        poses = self._pose_estimator.estimate(frame_bgr)
+                        pose_result = self._pose_estimator.estimate(frame_bgr)
+                        poses = [pose_result] if pose_result.detected else []
                     except Exception as e:
                         logger.debug(f"Pose detection error: {e}")
                         poses = []
