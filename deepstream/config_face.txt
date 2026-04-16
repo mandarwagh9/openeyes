@@ -2,28 +2,18 @@
 gpu-id=0
 net-scale-factor=0.0039215697906911373
 model-color-format=0
-# Use yolov8n-face.onnx when available - download from:
-# https://github.com/lindevs/yolov8-face/releases
-# OR use yolov10n.engine (fallback) treating person as face
-model-engine-file=../models/yolov8n-face.onnx
+model-engine-file=../models/yolov8n-face.engine
 labelfile-path=labels_face.txt
 batch-size=4
 network-mode=2
-# Face = class 0 (person in COCO) - filter to show only faces
-num-detected-classes=80
+num-detected-classes=1
 interval=2
 gie-unique-id=2
 process-mode=1
-operate-on-gie-id=1
-# Process only person class (id=0) as "face"
-operate-on-class-ids=0
 network-type=0
-cluster-mode=4
+cluster-mode=2
 maintain-aspect-ratio=1
 symmetric-padding=1
-parse-bbox-func-name=NvDsInferParseYolo
-custom-lib-path=libnvdsinfer_custom_impl_Yolo.so
-engine-create-func-name=NvDsInferYoloCudaEngineGet
 
 [class-attrs-all]
 pre-cluster-threshold=0.5
