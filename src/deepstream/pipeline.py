@@ -604,6 +604,9 @@ class DeepStreamPipeline:
         
         # Extract frame for Python models
         try:
+            # Add debug log
+            logger.info("Appsink: Processing new frame for Python models")
+            
             # Map buffer to read
             success, buf_map = buf.map(Gst.MapFlags.READ)
             if success:
@@ -619,8 +622,8 @@ class DeepStreamPipeline:
                 gestures = []
                 poses = []
                 
-                # Face detection (every 3rd frame for performance)
-                if self.enable_face and self._face_detector and self._face_count % 3 == 0:
+                # Face detection (every frame for testing)
+                if self.enable_face and self._face_detector:
                     try:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         results = self._face_detector._face_mesh.process(frame_rgb)
