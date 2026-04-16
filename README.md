@@ -5,7 +5,7 @@
 <h1 align="center">OpenEyes</h1>
 
 <p align="center">
-  <strong>v2.6.0</strong> · Robot Vision for Edge Devices<br>
+  <strong>v3.0.0</strong> · Robot Vision for Edge Devices<br>
   <br>
   <a href="https://github.com/mandarwagh9/openeyes/stargazers"><img src="https://img.shields.io/github/stars/mandarwagh9/openeyes?style=flat&color=ffffff" alt="Stars"></a>
   <a href="https://github.com/mandarwagh9/openeyes/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
@@ -39,9 +39,10 @@ Camera → Detection → Tracking → Depth → Control
 
 | Capability | Description |
 |:-----------|:------------|
-| 🔍 **Object Detection** | YOLO11n/12n/26n with TensorRT optimization (35-40 FPS) |
+| 🚀 **DeepStream** | Hardware-accelerated pipeline (30-60 FPS on Jetson) |
+| 🔍 **Object Detection** | YOLO11n/12n with TensorRT optimization |
 | 📏 **Depth Estimation** | MiDaS + Depth Anything V3 |
-| 👤 **Face Detection** | MediaPipe FaceMesh (optimized: complexity=0) |
+| 👤 **Face Detection** | MediaPipe FaceMesh |
 | 👋 **Gesture Recognition** | MediaPipe Hands |
 | 🦴 **Pose Estimation** | MediaPipe Pose |
 | 🎯 **Object Tracking** | ByteTrack with occlusion handling |
@@ -65,6 +66,9 @@ pip install -r requirements.txt
 # Basic vision pipeline
 python -m src.main --debug
 
+# DeepStream pipeline (NEW - 30 FPS)
+python -m src.main --deepstream --camera 0
+
 # With person following
 python -m src.main --follow --debug
 
@@ -73,6 +77,18 @@ python -m src.main --turbo --follow --debug
 
 # ROS2 mode
 python -m src.main --ros2 --debug
+```
+
+### DeepStream Quick Start
+```bash
+# One-time setup (with internet)
+python setup_plug_and_play.py
+
+# Run DeepStream pipeline
+python -m src.main --deepstream --camera 0
+
+# Run all demos
+python demo_all_features.py
 ```
 
 ### Optimize (Jetson)
@@ -86,6 +102,7 @@ sudo bash scripts/jetson_perf.sh
 
 | Configuration | FPS (Orin Nano) | Notes |
 |:--------------|:----------------|:------|
+| **DeepStream pipeline** | **30-40** | YOLOv10n + TensorRT |
 | Detection only (INT8) | 50-80 | YOLO11n INT8 + TensorRT |
 | Full pipeline + INT8 | 15-25 | All models with INT8 |
 | Full pipeline + INT8 + Turbo | 25-35 | Aggressive frame skipping |
