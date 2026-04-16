@@ -81,7 +81,12 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--deepstream",
         action="store_true",
-        help="Use DeepStream pipeline for inference",
+        help="Use DeepStream pipeline for inference (requires DeepStream SDK)",
+    )
+    parser.add_argument(
+        "--no-display",
+        action="store_true",
+        help="Disable display output (for headless DeepStream mode)",
     )
     parser.add_argument(
         "--batch-size",
@@ -261,9 +266,14 @@ def create_parser() -> argparse.ArgumentParser:
         help="Use INT8 quantized models for faster inference",
     )
     parser.add_argument(
-        "--dla",
+        "--low-res",
         action="store_true",
-        help="Use DLA (Deep Learning Accelerator) for inference",
+        help="Use lower resolution (640x480) for faster processing",
+    )
+    parser.add_argument(
+        "--lightweight-depth",
+        action="store_true",
+        help="Use lightweight MiDaS depth model instead of Depth Anything (5x faster)",
     )
     parser.add_argument(
         "--diffusion-policy",
