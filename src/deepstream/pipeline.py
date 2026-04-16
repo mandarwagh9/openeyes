@@ -71,6 +71,20 @@ class DetectionResult:
                 f"conf={self.confidence:.2f})")
 
 
+class FaceResult:
+    """Face detection result."""
+    
+    def __init__(self, x: int, y: int, w: int, h: int, landmarks: list = None):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.landmarks = landmarks or []
+    
+    def __repr__(self):
+        return f"Face(bbox=({self.x},{self.y},{self.w},{self.h}))"
+
+
 class DeepStreamPipeline:
     """DeepStream pipeline for real-time inference on Jetson.
     
@@ -125,14 +139,49 @@ class DeepStreamPipeline:
         self.loop = None
         self.running = False
         self._callbacks: List[Callable[[List[DetectionResult], float], None]] = []
+        self._face_callbacks: List[Callable[[List[FaceResult], float], None]] = []
         self._detections: List[DetectionResult] = []
+        self._faces: List[FaceResult] = []
         self._last_fps_time = time.time()
+        self._face_detector = None
+        self._face_count = 0  # Counter for face detection interval
+        
+        # Load face detector if enabled
+        if enable_face:
+            try:
+                from src.models.face_detector import FaceDetector
+                self._face_detector = FaceDetector()
+                self._face_detector.load()
+                logger.info("Face detector loaded in DeepStream pipeline")
+            except Exception as e:
+                logger.warning(f"Face detector not available: {e}")
         self._frame_count = 0
         self._current_fps = 0.0
     
     def set_detection_callback(self, callback: Callable[[List[DetectionResult], float], None]):
         """Set callback for detection results."""
         self._callbacks.append(callback)
+    
+    def set_face_callback(self, callback: Callable[[List[FaceResult], float], None]):
+        """Set callback for face detection results."""
+        self._face_callbacks.append(callback)
+    
+    def detect_faces(self, frame: np.ndarray) -> List[FaceResult]:
+        """Detect faces in frame using MediaPipe."""
+        if not self._face_detector:
+            return []
+        
+        try:
+            faces = self._face_detector.detect(frame)
+            return [FaceResult(
+                x=int(face.bbox.x),
+                y=int(face.bbox.y),
+                w=int(face.bbox.width),
+                h=int(face.bbox.height),
+            ) for face in faces]
+        except Exception as e:
+            logger.debug(f"Face detection error: {e}")
+            return []
     
     def _get_config_path(self) -> str:
         """Get path to model config file."""
