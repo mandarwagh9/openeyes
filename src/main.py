@@ -237,12 +237,44 @@ def main() -> None:
             config._config["performance"]["tensorrt"]["int8_enabled"] = True
             print("INT8 quantization enabled")
 
+        if args.low_res:
+            config._config["camera"]["width"] = 640
+            config._config["camera"]["height"] = 480
+            print("Low resolution mode: 640x480")
+
+        if args.lightweight_depth:
+            config._config["models"]["depth"]["model"] = "midas-small"
+            print("Lightweight depth mode: MiDaS small")
+
         if args.dla:
             config._config["performance"]["tensorrt"]["dla_enabled"] = True
             print("DLA offloading enabled")
 
         if args.deepstream:
             print("DeepStream pipeline mode enabled")
+            from src.deepstream import run_deepstream
+            camera_id = args.camera if args.camera is not None else 0
+            
+            # Use yolov10n which has working engine
+            if os.path.exists(os.path.join(os.path.dirname(__file__), "..", "models", "yolov10n.engine")):
+                model_name = "yolov10n"
+            else:
+                model_name = "yolo11n"
+                
+            pipeline = run_deepstream(
+                model=model_name,
+                camera=camera_id,
+                width=args.width or 640,
+                height=args.height or 480,
+                fps=args.fps or 30,
+                display=not args.no_display,
+                use_ros2=args.ros2,
+                use_udp=args.host != "none",
+                output_host=args.host,
+                output_port=args.port,
+            )
+            pipeline.run()
+            return
 
         if args.diffusion_policy:
             from src.models.diffusion_policy import DiffusionPolicy
