@@ -5,7 +5,7 @@
 <h1 align="center">OpenEyes</h1>
 
 <p align="center">
-  <strong>v3.0.0</strong> · Robot Vision for Edge Devices<br>
+  <strong>v3.0.1</strong> · Robot Vision for Edge Devices<br>
   <br>
   <a href="https://github.com/mandarwagh9/openeyes/stargazers"><img src="https://img.shields.io/github/stars/mandarwagh9/openeyes?style=flat&color=ffffff" alt="Stars"></a>
   <a href="https://github.com/mandarwagh9/openeyes/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
