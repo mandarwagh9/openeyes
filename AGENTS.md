@@ -48,6 +48,16 @@ src/
 - **MediaPipe empty results**: Lower confidence to 0.3 for face/pose, 0.1 for hands, resize to 640x480
 - **Person following distance**: Use bounding box HEIGHT RATIO (% of frame): forward <60%, stop 60-95%, backward >95%
 
+## DeepStream Pipeline
+
+- **Entry**: Always use `python -m src.main` (not python src/main.py)
+- **Resolution**: 1280x720 default for clear display
+- **appsink**: For Python models (face/gesture/pose) - extracts frames after OSD
+- **Gesture types**: open_palm, fist, thumbs_up, point, peace, three, four, ok
+- **Pose**: 33 body keypoints if full body visible
+- **Performance**: 60 FPS with YOLO only, 20-40 FPS with all models
+- **RGBA to BGR**: Must convert: `cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)` for MediaPipe
+
 ## Style
 
 - Python 3.10+, type hints required

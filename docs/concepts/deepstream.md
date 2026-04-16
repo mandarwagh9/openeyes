@@ -60,7 +60,14 @@ python3 src/deepstream/test_deepstream.py
 
 ```bash
 cd ~/openeyes
-python3 src/deepstream/pipeline.py
+python -m src.main --deepstream --camera 0
+```
+
+### DeepStream with All Models
+
+```bash
+# Face, gesture, and pose detection (60 FPS)
+python -m src.main --deepstream --camera 0 --enable-face --enable-gesture --enable-pose
 ```
 
 ## Architecture
@@ -69,20 +76,36 @@ python3 src/deepstream/pipeline.py
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    GStreamer Pipeline                        │
+│                   GStreamer Pipeline                       │
 ├─────────────────────────────────────────────────────────────┤
 │  CSI Camera → nvarguscamerasrc → NVDEC → nvinfer (YOLO)   │
 │                                              ↓              │
 │                                         TensorRT            │
 └─────────────────────────────────────────────────────────────┘
-                               ↓
-                    ┌─────────────────────┐
-                    │   Python Process    │
-                    ├─────────────────────┤
-                    │  MediaPipe Models   │
-                    │  (Face/Hands/Pose)  │
-                    └─────────────────────┘
+                                ↓
+                     ┌─────────────────────┐
+                     │  nvdsosd (OSD)    │
+                     │  + bounding boxes  │
+                     └─────────────────────┘
+                                ↓
+                     ┌─────────────────────┐
+                     │  appsink          │
+                     │  (Python models)  │
+                     └─────────────────────┘
+                                ↓
+              ┌──────────────────────────────────────┐
+              │ MediaPipe: FaceMesh, Hands, Pose │
+              └──────────────────────────────────────┘
 ```
+
+### appsink Integration
+
+For face, gesture, and pose detection, DeepStream uses appsink to extract frames to Python:
+
+1. **nvdsosd** draws YOLO boxes
+2. **appsink** extracts RGB frames
+3. **MediaPipe** processes face/gesture/pose
+4. Results merged with detection output
 
 ## Performance
 
@@ -90,8 +113,8 @@ Expected performance on Jetson Orin Nano:
 
 | Configuration | FPS |
 |--------------|-----|
-| YOLOv10n (TensorRT) | 40-60 |
-| All models combined | 15-25 |
+| YOLOv10n (TensorRT) | 60+ |
+| + Face + Gesture + Pose | 20-40 |
 
 ## Notes
 

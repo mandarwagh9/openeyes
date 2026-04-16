@@ -1,11 +1,47 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v3.0.0  
+> **Version**: v3.0.1  
 > **Last Updated**: 2026-04-16
 
 ---
 
 All notable changes to this project will be documented in this file.
+
+---
+
+## [v3.0.1] - 2026-04-16
+
+### Added - DeepStream Python Models
+
+- **Face Detection**: MediaPipe FaceMesh via appsink (up to 3 faces)
+- **Gesture Recognition**: MediaPipe Hands via appsink (8 gestures)
+- **Pose Estimation**: MediaPipe Pose via appsink (33 keypoints)
+- **Live Terminal Output**: Real-time stats every second
+
+### Changed - Performance
+
+- Default resolution: 1280x720 (from 640x480)
+- Model throttling: Gesture every 3rd frame, Pose every 6th frame
+- Fixed pose result handling (PoseData object vs list)
+
+### CLI Flags
+
+```bash
+# DeepStream with all models (60 FPS)
+python -m src.main --deepstream --camera 0 --enable-face --enable-gesture --enable-pose
+```
+
+### Output Format
+
+```
+FPS: 60 | Obj: 3 | Face: 1 | Hand: thumbs_up | Pose: 1
+```
+
+- **FPS**: Frames per second
+- **Obj**: YOLO detected objects
+- **Face**: Faces detected (max 3)
+- **Hand**: Hand gesture (open_palm, fist, thumbs_up, point, peace, etc.)
+- **Pose**: Body detected (1 = yes, 0 = no)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).

@@ -271,3 +271,45 @@ python -m src.main --lidar --realsense
 # ROS2 with world model
 python -m src.main --ros2 --world-model lewm --follow
 ```
+
+---
+
+## DeepStream Pipeline
+
+```bash
+# Basic DeepStream (YOLO only)
+python -m src.main --deepstream --camera 0
+
+# DeepStream with face detection
+python -m src.main --deepstream --camera 0 --enable-face
+
+# DeepStream with all models (60 FPS)
+python -m src.main --deepstream --camera 0 --enable-face --enable-gesture --enable-pose
+
+# Custom resolution
+python -m src.main --deepstream --camera 0 --width 1280 --height 720
+```
+
+### DeepStream Flags
+
+| Flag | Description | Default |
+|:-----|:------------|:--------|
+| `--deepstream` | Use DeepStream pipeline | false |
+| `--enable-face` | Enable face detection | false |
+| `--enable-gesture` | Enable gesture recognition | false |
+| `--enable-pose` | Enable pose estimation | false |
+| `--enable-depth` | Enable depth estimation | false |
+
+### Output Format
+
+```
+FPS: 60 | Obj: 3 | Face: 1 | Hand: thumbs_up | Pose: 1
+```
+
+| Field | Description |
+|:------|:------------|
+| FPS | Frames per second (target 60) |
+| Obj | YOLO detected objects (person, tv, etc.) |
+| Face | Faces detected (max 3) |
+| Hand | Hand gesture: open_palm, fist, thumbs_up, point, peace, three, four, ok |
+| Pose | Body detected: 1 = yes, 0 = no |

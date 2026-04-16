@@ -39,12 +39,12 @@ Camera → Detection → Tracking → Depth → Control
 
 | Capability | Description |
 |:-----------|:------------|
-| 🚀 **DeepStream** | Hardware-accelerated pipeline (30-60 FPS on Jetson) |
-| 🔍 **Object Detection** | YOLO11n/12n with TensorRT optimization |
+| 🚀 **DeepStream** | Hardware-accelerated pipeline (60 FPS on Jetson) |
+| 🔍 **Object Detection** | YOLOv10n with TensorRT (80+ classes) |
+| 👤 **Face Detection** | MediaPipe FaceMesh (up to 3 faces) |
+| 👋 **Gesture Recognition** | MediaPipe Hands (8 gestures) |
+| 🦴 **Pose Estimation** | MediaPipe Pose (33 keypoints) |
 | 📏 **Depth Estimation** | MiDaS + Depth Anything V3 |
-| 👤 **Face Detection** | MediaPipe FaceMesh |
-| 👋 **Gesture Recognition** | MediaPipe Hands |
-| 🦴 **Pose Estimation** | MediaPipe Pose |
 | 🎯 **Object Tracking** | ByteTrack with occlusion handling |
 | 🚶 **Person Following** | Autonomous person tracking |
 | 📡 **ROS2** | Full integration with 10+ topics |

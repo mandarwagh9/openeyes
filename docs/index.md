@@ -1,6 +1,6 @@
 # OpenEyes Documentation
 
-> **Version**: v2.5.0
+> **Version**: v3.0.1
 
 Welcome to the OpenEyes documentation. This index helps you find the right document for your needs.
 

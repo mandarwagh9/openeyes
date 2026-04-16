@@ -113,6 +113,13 @@ optional arguments:
   --max-velocity M/S     Max velocity m/s (default: 1.0)
   --min-distance M       Min obstacle distance (default: 0.3)
   --ota-update           Enable OTA updates
+  
+  # v3.0.1 - DeepStream
+  --deepstream           Use DeepStream pipeline (60 FPS)
+  --enable-face          Enable face detection (MediaPipe)
+  --enable-gesture       Enable gesture recognition (MediaPipe)
+  --enable-pose          Enable pose estimation (MediaPipe)
+  --enable-depth        Enable depth estimation
 ```
 
 ```
