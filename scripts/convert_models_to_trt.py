@@ -49,9 +49,10 @@ def convert_onnx_to_engine(onnx_path, engine_path, fp16=True):
     engine = builder.build_serialized_network(network, config)
     
     if engine:
+        engine_data = engine.serialize()
         with open(engine_path, 'wb') as f:
-            f.write(engine)
-        print(f"✅ Saved: {engine_path} ({len(engine)/1e6:.1f} MB)")
+            f.write(engine_data)
+        print(f"✅ Saved: {engine_path} ({len(engine_data)/1e6:.1f} MB)")
         return True
     
     return False
