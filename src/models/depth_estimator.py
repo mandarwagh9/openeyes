@@ -24,16 +24,16 @@ from src.utils.logger import get_logger
 
 
 class DepthEstimator:
-    """Unified depth estimator supporting MiDaS and Depth Anything V3."""
+    """Unified depth estimator supporting MiDaS and Depth Anything V2."""
 
     SUPPORTED_MODELS = {
         "da3-small": {
-            "name": "Depth Anything V3 Small",
+            "name": "Depth Anything V2 Small",
             "params": 25,
             "recommended_fps": 15,
         },
         "da3-base": {
-            "name": "Depth Anything V3 Base",
+            "name": "Depth Anything V2 Base",
             "params": 98,
             "recommended_fps": 8,
         },
@@ -79,15 +79,15 @@ class DepthEstimator:
             self._load_midas()
 
     def _load_depth_anything_v3(self) -> None:
-        """Load Depth Anything V3 model."""
-        self._logger.info(f"Loading Depth Anything V3 ({self._model_name})...")
+        """Load Depth Anything V2 model (V3 not available on HuggingFace)."""
+        self._logger.info(f"Loading Depth Anything V2 ({self._model_name})...")
 
         try:
             from transformers import AutoImageProcessor, AutoModelForDepthEstimation
 
             hf_ids = {
-                "da3-small": "depth-anything/Depth-Anything-V3-Small",
-                "da3-base": "depth-anything/Depth-Anything-V3-Base",
+                "da3-small": "depth-anything/Depth-Anything-V2-Small-hf",
+                "da3-base": "depth-anything/Depth-Anything-V2-Base-hf",
             }
             hf_id = hf_ids.get(self._model_name, hf_ids["da3-small"])
 
@@ -104,7 +104,7 @@ class DepthEstimator:
             self._is_loaded = True
             info = self.SUPPORTED_MODELS[self._model_name]
             self._logger.info(
-                f"Depth Anything V3 loaded: "
+                f"Depth Anything V2 loaded: "
                 f"{info['params']}M params on {self._device}"
             )
 

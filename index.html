@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenEyes — Robot Vision System v2.5.0</title>
+  <title>OpenEyes — Robot Vision System v2.6.0</title>
   <meta name="description" content="Hardware-agnostic edge robot vision framework with world models for predictive intelligence">
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
@@ -37,9 +37,9 @@
   <section class="hero">
     <div class="hero-content">
       <div class="hero-badges">
-        <span class="badge">v2.5.0</span>
-        <span class="badge">World Models</span>
-        <span class="badge">Edge Optimized</span>
+        <span class="badge">v2.6.0</span>
+        <span class="badge">INT8 Optimized</span>
+        <span class="badge">30-50 FPS</span>
       </div>
       <img src="assets/images/logo.svg" alt="OpenEyes" class="hero-logo">
       <h1>We Give Robots Vision</h1>
@@ -203,14 +203,29 @@
         </thead>
         <tbody>
           <tr>
-            <td>Detection only (TensorRT)</td>
-            <td><span class="badge badge-int8">35-40</span></td>
-            <td>YOLO11n FP16</td>
+            <td>Detection only (INT8)</td>
+            <td><span class="badge badge-int8">50-80</span></td>
+            <td>YOLO11n INT8 + TensorRT</td>
           </tr>
           <tr>
-            <td>Full pipeline (default)</td>
-            <td><span class="badge">4-6</span></td>
-            <td>All models enabled</td>
+            <td>Full pipeline + INT8</td>
+            <td><span class="badge">15-25</span></td>
+            <td>All models with INT8</td>
+          </tr>
+          <tr>
+            <td>Full pipeline + INT8 + Turbo</td>
+            <td><span class="badge">25-35</span></td>
+            <td>Aggressive frame skipping</td>
+          </tr>
+          <tr>
+            <td>Minimal (no face/gesture/pose)</td>
+            <td><span class="badge">25-40</span></td>
+            <td>Detection + depth + tracking</td>
+          </tr>
+          <tr>
+            <td>DLA mode</td>
+            <td><span class="badge badge-dla">20-30</span></td>
+            <td>GPU + DLA offload</td>
           </tr>
           <tr>
             <td>Full pipeline + turbo</td>

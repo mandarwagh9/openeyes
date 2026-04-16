@@ -193,7 +193,7 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--version",
         action="version",
-        version="OpenEyes v2.5.0",
+        version="OpenEyes v2.6.0",
     )
     parser.add_argument(
         "--info",

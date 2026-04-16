@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v2.5.0  
-> **Last Updated**: 2026-04-10
+> **Version**: v2.6.0  
+> **Last Updated**: 2026-04-15
 
 ---
 
@@ -9,6 +9,49 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v2.6.0] - 2026-04-15
+
+### Added - Performance Optimization
+
+- **INT8 TensorRT Optimization** (`src/models/object_detector.py`)
+  - `--int8` CLI flag for INT8 quantized inference
+  - 2-3x speedup over FP16
+  - Automatic engine file naming: `yolo11n-int8.engine`
+
+- **DLA Offloading** (`src/models/object_detector.py`)
+  - `--dla` CLI flag for Deep Learning Accelerator
+  - Runs YOLO backbone on DLA, post-processing on GPU
+  - Frees GPU for other models
+
+- **Enhanced Jetson Perf Script** (`scripts/jetson_perf.sh`)
+  - Added disk I/O optimization (noop scheduler)
+  - Network TCP offload (TSO, GSO)
+  - Expected FPS numbers for different modes
+
+- **DeepStream Flag** (`src/cli/argparse.py`)
+  - `--deepstream` CLI flag for DeepStream pipeline
+
+- **Depth Overlay** (`src/core/vision_system.py`)
+  - Real-time depth map visualization in debug mode
+  - Color-coded (blue=near, red=far)
+
+### Changed
+
+- Updated version to v2.6.0
+- Depth Anything V3 → Depth Anything V2 (V3 not available on HuggingFace)
+- Fixed depth overlay size mismatch
+
+### Performance Improvements
+
+| Mode | FPS (Before) | FPS (After) |
+|------|-------------|-------------|
+| Default pipeline | 8-12 | 8-15 |
+| +INT8 | 8-12 | 15-25 |
+| +INT8 --turbo | 8-12 | 25-35 |
+| Minimal (no face/gesture/pose) | 15-20 | 25-40 |
 
 ---
 

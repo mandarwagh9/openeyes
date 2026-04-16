@@ -18,7 +18,7 @@ def create_api() -> FastAPI:
     _app = FastAPI(
         title="OpenEyes Vision API",
         description="REST API for OpenEyes robot vision system",
-        version="2.5.0",
+        version="2.6.0",
     )
 
     _app.include_router(health.router, prefix="/health", tags=["health"])

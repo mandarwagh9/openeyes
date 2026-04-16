@@ -5,7 +5,7 @@
 <h1 align="center">OpenEyes</h1>
 
 <p align="center">
-  <strong>v2.5.0</strong> · Robot Vision for Edge Devices<br>
+  <strong>v2.6.0</strong> · Robot Vision for Edge Devices<br>
   <br>
   <a href="https://github.com/mandarwagh9/openeyes/stargazers"><img src="https://img.shields.io/github/stars/mandarwagh9/openeyes?style=flat&color=ffffff" alt="Stars"></a>
   <a href="https://github.com/mandarwagh9/openeyes/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-green" alt="License"></a>
@@ -86,10 +86,35 @@ sudo bash scripts/jetson_perf.sh
 
 | Configuration | FPS (Orin Nano) | Notes |
 |:--------------|:----------------|:------|
-| Detection only (TensorRT) | 35-40 | YOLO11n FP16 |
-| Full pipeline (default) | 4-6 | All models enabled |
-| Full pipeline + turbo | 8-12 | Aggressive frame skipping |
-| Minimal | 15-20 | Detection + depth + tracking |
+| Detection only (INT8) | 50-80 | YOLO11n INT8 + TensorRT |
+| Full pipeline + INT8 | 15-25 | All models with INT8 |
+| Full pipeline + INT8 + Turbo | 25-35 | Aggressive frame skipping |
+| Minimal (no face/gesture/pose) | 25-40 | Detection + depth + tracking |
+| DLA mode | 20-30 | GPU + DLA offload |
+
+---
+
+## Run Commands
+
+```bash
+# Default (~8-15 FPS)
+python -m src.main --debug
+
+# With INT8 (~15-25 FPS)
+python -m src.main --int8 --debug
+
+# INT8 + Turbo (~25-35 FPS)
+python -m src.main --int8 --turbo --debug
+
+# Minimal (~25-40 FPS)
+python -m src.main --int8 --no-face --no-gesture --no-pose --debug
+
+# DLA mode
+python -m src.main --dla --debug
+
+# Run optimization script first
+sudo bash scripts/jetson_perf.sh
+```
 
 ---
 
