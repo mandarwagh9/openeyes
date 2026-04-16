@@ -13,7 +13,7 @@ class FaceDetector:
     def __init__(
         self,
         model_selection: int = 0,
-        min_confidence: float = 0.3,
+        min_confidence: float = 0.25,
     ):
         self._model_selection = model_selection
         self._min_confidence = min_confidence

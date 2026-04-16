@@ -86,6 +86,29 @@ class FaceResult:
         return f"Face(bbox=({self.x},{self.y},{self.w},{self.h}))"
 
 
+class GestureResult:
+    """Gesture detection result."""
+    
+    def __init__(self, gesture_type: str, handedness: str, confidence: float):
+        self.gesture_type = gesture_type
+        self.handedness = handedness
+        self.confidence = confidence
+    
+    def __repr__(self):
+        return f"Gesture({self.gesture_type}, {self.handedness}, conf={self.confidence:.2f})"
+
+
+class PoseResult:
+    """Pose detection result."""
+    
+    def __init__(self, keypoints: dict, confidence: float):
+        self.keypoints = keypoints
+        self.confidence = confidence
+    
+    def __repr__(self):
+        return f"Pose(keypoints={len(self.keypoints)}, conf={self.confidence:.2f})"
+
+
 class DeepStreamPipeline:
     """DeepStream pipeline for real-time inference on Jetson.
     
@@ -114,7 +137,7 @@ class DeepStreamPipeline:
         self,
         model: str = "yolo11n",
         camera: int = 0,
-        width: int = 640,
+        width: int = 1280,
         height: int = 480,
         fps: int = 30,
         display: bool = True,
@@ -143,8 +166,12 @@ class DeepStreamPipeline:
         self._face_callbacks: List[Callable[[List[FaceResult], float], None]] = []
         self._detections: List[DetectionResult] = []
         self._faces: List[FaceResult] = []
+        self._gestures: List[Any] = []
+        self._poses: List[Any] = []
         self._last_fps_time = time.time()
         self._face_detector = None
+        self._gesture_recognizer = None
+        self._pose_estimator = None
         self._face_count = 0  # Counter for face detection interval
         
         # Load face detector if enabled
@@ -156,6 +183,26 @@ class DeepStreamPipeline:
                 logger.info("Face detector loaded in DeepStream pipeline")
             except Exception as e:
                 logger.warning(f"Face detector not available: {e}")
+        
+        # Load gesture recognizer if enabled
+        if enable_gesture:
+            try:
+                from src.models.gesture_recognizer import GestureRecognizer
+                self._gesture_recognizer = GestureRecognizer(min_confidence=0.3)
+                self._gesture_recognizer.load()
+                logger.info("Gesture recognizer loaded in DeepStream pipeline")
+            except Exception as e:
+                logger.warning(f"Gesture recognizer not available: {e}")
+        
+        # Load pose estimator if enabled
+        if enable_pose:
+            try:
+                from src.models.pose_estimator import PoseEstimator
+                self._pose_estimator = PoseEstimator()
+                self._pose_estimator.load()
+                logger.info("Pose estimator loaded in DeepStream pipeline")
+            except Exception as e:
+                logger.warning(f"Pose estimator not available: {e}")
         self._frame_count = 0
         self._current_fps = 0.0
     
@@ -206,18 +253,9 @@ class DeepStreamPipeline:
         
         configs = []
         
-        # Always include YOLO detection (gie-unique-id=1)
+        # Only include YOLO detection (gie-unique-id=1)
+        # Note: Face, gesture, pose use Python models via appsink, not DeepStream nvinfer
         configs.append(("yolov10n", os.path.join(config_dir, "config_yolov10n.txt"), 1))
-        
-        # Optional secondary models (gie-unique-id >= 2)
-        # Note: enable_face uses Python face detector, not DeepStream
-        # DeepStream face needs custom output parser for landmarks
-        if self.enable_gesture:
-            configs.append(("gesture", os.path.join(config_dir, "config_gesture.txt"), 3))
-        if self.enable_pose:
-            configs.append(("pose", os.path.join(config_dir, "config_pose.txt"), 4))
-        if self.enable_depth:
-            configs.append(("depth", os.path.join(config_dir, "config_depth.txt"), 5))
         
         return configs
     
@@ -245,19 +283,20 @@ class DeepStreamPipeline:
         
         # OSD and display
         pipeline_parts.extend([
-            "nvdsosd name=nvdsosd display-text=1 display-bbox=1 display-mask=1 ! ",
+            "nvdsosd name=nvdsosd display-text=1 display-bbox=1 ! ",
             "nvvidconv ! ",
             "video/x-raw,format=RGBA ! ",
         ])
         
-        # Add appsink branch for Python models (tee)
+        # Add OSD fps text element
+        
+        # Display and appsink for Python processing
         if need_appsink:
             pipeline_parts.extend([
                 "tee name=t ! ",
                 "queue ! nv3dsink sync=0 t. ! ",
                 "queue ! appsink name=python-appsink emit-signals=true",
             ])
-            logger.info(f"Appsink enabled for Python models")
         else:
             pipeline_parts.append("queue ! nv3dsink sync=0")
         
@@ -424,19 +463,26 @@ class DeepStreamPipeline:
         return Gst.PadProbeReturn.OK
     
     def _update_osd_text(self):
-        """Update the on-screen FPS display."""
+        """Update terminal with current stats."""
         if self.running:
             try:
-                osd = self.pipeline.get_by_name("osdfps")
-                if osd:
-                    det_count = len(self._detections) if self._detections else 0
-                    det_names = ", ".join([d.class_name for d in self._detections[:3]]) if self._detections else ""
-                    text = f"FPS: {self._current_fps:.0f} | Obj: {det_count}"
-                    if det_names:
-                        text += f" | {det_names}"
-                    osd.set_property("text", text)
+                det_count = len(self._detections) if self._detections else 0
+                face_count = len(self._faces) if self._faces else 0
+                gest_count = len(self._gestures) if self._gestures else 0
+                pose_count = len(self._poses) if self._poses else 0
+                
+                text = f"FPS: {self._current_fps:.0f} | Obj: {det_count}"
+                if face_count > 0:
+                    text += f" | Face: {face_count}"
+                if gest_count > 0:
+                    gest_names = ", ".join([g.gesture_type for g in self._gestures])
+                    text += f" | Hand: {gest_names}"
+                if pose_count > 0:
+                    text += f" | Pose: {pose_count}"
+                
+                logger.info(text)
             except Exception as e:
-                logger.debug(f"OSD text update: {e}")
+                logger.debug(f"Stats update: {e}")
         return True
     
     def run(self):
@@ -450,18 +496,16 @@ class DeepStreamPipeline:
         osd = self.pipeline.get_by_name("nvdsosd")
         if osd:
             try:
-                src_pad = osd.get_static_pad("src")
-                if src_pad:
-                    src_pad.add_probe(Gst.PadProbeType.BUFFER, self._osd_probe)
-                    logger.info("Added OSD probe on src pad")
+                sink_pad = osd.get_static_pad("sink")
+                if sink_pad:
+                    sink_pad.add_probe(Gst.PadProbeType.BUFFER, self._osd_probe)
             except Exception as e:
-                logger.warning(f"Probe error: {e}")
+                logger.debug(f"OSD sink probe error: {e}")
         
         self.running = True
         self.loop = GLib.MainLoop()
         
-        GLib.timeout_add(500, self._update_osd_text)
-        GLib.timeout_add(1000, self._print_fps_timer)
+        GLib.timeout_add(1000, self._update_osd_text)
         
         try:
             self.loop.run()
@@ -488,7 +532,7 @@ class DeepStreamPipeline:
         return True
     
     def _osd_probe(self, pad, info):
-        """Probe to get detection results for metadata extraction."""
+        """Probe to get detection results + face detection for OSD."""
         buf = info.get_buffer()
         if not buf:
             return Gst.PadProbeReturn.OK
@@ -507,6 +551,33 @@ class DeepStreamPipeline:
                         frame = pyds.NvDsFrameMeta.cast(frame_meta.data)
                         detections = self._parse_detections(frame)
                         self._detections = detections
+                        
+                        # Get frame for face detection and draw boxes directly
+                        if self.enable_face and self._face_detector:
+                            n_frame = pyds.get_nvds_buf_surface(hash(buf), frame.batch_id)
+                            if n_frame:
+                                # Get frame as numpy (RGBA)
+                                frame_np = np.array(n_frame, copy=False, order='C')
+                                
+                                # Run face detection
+                                frame_rgb = cv2.cvtColor(frame_np, cv2.COLOR_RGBA2RGB)
+                                results = self._face_detector._face_mesh.process(frame_rgb)
+                                
+                                if results.multi_face_landmarks:
+                                    h, w = frame_np.shape[:2]
+                                    for lm in results.multi_face_landmarks:
+                                        xs = [p.x * w for p in lm.landmark]
+                                        ys = [p.y * h for p in lm.landmark]
+                                        face_x, face_y = int(min(xs)), int(min(ys))
+                                        face_w, face_h = int(max(xs) - face_x), int(max(ys) - face_y)
+                                        self._faces.append(FaceResult(face_x, face_y, face_w, face_h))
+                                        
+                                        # Draw face box directly on frame (green)
+                                        cv2.rectangle(frame_np, (face_x, face_y), 
+                                                   (face_x + face_w, face_y + face_h),
+                                                   (0, 255, 0, 255), 3)
+                                        cv2.putText(frame_np, "Face", (face_x, face_y - 8),
+                                                  cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0, 255), 2)
                         
                         for callback in self._callbacks:
                             callback(detections, self._current_fps)
@@ -544,7 +615,7 @@ class DeepStreamPipeline:
             
             # Log FPS periodically
             if int(current_time) % 3 == 0:
-                logger.info(f"FPS: {self._current_fps:.1f} | Objects: {len(self._detections)}")
+                logger.debug(f"FPS: {self._current_fps:.1f} | Objects: {len(self._detections)}")
         
         except Exception as e:
             logger.debug(f"Appsink sample error: {e}")
@@ -604,18 +675,39 @@ class DeepStreamPipeline:
         
         # Extract frame for Python models
         try:
-            # Add debug log
-            logger.info("Appsink: Processing new frame for Python models")
+            # Get caps to determine actual format and dimensions
+            caps = sample.get_caps()
+            if not caps:
+                logger.debug("No caps from appsink")
+                return Gst.FlowReturn.OK
             
-            # Map buffer to read
+            gst_struct = caps.get_structure(0)
+            w = gst_struct.get_value("width") or self.width
+            h = gst_struct.get_value("height") or self.height
+            
+            # Map buffer for reading
             success, buf_map = buf.map(Gst.MapFlags.READ)
-            if success:
-                # Create numpy array from buffer
+            if not success:
+                logger.debug("Failed to map buffer")
+                return Gst.FlowReturn.OK
+            
+            try:
+                # Create numpy array WITH COPY - critical step from NVIDIA sample
+                # This creates a proper copy rather than viewing the buffer
                 frame = np.ndarray(
-                    shape=(self.height, self.width, 3),
+                    shape=(h, w, 4),
                     dtype=np.uint8,
                     buffer=buf_map.data
                 )
+                frame_copy = np.array(frame, copy=True, order='C')
+                
+                # Convert RGBA to BGR (OpenCV default) - NVIDIA uses RGBA2BGRA
+                frame_bgr = cv2.cvtColor(frame_copy, cv2.COLOR_RGBA2BGR)
+                
+                # Unmap buffer before processing
+                buf.unmap(buf_map)
+                
+                logger.debug(f"Frame processed: {frame_bgr.shape}")
                 
                 # Run Python models if enabled
                 faces = []
@@ -625,39 +717,51 @@ class DeepStreamPipeline:
                 # Face detection (every frame for testing)
                 if self.enable_face and self._face_detector:
                     try:
-                        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                        # Convert BGR to RGB for MediaPipe
+                        frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
                         results = self._face_detector._face_mesh.process(frame_rgb)
                         if results.multi_face_landmarks:
-                            logger.info(f"🎯 Detected {len(results.multi_face_landmarks)} faces in frame")
                             for lm in results.multi_face_landmarks:
-                                # Get bounding box from landmarks
-                                h, w = frame.shape[:2]
-                                xs = [p.x * w for p in lm.landmark]
-                                ys = [p.y * h for p in lm.landmark]
+                                fh, fw = frame_rgb.shape[:2]
+                                xs = [p.x * fw for p in lm.landmark]
+                                ys = [p.y * fh for p in lm.landmark]
                                 face_x, face_y = int(min(xs)), int(min(ys))
                                 face_w, face_h = int(max(xs) - face_x), int(max(ys) - face_y)
                                 faces.append(FaceResult(face_x, face_y, face_w, face_h))
-                                logger.info(f"  Face: ({face_x},{face_y}) {face_w}x{face_h}")
                     except Exception as e:
                         logger.debug(f"Face detection error: {e}")
                 
-                # Gesture detection
-                if self.enable_gesture and self._face_count % 3 == 0:
-                    gestures = []  # Would run gesture recognizer here
+                # Gesture detection (every 6th frame for performance)
+                if self.enable_gesture and self._gesture_recognizer and self._face_count % 6 == 0:
+                    try:
+                        gestures = self._gesture_recognizer.recognize(frame_bgr)
+                    except Exception as e:
+                        logger.debug(f"Gesture detection error: {e}")
+                        gestures = []
                 
-                # Pose detection
-                if self.enable_pose and self._face_count % 3 == 0:
-                    poses = []  # Would run pose estimator here
+                # Pose detection (every 6th frame for performance)
+                if self.enable_pose and self._pose_estimator and self._face_count % 6 == 0:
+                    try:
+                        poses = self._pose_estimator.estimate(frame_bgr)
+                    except Exception as e:
+                        logger.debug(f"Pose detection error: {e}")
+                        poses = []
                 
                 self._faces = faces
+                self._gestures = gestures
+                self._poses = poses
                 self._face_count += 1
                 
                 # Call face callbacks
                 for callback in self._face_callbacks:
                     callback(faces, self._current_fps)
                 
-                # Unmap buffer
-                buf.unmap(buf_map)
+            except Exception as e:
+                logger.debug(f"Frame processing error: {e}")
+                try:
+                    buf.unmap(buf_map)
+                except:
+                    pass
                 
         except Exception as e:
             logger.debug(f"Appsink frame error: {e}")
@@ -691,7 +795,7 @@ class DeepStreamMultiCameraPipeline(DeepStreamPipeline):
     """Multi-camera DeepStream pipeline."""
     
     def __init__(self, cameras: List[int], model: str = "yolo11n",
-                 width: int = 640, height: int = 480, fps: int = 30):
+                 width: int = 1280, height: int = 480, fps: int = 30):
         super().__init__(model=model, camera=0, width=width, height=height)
         self.cameras = cameras
     
@@ -734,7 +838,7 @@ class DeepStreamMultiCameraPipeline(DeepStreamPipeline):
 def run_deepstream(
     model: str = "yolo11n",
     camera: int = 0,
-    width: int = 640,
+    width: int = 1280,
     height: int = 480,
     fps: int = 30,
     display: bool = True,
@@ -896,23 +1000,38 @@ def run_deepstream(
                         "bbox": [face.x, face.y, face.w, face.h]
                     })
             
+            # Get gestures from pipeline
+            gestures_list = []
+            if use_gesture and hasattr(pipeline, '_gestures'):
+                for gest in pipeline._gestures:
+                    gestures_list.append({
+                        "type": gest.gesture_type,
+                        "hand": gest.handedness,
+                        "confidence": round(gest.confidence, 2)
+                    })
+            
+            # Get poses from pipeline
+            poses_list = []
+            if use_pose and hasattr(pipeline, '_poses'):
+                for pose in pipeline._poses:
+                    poses_list.append({
+                        "keypoints": pose.keypoints,
+                        "confidence": round(pose.confidence, 2)
+                    })
+            
             result = {
                 "objects": detections_list,
                 "faces": faces_list,
-                "gestures": [],
-                "poses": [],
+                "gestures": gestures_list,
+                "poses": poses_list,
                 "fps": round(current_fps, 1),
                 "timestamp": current_time
             }
             
             try:
                 _udp_sender.send(json.dumps(result))
-                if faces_list:
-                    logger.info(f"UDP: {len(detections_list)} objects, {len(faces_list)} faces -> {output_host}:{output_port}")
-                else:
-                    logger.info(f"UDP: {len(detections_list)} objects -> {output_host}:{output_port}")
             except Exception as e:
-                logger.warning(f"UDP error: {e}")
+                logger.debug(f"UDP error: {e}")
             
             if _ros2_pub:
                 try:
@@ -939,7 +1058,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OpenEyes DeepStream Pipeline")
     parser.add_argument("--model", default="yolo11n", help="Model name")
     parser.add_argument("--camera", type=int, default=0, help="Camera ID")
-    parser.add_argument("--width", type=int, default=640, help="Frame width")
+    parser.add_argument("--width", type=int, default=1280, help="Frame width")
     parser.add_argument("--height", type=int, default=480, help="Frame height")
     parser.add_argument("--fps", type=int, default=30, help="Target FPS")
     parser.add_argument("--no-display", action="store_true", help="Disable display")

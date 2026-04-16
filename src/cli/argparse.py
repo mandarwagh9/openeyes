@@ -26,13 +26,13 @@ def create_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--width",
         type=int,
-        default=640,
+        default=1280,
         help="Frame width",
     )
     parser.add_argument(
         "--height",
         type=int,
-        default=480,
+        default=720,
         help="Frame height",
     )
     parser.add_argument(
