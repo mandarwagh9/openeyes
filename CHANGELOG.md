@@ -1,7 +1,7 @@
 # CHANGELOG.md - Version History for OpenEyes
 
-> **Version**: v2.6.0  
-> **Last Updated**: 2026-04-15
+> **Version**: v3.0.0  
+> **Last Updated**: 2026-04-16
 
 ---
 
@@ -9,6 +9,47 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [v3.0.0] - 2026-04-16
+
+### Added - DeepStream Pipeline
+
+- **DeepStream Pipeline**: New hardware-accelerated pipeline using NVIDIA DeepStream SDK
+  - CSI camera input via nvarguscamerasrc
+  - TensorRT inference via nvinfer (YOLOv10n)
+  - On-screen display via nvdsosd (bounding boxes + labels)
+  - Display output via nv3dsink
+- **FPS Overlay**: Real-time FPS display on terminal and screen
+- **UDP Output**: JSON detection output to 127.0.0.1:5000
+- **ROS2 Integration**: VisionPublisher for ROS2 topics
+- **pyds Bindings**: NVIDIA DeepStream Python bindings (v1.2.0)
+- **Demo Script**: `demo_all_features.py` with 12 different demos
+- **Plug & Play Setup**: `setup_plug_and_play.py`
+
+### Performance
+
+- **30 FPS** on Jetson Orin Nano (vs ~1.9 FPS with old OpenCV pipeline)
+- Hardware-accelerated throughout entire pipeline
+
+### Files Added
+
+- `src/deepstream/pipeline.py` - Main DeepStream pipeline
+- `src/deepstream/__init__.py` - Module exports
+- `deepstream/config_yolov10n.txt` - YOLOv10n config
+- `deepstream/labels.txt` - COCO class labels
+- `tests/test_deepstream_pipeline.py` - Unit tests (18 tests)
+- `tests/test_deepstream_integration.py` - Integration tests (13 tests)
+- `demo_all_features.py` - Feature demos
+- `setup_plug_and_play.py` - Setup script
+
+### Fixed
+
+- Metadata extraction using correct pyds API (`gst_buffer_get_nvds_batch_meta`)
+- Probe attachment to src pad instead of sink
+- Duplicate method definitions removed
+- Frame counter for accurate FPS calculation
 
 ---
 
