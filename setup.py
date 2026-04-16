@@ -6,7 +6,7 @@ package_name = 'openeyes'
 
 setup(
     name=package_name,
-    version='2.5.0',
+    version='3.0.1',
     packages=['src'],
     package_dir={'src': 'src'},
     data_files=[
