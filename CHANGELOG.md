@@ -21,12 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - TensorRT inference via nvinfer (YOLOv10n)
   - On-screen display via nvdsosd (bounding boxes + labels)
   - Display output via nv3dsink
+- **Multi-Model Support**: Added support for cascading multiple vision models
+  - Face Detection (YOLOv8n-face: GIE ID 2)
+  - Gesture Recognition (trt_pose_hand: GIE ID 3)
+  - Body Pose Estimation (TRTPose: GIE ID 4)
+  - Depth Estimation (GIE ID 5)
 - **FPS Overlay**: Real-time FPS display on terminal and screen
 - **UDP Output**: JSON detection output to 127.0.0.1:5000
 - **ROS2 Integration**: VisionPublisher for ROS2 topics
 - **pyds Bindings**: NVIDIA DeepStream Python bindings (v1.2.0)
 - **Demo Script**: `demo_all_features.py` with 12 different demos
 - **Plug & Play Setup**: `setup_plug_and_play.py`
+- **Model Download Script**: `scripts/download_deepstream_models.py`
+
+### Added - CLI Flags
+
+- `--enable-face`: Enable face detection in DeepStream pipeline
+- `--enable-gesture`: Enable gesture recognition in DeepStream pipeline
+- `--enable-pose`: Enable pose estimation in DeepStream pipeline
+- `--enable-depth`: Enable depth estimation in DeepStream pipeline
+
+### Added - Model Weights
+
+- `models/yolov8n-face.onnx`: YOLOv8n Face Detection (12 MB)
+- `models/hand_pose_resnet18_att_244_244.pth`: TRTPose Hand (85 MB)
+- `models/densenet121_body.pth`: TRTPose Body (88 MB)
 
 ### Performance
 

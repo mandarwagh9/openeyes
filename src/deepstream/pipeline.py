@@ -104,6 +104,10 @@ class DeepStreamPipeline:
         fps: int = 30,
         display: bool = True,
         display_fps: bool = True,
+        enable_face: bool = False,
+        enable_gesture: bool = False,
+        enable_pose: bool = False,
+        enable_depth: bool = False,
     ):
         self.model = model
         self.camera = camera
@@ -112,6 +116,10 @@ class DeepStreamPipeline:
         self.fps = fps
         self.display = display
         self.display_fps = display_fps
+        self.enable_face = enable_face
+        self.enable_gesture = enable_gesture
+        self.enable_pose = enable_pose
+        self.enable_depth = enable_depth
         
         self.pipeline = None
         self.loop = None
@@ -141,26 +149,61 @@ class DeepStreamPipeline:
         
         return config_abs
     
+    def _get_all_configs(self) -> List[str]:
+        """Get list of config paths for multi-model pipeline."""
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        config_dir = os.path.join(base_dir, "..", "deepstream")
+        
+        configs = []
+        
+        # Always include YOLO detection (gie-unique-id=1)
+        configs.append(("yolov10n", os.path.join(config_dir, "config_yolov10n.txt"), 1))
+        
+        # Optional secondary models (gie-unique-id >= 2)
+        if self.enable_face:
+            configs.append(("face", os.path.join(config_dir, "config_face.txt"), 2))
+        if self.enable_gesture:
+            configs.append(("gesture", os.path.join(config_dir, "config_gesture.txt"), 3))
+        if self.enable_pose:
+            configs.append(("pose", os.path.join(config_dir, "config_pose.txt"), 4))
+        if self.enable_depth:
+            configs.append(("depth", os.path.join(config_dir, "config_depth.txt"), 5))
+        
+        return configs
+    
     def _create_pipeline_string(self) -> str:
-        """Create pipeline string for display output with FPS overlay and labels."""
-        config_path = self._get_config_path()
+        """Create pipeline string for multi-model DeepStream pipeline."""
+        configs = self._get_all_configs()
+        
+        # Build pipeline with multiple nvinfer instances
+        pipeline_parts = [
+            f"nvarguscamerasrc sensor-id={self.camera} ! ",
+            f"video/x-raw(memory:NVMM),format=NV12,width={self.width},height={self.height},framerate={self.fps}/1 ! ",
+            "nvvidconv ! ",
+            "video/x-raw(memory:NVMM),format=NV12 ! ",
+            f"m.sink_0 nvstreammux name=m batch-size=1 width={self.width} height={self.height} live-source=1 ! ",
+        ]
+        
+        # Add nvinfer for each model
+        for i, (model_name, config_path, gie_id) in enumerate(configs):
+            config_abs = os.path.abspath(config_path)
+            pipeline_parts.append(f'nvinfer name=nvinfer{gie_id} config-file-path={config_abs} ! ')
+        
+        # OSD and display
+        pipeline_parts.extend([
+            "nvdsosd name=nvdsosd display-text=1 display-bbox=1 display-mask=1 ! ",
+            "nvvidconv ! ",
+            "video/x-raw,format=RGBA ! ",
+            'textoverlay name=osdfps text="FPS: 0 | Obj: 0" valignment=top halignment=right ! ',
+            "queue ! nv3dsink sync=0",
+        ])
+        
+        # Log enabled models
+        enabled = [name for name, _, _ in configs]
+        logger.info(f"Enabled models: {enabled}")
         logger.info(f"Resolution: {self.width}x{self.height} @ {self.fps} FPS")
         
-        pipeline = (
-            f"nvarguscamerasrc sensor-id={self.camera} ! "
-            f"video/x-raw(memory:NVMM),format=NV12,width={self.width},height={self.height},framerate={self.fps}/1 ! "
-            f"nvvidconv ! "
-            f"video/x-raw(memory:NVMM),format=NV12 ! "
-            f"m.sink_0 nvstreammux name=m batch-size=1 width={self.width} height={self.height} live-source=1 ! "
-            f"nvinfer config-file-path={config_path} ! "
-            f"nvdsosd name=nvdsosd display-text=1 display-bbox=1 display-mask=1 ! "
-            f"nvvidconv ! "
-            f"video/x-raw,format=RGBA ! "
-            f"textoverlay name=osdfps text=\"FPS: 0 | Obj: 0\" valignment=top halignment=right ! "
-            f"queue ! nv3dsink sync=0"
-        )
-        
-        return pipeline
+        return "".join(pipeline_parts)
     
     def create_pipeline(self) -> Gst.Pipeline:
         """Create the DeepStream pipeline."""
@@ -697,7 +740,7 @@ def run_deepstream(
         except Exception as e:
             logger.warning(f"ROS2 not available: {e}")
     
-    # Create pipeline
+    # Create pipeline with multi-model support
     pipeline = DeepStreamPipeline(
         model=model,
         camera=camera,
@@ -705,7 +748,13 @@ def run_deepstream(
         height=height,
         fps=fps,
         display=display,
+        enable_face=use_face,
+        enable_gesture=use_gesture,
+        enable_pose=use_pose,
+        enable_depth=use_depth,
     )
+    
+    logger.info(f"Multi-model config: face={use_face}, gesture={use_gesture}, pose={use_pose}, depth={use_depth}")
     
     _frame_count = 0
     _last_udp_time = time.time()

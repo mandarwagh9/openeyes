@@ -1,0 +1,21 @@
+# ============================================================
+# Multi-Model DeepStream Config - Parallel Inference
+# 
+# This config runs multiple detection models in parallel on the same frame.
+# Each model processes full frame independently.
+#
+# GIE 1 (gie-unique-id=1): YOLO Detection (COCO 80 classes)
+# GIE 2 (gie-unique-id=2): Face Detection (1 class: face)
+# GIE 3 (gie-unique-id=3): Gesture/Hand Detection
+# GIE 4 (gie-unique-id=4): Body Pose Detection
+#
+# For cascaded inference (SGIE), use process-mode=2 and operate-on-gie-id
+# ============================================================
+
+# Primary GIE: YOLO Detection (COCO) - Full frame detection
+[primary-gie]
+enable=1
+gpu-id=0
+config-file=config_yolov10n.txt
+gie-unique-id=1
+batch-size=4

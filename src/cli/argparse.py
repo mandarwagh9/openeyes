@@ -89,6 +89,26 @@ def create_parser() -> argparse.ArgumentParser:
         help="Disable display output (for headless DeepStream mode)",
     )
     parser.add_argument(
+        "--enable-face",
+        action="store_true",
+        help="Enable face detection in DeepStream pipeline",
+    )
+    parser.add_argument(
+        "--enable-gesture",
+        action="store_true",
+        help="Enable gesture recognition in DeepStream pipeline",
+    )
+    parser.add_argument(
+        "--enable-pose",
+        action="store_true",
+        help="Enable pose estimation in DeepStream pipeline",
+    )
+    parser.add_argument(
+        "--enable-depth",
+        action="store_true",
+        help="Enable depth estimation in DeepStream pipeline",
+    )
+    parser.add_argument(
         "--batch-size",
         type=int,
         default=1,
