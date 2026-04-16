@@ -1,11 +1,16 @@
 # DeepStream module for OpenEyes
+# High-performance inference pipeline for Jetson Orin Nano
 
-from .pipeline import DeepStreamPipeline, DeepStreamYOLOPipeline, run_deepstream_inference
-from .test_deepstream import DeepStreamYOLOTest
+from .pipeline import (
+    DeepStreamPipeline,
+    DeepStreamMultiCameraPipeline,
+    run_deepstream,
+    DetectionResult,
+)
 
 __all__ = [
     'DeepStreamPipeline',
-    'DeepStreamYOLOPipeline', 
-    'run_deepstream_inference',
-    'DeepStreamYOLOTest',
+    'DeepStreamMultiCameraPipeline', 
+    'run_deepstream',
+    'DetectionResult',
 ]
