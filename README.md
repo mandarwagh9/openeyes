@@ -109,6 +109,32 @@ sudo bash scripts/jetson_perf.sh
 | Minimal (no face/gesture/pose) | 25-40 | Detection + depth + tracking |
 | DLA mode | 20-30 | GPU + DLA offload |
 
+### How We Achieved 30 FPS (vs 2 FPS)
+
+The original OpenCV pipeline was slow because:
+```
+cv2.VideoCapture → CPU decode → YOLO (CPU) → cv2.rectangle (CPU)
+= ~2 FPS on Jetson
+```
+
+DeepStream uses **hardware-accelerated** GPU pipeline:
+```
+nvarguscamerasrc → NVMM → nvinfer (TensorRT/GPU) → nvdsosd (GPU) → nv3dsink
+= ~30 FPS on Jetson
+```
+
+**Key optimizations:**
+1. **nvarguscamerasrc** - CSI camera hardware decode
+2. **NVMM** - Zero-copy video memory
+3. **nvinfer** - TensorRT inference (not ONNX Runtime)
+4. **nvdsosd** - GPU-accelerated drawing
+5. **nv3dsink** - Hardware display output
+
+Run benchmark:
+```bash
+python -m benchmarks.run_deepstream_benchmark --compare
+```
+
 ---
 
 ## Run Commands
