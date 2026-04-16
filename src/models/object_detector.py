@@ -11,9 +11,11 @@ from src.utils.logger import get_logger
 class TensorRTDetector:
     """TensorRT-based YOLO detector for GPU acceleration."""
 
-    def __init__(self, onnx_path: str, fp16: bool = True, logger=None):
+    def __init__(self, onnx_path: str, fp16: bool = True, int8: bool = False, dla: bool = False, logger=None):
         self.onnx_path = onnx_path
         self.fp16 = fp16
+        self.int8 = int8
+        self.dla = dla
         self.logger = logger or get_logger(__name__)
         self.engine = None
         self.context = None
@@ -46,7 +48,13 @@ class TensorRTDetector:
 
         import tensorrt as trt
 
-        engine_path = self.onnx_path.replace('.onnx', '.engine')
+        if self.int8:
+            engine_path = self.onnx_path.replace('.onnx', '-int8.engine')
+        elif self.dla:
+            engine_path = self.onnx_path.replace('.onnx', '-dla.engine')
+        else:
+            engine_path = self.onnx_path.replace('.onnx', '.engine')
+        
         engine_file = Path(engine_path)
 
         if engine_file.exists() and not force_rebuild:
@@ -69,9 +77,18 @@ class TensorRTDetector:
         config = builder.create_builder_config()
         config.set_memory_pool_limit(trt.MemoryPoolType.WORKSPACE, 1 << 30)
 
-        if self.fp16:
+        if self.int8:
+            config.set_flag(trt.BuilderFlag.INT8)
+            self.logger.info("Using INT8 precision")
+        elif self.fp16:
             config.set_flag(trt.BuilderFlag.FP16)
             self.logger.info("Using FP16 precision")
+
+        if self.dla:
+            config.set_flag(trt.BuilderFlag.GPU_FALLBACK)
+            config.set_default_device_type(trt.DeviceType.kDLA)
+            config.set_dla_core(0)
+            self.logger.info("DLA enabled - will use DLA with GPU fallback")
 
         self.logger.info("Serializing TensorRT engine...")
         self.engine = builder.build_serialized_network(network, config)
@@ -175,10 +192,14 @@ class ObjectDetector:
         model_path: str = "yolo11n.pt",
         confidence: float = 0.5,
         iou_threshold: float = 0.45,
+        int8: bool = False,
+        dla: bool = False,
     ):
         self._model_path = model_path
         self._confidence = confidence
         self._iou_threshold = iou_threshold
+        self._int8 = int8
+        self._dla = dla
         self._model = None
         self._logger = get_logger(__name__)
         self._using_onnx = False
@@ -233,7 +254,9 @@ class ObjectDetector:
             self._logger.info("Attempting to load TensorRT engine...")
             self._tensorrt_detector = TensorRTDetector(
                 self._model_path,
-                fp16=True,
+                fp16=not self._int8,
+                int8=self._int8,
+                dla=self._dla,
                 logger=self._logger
             )
 

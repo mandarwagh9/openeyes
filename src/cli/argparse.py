@@ -261,6 +261,11 @@ def create_parser() -> argparse.ArgumentParser:
         help="Use INT8 quantized models for faster inference",
     )
     parser.add_argument(
+        "--dla",
+        action="store_true",
+        help="Use DLA (Deep Learning Accelerator) for inference",
+    )
+    parser.add_argument(
         "--diffusion-policy",
         action="store_true",
         help="Enable diffusion policy for manipulation",

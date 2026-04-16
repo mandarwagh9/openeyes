@@ -248,6 +248,8 @@ class VisionSystem:
             model_path=self._config.yolo_path or "models/yolov10n.onnx",
             confidence=self._config.yolo_confidence,
             iou_threshold=self._config.yolo_iou_threshold,
+            int8=self._config.tensorrt_int8_enabled,
+            dla=self._config.tensorrt_dla_enabled,
         )
         try:
             self._detector.load()

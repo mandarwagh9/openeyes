@@ -234,7 +234,7 @@ def main() -> None:
             print("RealSense camera mode enabled (depth + IMU)")
 
         if args.int8:
-            config._config["performance"]["tensorrt"]["precision"] = "int8"
+            config._config["performance"]["tensorrt"]["int8_enabled"] = True
             print("INT8 quantization enabled")
 
         if args.dla:

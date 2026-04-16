@@ -128,6 +128,10 @@ class Config:
         return self.get("performance", "tensorrt", "precision", default="fp16")
 
     @property
+    def tensorrt_int8_enabled(self) -> bool:
+        return self.get("performance", "tensorrt", "int8_enabled", default=False)
+
+    @property
     def tensorrt_dla_enabled(self) -> bool:
         return self.get("performance", "tensorrt", "dla_enabled", default=False)
 
