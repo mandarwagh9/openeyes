@@ -625,6 +625,7 @@ class DeepStreamPipeline:
                         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                         results = self._face_detector._face_mesh.process(frame_rgb)
                         if results.multi_face_landmarks:
+                            logger.info(f"🎯 Detected {len(results.multi_face_landmarks)} faces in frame")
                             for lm in results.multi_face_landmarks:
                                 # Get bounding box from landmarks
                                 h, w = frame.shape[:2]
@@ -633,6 +634,7 @@ class DeepStreamPipeline:
                                 face_x, face_y = int(min(xs)), int(min(ys))
                                 face_w, face_h = int(max(xs) - face_x), int(max(ys) - face_y)
                                 faces.append(FaceResult(face_x, face_y, face_w, face_h))
+                                logger.info(f"  Face: ({face_x},{face_y}) {face_w}x{face_h}")
                     except Exception as e:
                         logger.debug(f"Face detection error: {e}")
                 
