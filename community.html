@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenEyes | Community & Contributing</title>
+  <meta name="description" content="Join the OpenEyes robotics community. Contribute to the open-source vision framework.">
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Floating Navigation Dock -->
+  <nav class="nav-dock">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/images/logo.svg" alt="OpenEyes">
+      OpenEyes
+    </a>
+    <div class="nav-links">
+      <a href="docs.html">Docs</a>
+      <a href="hardware.html">Hardware</a>
+      <a href="community.html" class="active">Community</a>
+    </div>
+  </nav>
+
+  <main class="container section">
+    
+    <h1>Community</h1>
+    <p class="hero-desc">Build the future of edge robotics with us.</p>
+
+    <div class="content-wrapper">
+      
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <a href="#contributing" class="text-mono">01. Contributing</a>
+        <a href="#code-standards" class="text-mono">02. Standards</a>
+        <a href="#links" class="text-mono">03. Links</a>
+      </aside>
+
+      <!-- Main Content -->
+      <article class="doc-content">
+        
+        <h2 id="contributing">01. How to Contribute</h2>
+        <p>OpenEyes is an Apache 2.0 open-source framework. We welcome pull requests for bug fixes, new model integrations, and performance optimizations (especially TensorRT).</p>
+        
+        <div class="terminal" style="margin-bottom: var(--space-md);">
+          <div class="terminal-header">
+            <div class="terminal-dots"><span></span><span></span><span></span></div>
+            <div class="terminal-title">git</div>
+          </div>
+          <div class="terminal-body" style="height: auto;">
+            <div class="term-line"><span class="term-dim"># Fork and clone</span></div>
+            <div class="term-line"><span class="term-cmd">git clone https://www.openeyes.cc/</span></div>
+            <div class="term-line"><span class="term-cmd">cd openeyes</span></div>
+            <div class="term-line"><br></div>
+            <div class="term-line"><span class="term-dim"># Create feature branch</span></div>
+            <div class="term-line"><span class="term-cmd">git checkout -b feature/model-optimization</span></div>
+            <div class="term-line"><br></div>
+            <div class="term-line"><span class="term-dim"># Test your changes before committing</span></div>
+            <div class="term-line"><span class="term-cmd">pytest tests/ -v</span></div>
+            <div class="term-line"><span class="term-cmd">pytest tests/test_camera.py -x</span></div>
+          </div>
+        </div>
+
+        <h2 id="code-standards">02. Code Standards</h2>
+        <p>We enforce strict standards to maintain pipeline performance.</p>
+        <ul style="margin-top: var(--space-md);">
+          <li><strong>Python 3.10+ required.</strong> All functions must have type hints.</li>
+          <li><strong>Zero-copy data.</strong> Pass pointers to GPU buffers instead of pulling to CPU whenever possible.</li>
+          <li><strong>Docstrings.</strong> Use Google-style docstrings for all core modules.</li>
+          <li><strong>Imports.</strong> Sort with <span class="text-mono">isort</span> and format with <span class="text-mono">black</span> (line length 120).</li>
+          <li><strong>Logging.</strong> Do not use standard <span class="text-mono">print()</span>. Use <span class="text-mono">from src.utils.logger import get_logger</span>.</li>
+        </ul>
+
+        <h2 id="links">03. Connect</h2>
+        <div class="bento-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: var(--space-md);">
+          
+          <a href="https://www.openeyes.cc/" class="bento-card col-span-1" style="text-decoration: none;">
+            <div>
+              <h3 class="bento-title text-accent">GitHub Issues</h3>
+              <p class="bento-text text-muted">Report bugs or request features. Please include hardware specs and logs.</p>
+            </div>
+          </a>
+
+          <a href="https://discord.gg/openeyes" class="bento-card col-span-1" style="text-decoration: none;">
+            <div>
+              <h3 class="bento-title text-accent">Discord Server</h3>
+              <p class="bento-text text-muted">Join the developer chat. Discuss ROS2 integration and DeepStream pipelines.</p>
+            </div>
+          </a>
+
+        </div>
+
+      </article>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer section-tight">
+      <div class="nav-brand">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        OpenEyes
+      </div>
+      <div class="footer-meta">
+        v3.0.1 Released April 2026<br>
+        Open Source under Apache 2.0
+      </div>
+    </footer>
+
+  </main>
+
+</body>
+</html>

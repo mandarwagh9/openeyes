@@ -3,143 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hardware - OpenEyes v3.0.1</title>
+  <title>OpenEyes | Hardware Specifications</title>
+  <meta name="description" content="Supported edge AI hardware for the OpenEyes robotics framework.">
   <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="navbar-container">
-      <a href="index.html" class="navbar-logo">
-        <img src="assets/images/logo.svg" alt="OpenEyes">
-        <span>OpenEyes</span>
-      </a>
-      <ul class="navbar-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="getting-started.html">Getting Started</a></li>
-        <li><a href="commands.html">Commands</a></li>
-        <li><a href="ros2.html">ROS2</a></li>
-        <li><a href="hardware.html">Hardware</a></li>
-        <li><a href="safety.html">Safety</a></li>
-        <li><a href="contributing.html">Contribute</a></li>
-        <li><a href="https://www.openeyes.cc/">GitHub</a></li>
-      </ul>
-      <div class="navbar-toggle" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+
+  <!-- Floating Navigation Dock -->
+  <nav class="nav-dock">
+    <a href="index.html" class="nav-brand">
+      <img src="assets/images/logo.svg" alt="OpenEyes">
+      OpenEyes
+    </a>
+    <div class="nav-links">
+      <a href="docs.html">Docs</a>
+      <a href="hardware.html" class="active">Hardware</a>
+      <a href="community.html">Community</a>
     </div>
   </nav>
 
-  <header class="page-header">
+  <main class="container section">
+    
     <h1>Hardware</h1>
-    <p>Hardware specifications and setup for OpenEyes</p>
-  </header>
+    <p class="hero-desc">Built for Edge AI and Mobile Robotics</p>
 
-  <main class="content">
-    <h2>Jetson Orin Nano</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Specification</th><th>4GB</th><th>8GB</th></tr></thead>
-        <tbody>
-          <tr><td>GPU</td><td>512 CUDA, 16 Tensor</td><td>1024 CUDA, 32 Tensor</td></tr>
-          <tr><td>CPU</td><td colspan="2">6-core Arm Cortex-A78AE</td></tr>
-          <tr><td>Memory</td><td>4GB LPDDR5</td><td>8GB LPDDR5</td></tr>
-          <tr><td>AI Performance</td><td>20 TOPS</td><td>40 TOPS</td></tr>
-          <tr><td>Power</td><td colspan="2">7-15W</td></tr>
-        </tbody>
-      </table>
+    <div class="hw-grid">
+      
+      <div class="hw-card">
+        <div class="hw-name">NVIDIA Jetson Orin Nano</div>
+        <p class="hw-spec">40 TOPS | 8GB RAM | TensorRT</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">The primary development platform for OpenEyes v3.0.1. Full DeepStream pipeline support.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Raspberry Pi 5 + AI HAT</div>
+        <p class="hw-spec">26 TOPS | 8GB RAM | Hailo-8L</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">High performance per watt. Optimized for ONNX models when DeepStream is not available.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Intel Core Ultra NPU</div>
+        <p class="hw-spec">48 TOPS | OpenVINO</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">X86 edge robotics and industrial x86_64 IPC architectures.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Qualcomm RB5</div>
+        <p class="hw-spec">15 TOPS | SNPE</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">Optimized for power-constrained micro-drones and compact robotics.</p>
+      </div>
+
     </div>
 
-    <h2>Camera Options</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Camera</th><th>Resolution</th><th>Interface</th><th>Cost</th></tr></thead>
-        <tbody>
-          <tr><td>Logitech C920</td><td>1080p @ 30fps</td><td>USB 2.0</td><td>$50</td></tr>
-          <tr><td>Logitech C270</td><td>720p @ 30fps</td><td>USB 2.0</td><td>$25</td></tr>
-          <tr><td>IMX219 (CSI)</td><td>1080p @ 30fps</td><td>CSI</td><td>$20</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <!-- Supported Sensors -->
+    <h2 style="margin-top: var(--space-3xl);">Sensors & Perception</h2>
+    <table class="spec-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Supported Devices</th>
+          <th>Protocol / Interface</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="text-mono">RGB Camera</span></td>
+          <td>IMX219, IMX477, USB UVC webcams</td>
+          <td>CSI-2 / V4L2</td>
+        </tr>
+        <tr>
+          <td><span class="text-mono">Stereo / Depth</span></td>
+          <td>Intel RealSense D435i / D455, OAK-D</td>
+          <td>USB 3.0 / ROS2 Wrapper</td>
+        </tr>
+        <tr>
+          <td><span class="text-mono">LIDAR (2D)</span></td>
+          <td>RPLIDAR A1/A2/S1, Sick</td>
+          <td>UART / Serial</td>
+        </tr>
+        <tr>
+          <td><span class="text-mono">IMU / Gyro</span></td>
+          <td>BNO085, MPU6050</td>
+          <td>I2C / SPI</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <h2>Power Supply</h2>
-    <ul>
-      <li><strong>Voltage:</strong> 5V DC</li>
-      <li><strong>Current:</strong> 3A minimum, 4A recommended</li>
-      <li><strong>Connector:</strong> Barrel jack 5.5mm x 2.1mm</li>
-    </ul>
+    <!-- Footer -->
+    <footer class="footer section-tight">
+      <div class="nav-brand">
+        <img src="assets/images/logo.svg" alt="OpenEyes">
+        OpenEyes
+      </div>
+      <div class="footer-meta">
+        v3.0.1 Released April 2026<br>
+        Open Source under Apache 2.0
+      </div>
+    </footer>
 
-    <h2>Power Budget</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Component</th><th>Idle</th><th>Active</th><th>Peak</th></tr></thead>
-        <tbody>
-          <tr><td>Jetson Orin Nano</td><td>5W</td><td>10W</td><td>15W</td></tr>
-          <tr><td>USB Camera</td><td>0.5W</td><td>1W</td><td>2W</td></tr>
-          <tr><td><strong>Total</strong></td><td><strong>5.5W</strong></td><td><strong>13W</strong></td><td><strong>22W</strong></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>Bill of Materials</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Item</th><th>Cost</th></tr></thead>
-        <tbody>
-          <tr><td>Jetson Orin Nano 8GB</td><td>$200</td></tr>
-          <tr><td>USB Webcam 1080p</td><td>$50</td></tr>
-          <tr><td>64GB microSD</td><td>$20</td></tr>
-          <tr><td>5V/4A Power Supply</td><td>$15</td></tr>
-          <tr><td><strong>Total (Basic)</strong></td><td><strong>$285</strong></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>Supported Platforms (v3.0.1)</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Platform</th><th>TOPS</th><th>Power</th><th>Backend</th></tr></thead>
-        <tbody>
-          <tr><td>Jetson Orin Nano</td><td>40</td><td>5-15W</td><td>TensorRT</td></tr>
-          <tr><td>Jetson Orin NX</td><td>100</td><td>10-25W</td><td>TensorRT</td></tr>
-          <tr><td>Raspberry Pi 5 + AI HAT</td><td>40</td><td>~12W</td><td>Hailo DFC</td></tr>
-          <tr><td>Intel Core Ultra</td><td>48</td><td>15-45W</td><td>OpenVINO</td></tr>
-          <tr><td>Hailo-8</td><td>26</td><td>3.5W</td><td>Hailo DFC</td></tr>
-          <tr><td>Qualcomm RB5/RB6</td><td>15-30</td><td>5-15W</td><td>QNN</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>LIDAR Options (v0.7.0+)</h2>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>LIDAR</th><th>Range</th><th>Interface</th><th>Cost</th></tr></thead>
-        <tbody>
-          <tr><td>YDLIDAR X4</td><td>10m</td><td>USB</td><td>$90</td></tr>
-          <tr><td>RPLIDAR A1M8</td><td>12m</td><td>USB</td><td>$100</td></tr>
-          <tr><td>LDS-50C</td><td>8m</td><td>USB</td><td>$60</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h2>RealSense D455 (v0.7.0+)</h2>
-    <ul>
-      <li><strong>Depth Range:</strong> 0.6m - 6m</li>
-      <li><strong>RGB Resolution:</strong> 1280x720</li>
-      <li><strong>FOV:</strong> 87° x 58°</li>
-      <li><strong>Interface:</strong> USB-C</li>
-      <li><strong>Cost:</strong> $150</li>
-    </ul>
   </main>
 
-  <footer class="footer">
-    <p>OpenEyes v3.0.1 — Hardware-agnostic edge robot vision</p>
-    <div class="footer-links">
-      <a href="https://www.openeyes.cc/">GitHub</a>
-      <a href="index.html">Home</a>
-      <a href="safety.html">Safety</a>
-    </div>
-  </footer>
-  <script>function toggleMenu(){document.querySelector('.navbar-links').classList.toggle('active')}function copyCode(btn){const c=btn.closest('.code-block').querySelector('code').textContent;navigator.clipboard.writeText(c).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}</script>
 </body>
 </html>
