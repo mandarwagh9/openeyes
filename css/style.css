@@ -616,11 +616,20 @@ a:hover {
     word-break: break-word;
   }
 
-  .footer {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+  
+  .footer-branding {
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-bottom {
     flex-direction: column;
     gap: var(--space-md);
     text-align: center;
-    padding: var(--space-2xl) 0;
   }
 }
 

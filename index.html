@@ -153,13 +153,43 @@
 
     <!-- Footer -->
     <footer class="footer section-tight">
-      <div class="nav-brand">
-        <img src="assets/images/logo.svg" alt="OpenEyes">
-        OpenEyes
+      <div class="footer-grid">
+        <div class="footer-col footer-branding">
+          <div class="nav-brand">
+            <img src="assets/images/logo.svg" alt="OpenEyes">
+            OpenEyes
+          </div>
+          <p class="text-muted" style="margin-top: var(--space-sm); font-size: 0.9rem; max-width: 320px;">
+            The open-source vision framework for edge devices. Giving robots computational sight at 60 FPS.
+          </p>
+          <div class="status-indicator">
+            <span class="status-dot"></span> <span class="text-mono" style="letter-spacing: 0.05em;">SYSTEMS OPERATIONAL</span>
+          </div>
+        </div>
+        
+        <div class="footer-col">
+          <h4 class="footer-heading">Ecosystem</h4>
+          <a href="docs.html" class="footer-link">Documentation</a>
+          <a href="hardware.html" class="footer-link">Hardware Specs</a>
+          <a href="demos.html" class="footer-link">Live Demos</a>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Community</h4>
+          <a href="https://github.com/mandarwagh9/openeyes" target="_blank" class="footer-link">GitHub Repository</a>
+          <a href="community.html" class="footer-link">Contributing Guide</a>
+          <a href="https://github.com/mandarwagh9/openeyes/blob/main/LICENSE.md" target="_blank" class="footer-link">Apache 2.0 License</a>
+        </div>
       </div>
-      <div class="footer-meta">
-        v3.0.1 Released April 2026<br>
-        Open Source under Apache 2.0
+      
+      <div class="footer-bottom">
+        <div class="footer-meta">
+          &copy; 2026 OpenEyes Project.
+        </div>
+        <div class="footer-meta text-mono" style="display: flex; gap: var(--space-md); align-items: center;">
+          <span>LATENCY: <span class="text-accent">&lt;16ms</span></span>
+          <span class="text-accent">v3.0.1</span>
+        </div>
       </div>
     </footer>
 
