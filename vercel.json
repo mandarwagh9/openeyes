@@ -4,46 +4,65 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "redirects": [
+  "rewrites": [
     {
       "source": "/docs",
-      "destination": "/docs.html",
-      "permanent": false
+      "destination": "/docs.html"
     },
     {
       "source": "/docs/",
-      "destination": "/docs.html",
-      "permanent": false
+      "destination": "/docs.html"
     },
     {
       "source": "/hardware",
-      "destination": "/hardware.html",
-      "permanent": false
+      "destination": "/hardware.html"
     },
     {
       "source": "/hardware/",
-      "destination": "/hardware.html",
-      "permanent": false
+      "destination": "/hardware.html"
     },
     {
       "source": "/demos",
-      "destination": "/demos.html",
-      "permanent": false
+      "destination": "/demos.html"
     },
     {
       "source": "/demos/",
-      "destination": "/demos.html",
-      "permanent": false
+      "destination": "/demos.html"
     },
     {
       "source": "/community",
-      "destination": "/community.html",
-      "permanent": false
+      "destination": "/community.html"
     },
     {
       "source": "/community/",
-      "destination": "/community.html",
-      "permanent": false
+      "destination": "/community.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/docs.html",
+      "destination": "/docs",
+      "permanent": true
+    },
+    {
+      "source": "/hardware.html",
+      "destination": "/hardware",
+      "permanent": true
+    },
+    {
+      "source": "/demos.html",
+      "destination": "/demos",
+      "permanent": true
+    },
+    {
+      "source": "/community.html",
+      "destination": "/community",
+      "permanent": true
     }
   ]
 }
