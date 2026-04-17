@@ -648,3 +648,4 @@ body::before {
   padding-left: calc(var(--space-sm) - 2px);
   background: var(--accent-primary-dim);
 }
+.demo-media { width: 100%; border-radius: 4px; margin-bottom: var(--space-md); margin-top: var(--space-xs); border: 1px solid var(--border-dim); }
