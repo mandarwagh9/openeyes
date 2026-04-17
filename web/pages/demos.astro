@@ -1,0 +1,92 @@
+---
+import actionIcon from "../../assets/images/action-chunking.svg";
+import apiIcon from "../../assets/images/ota-update.svg";
+import fusionIcon from "../../assets/images/sensor-fusion.svg";
+import rosIcon from "../../assets/images/multi-camera.svg";
+import trackingIcon from "../../assets/images/diffusion.svg";
+import demoOneGif from "../../demo/demo1.gif";
+import demoTwoGif from "../../demo/demo2.gif";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BentoCard from "../components/BentoCard.astro";
+import TerminalPanel from "../components/TerminalPanel.astro";
+---
+
+<BaseLayout
+  title="OpenEyes | Demos & Use Cases"
+  description="Interactive demos and use cases for OpenEyes across vision, ROS2, and API modes."
+  activePage="demos"
+>
+  <section class="hero section">
+    <div class="hero-content reveal">
+      <div class="hero-tag">Live Capabilities</div>
+      <h1><span class="text-accent">Demos</span> &amp; Use Cases</h1>
+      <p class="hero-desc">
+        Run targeted command profiles to activate OpenEyes capabilities for edge deployments, automation workflows, and distributed robotics pipelines.
+      </p>
+    </div>
+
+    <TerminalPanel title="demo_capabilities.py" className="reveal">
+      <div class="term-line"><span class="term-dim">$</span> <span class="term-cmd">python -m src.main --info</span></div>
+      <div class="term-line"><span class="term-accent">[SYS]</span> Verifying capabilities...</div>
+      <div class="term-line"><span class="term-success">[OK]</span> YOLO TensorRT object detection</div>
+      <div class="term-line"><span class="term-success">[OK]</span> Gesture and face processing</div>
+      <div class="term-line"><span class="term-success">[OK]</span> World model runtime</div>
+      <div class="term-line"><span class="term-success">[OK]</span> Headless API service</div>
+      <div class="term-line"><span class="term-success">[OK]</span> ROS2 publishing mode</div>
+    </TerminalPanel>
+  </section>
+
+  <section class="section">
+    <h2 class="reveal">Framework Configurations</h2>
+    <p class="text-medium reveal" style="margin-bottom: var(--space-2xl);">Use these command templates for common deployment scenarios.</p>
+
+    <div class="bento-grid">
+      <BentoCard title="Core Vision Pipeline" iconSrc={fusionIcon.src} iconAlt="Vision icon" className="col-span-2">
+        <img src={demoOneGif.src} alt="Core Vision Pipeline Demo" class="demo-media" loading="lazy" />
+        <p class="bento-text text-muted" style="margin-bottom: var(--space-md);">
+          DeepStream appsink pipeline with detection, face, gesture, and pose output.
+        </p>
+        <TerminalPanel compact={true}>
+          <div class="term-line"><span class="term-cmd">python -m src.main --camera 0 --enable-face --enable-gesture --enable-pose --debug</span></div>
+        </TerminalPanel>
+      </BentoCard>
+
+      <BentoCard title="Autonomous Person Following" iconSrc={trackingIcon.src} iconAlt="Tracking icon" className="col-span-2">
+        <img src={demoTwoGif.src} alt="Autonomous Person Following Demo" class="demo-media" loading="lazy" />
+        <p class="bento-text text-muted" style="margin-bottom: var(--space-md);">
+          Enables LeWM-based tracking and follow mode for distance-aware response.
+        </p>
+        <TerminalPanel compact={true}>
+          <div class="term-line"><span class="term-cmd">python -m src.main --world-model lewm --follow --turbo</span></div>
+        </TerminalPanel>
+      </BentoCard>
+
+      <BentoCard title="ROS2 Distributed Publisher" iconSrc={rosIcon.src} iconAlt="ROS icon" className="col-span-2">
+        <p class="bento-text text-muted" style="margin-bottom: var(--space-md);">
+          Publishes detections, depth, and state payloads for ROS2-enabled systems.
+        </p>
+        <TerminalPanel compact={true}>
+          <div class="term-line"><span class="term-cmd">ros2 launch openeyes openeyes.launch.py device:=cuda ros2:=true</span></div>
+        </TerminalPanel>
+      </BentoCard>
+
+      <BentoCard title="Headless REST API" iconSrc={apiIcon.src} iconAlt="API icon" className="col-span-2">
+        <p class="bento-text text-muted" style="margin-bottom: var(--space-md);">
+          Runs OpenEyes as an API service for external orchestration and monitoring.
+        </p>
+        <TerminalPanel compact={true}>
+          <div class="term-line"><span class="term-cmd">python -m src.main --api --api-port 8000 --api-host 0.0.0.0</span></div>
+        </TerminalPanel>
+      </BentoCard>
+
+      <BentoCard title="Batch Video Processing" iconSrc={actionIcon.src} iconAlt="Video icon" className="col-span-2">
+        <p class="bento-text text-muted" style="margin-bottom: var(--space-md);">
+          Processes offline media for reproducible benchmarking and demo generation.
+        </p>
+        <TerminalPanel compact={true}>
+          <div class="term-line"><span class="term-cmd">python -m src.main --video path/to/input.mp4 --output result.mp4</span></div>
+        </TerminalPanel>
+      </BentoCard>
+    </div>
+  </section>
+</BaseLayout>

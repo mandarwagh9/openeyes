@@ -19,3 +19,6 @@ ENV/
 models/*.pt
 models/*.pth
 site/
+node_modules/
+.astro/
+dist/

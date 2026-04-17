@@ -1,0 +1,154 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import TerminalPanel from "../components/TerminalPanel.astro";
+---
+
+<BaseLayout
+  title="OpenEyes | Documentation & CLI"
+  description="Complete documentation, installation, and CLI reference for OpenEyes v3.0.1."
+  activePage="docs"
+>
+  <section class="section">
+    <h1 class="reveal">Documentation</h1>
+    <p class="hero-desc reveal">v3.0.1 Stable</p>
+
+    <div class="content-wrapper">
+      <aside class="sidebar reveal">
+        <a href="#installation" class="sidebar-link text-mono">01. Installation</a>
+        <a href="#quickstart" class="sidebar-link text-mono">02. Quick Start</a>
+        <a href="#cli" class="sidebar-link text-mono">03. CLI Reference</a>
+        <a href="#ros2" class="sidebar-link text-mono">04. ROS2 Topics</a>
+        <a href="#troubleshooting" class="sidebar-link text-mono">05. Troubleshooting</a>
+      </aside>
+
+      <article class="doc-content">
+        <section id="installation" class="docs-section reveal">
+          <h2>01. Installation</h2>
+          <p>OpenEyes requires Python 3.10+ and suitable edge hardware for accelerated inference.</p>
+          <TerminalPanel title="bash" compact={true}>
+            <div class="term-line"><span class="term-dim"># 1. Clone repository</span></div>
+            <div class="term-line"><span class="term-cmd">git clone https://github.com/mandarwagh9/openeyes</span></div>
+            <div class="term-line"><span class="term-cmd">cd openeyes</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-dim"># 2. Install dependencies</span></div>
+            <div class="term-line"><span class="term-cmd">pip install -r requirements.txt</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-dim"># 3. Optional Jetson performance mode</span></div>
+            <div class="term-line"><span class="term-cmd">sudo bash scripts/jetson_perf.sh</span></div>
+          </TerminalPanel>
+        </section>
+
+        <section id="quickstart" class="docs-section reveal">
+          <h2>02. Quick Start</h2>
+          <p>Use module execution syntax for local runs:</p>
+          <TerminalPanel title="bash" compact={true}>
+            <div class="term-line"><span class="term-cmd">python -m src.main --camera 0</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-cmd">python -m src.main --camera 0 --enable-face --enable-gesture --enable-pose</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-cmd">python -m src.main --deepstream --camera 0</span></div>
+          </TerminalPanel>
+        </section>
+
+        <section id="cli" class="docs-section reveal">
+          <h2>03. CLI Reference</h2>
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>Flag</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="text-mono">--camera [ID]</span></td>
+                <td>Camera device index.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--video [FILE]</span></td>
+                <td>Process video file instead of camera stream.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--enable-face</span></td>
+                <td>Enable face detection pipeline.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--enable-gesture</span></td>
+                <td>Enable gesture recognition pipeline.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--enable-pose</span></td>
+                <td>Enable body pose estimation.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--deepstream</span></td>
+                <td>Enable DeepStream inference pipeline.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--api</span></td>
+                <td>Start REST API server.</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">--world-model</span></td>
+                <td>Enable predictive world model mode.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="ros2" class="docs-section reveal">
+          <h2>04. ROS2 Telemetry</h2>
+          <p>OpenEyes can publish detection and state outputs to ROS2 topics.</p>
+          <TerminalPanel title="bash" compact={true}>
+            <div class="term-line"><span class="term-cmd">ros2 launch openeyes openeyes.launch.py device:=cuda ros2:=true</span></div>
+          </TerminalPanel>
+
+          <table class="spec-table" style="margin-top: var(--space-md);">
+            <thead>
+              <tr>
+                <th>Topic</th>
+                <th>Payload</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="text-mono">/vision/detections</span></td>
+                <td>Object detections</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">/vision/depth</span></td>
+                <td>Depth image or map output</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">/vision/faces</span></td>
+                <td>Face detections</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">/vision/gestures</span></td>
+                <td>Gesture status</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">/vision/poses</span></td>
+                <td>Pose detections</td>
+              </tr>
+              <tr>
+                <td><span class="text-mono">/vision/status</span></td>
+                <td>System state</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="troubleshooting" class="docs-section reveal">
+          <h2>05. Troubleshooting</h2>
+          <ul>
+            <li><strong>Camera not found:</strong> verify camera permissions and selected index.</li>
+            <li><strong>Slow startup:</strong> first-run model initialization can take additional time.</li>
+            <li><strong>No ROS2 data:</strong> ensure ROS2 dependencies are installed and sourced, then allow startup to finish.</li>
+            <li><strong>DeepStream issues:</strong> verify NVIDIA stack and matching runtime libraries.</li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout
+  title="OpenEyes | Hardware Specifications"
+  description="Supported edge AI hardware for the OpenEyes robotics framework."
+  activePage="hardware"
+>
+  <section class="section">
+    <h1 class="reveal">Hardware</h1>
+    <p class="hero-desc reveal">Built for Edge AI and Mobile Robotics</p>
+
+    <div class="hw-grid reveal">
+      <div class="hw-card">
+        <div class="hw-name">NVIDIA Jetson Orin Nano</div>
+        <p class="hw-spec">40 TOPS | 8GB RAM | TensorRT</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">The primary development platform for OpenEyes v3.0.1. Full DeepStream pipeline support.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Raspberry Pi 5 + AI HAT</div>
+        <p class="hw-spec">26 TOPS | 8GB RAM | Hailo-8L</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">High performance per watt. Optimized for ONNX models when DeepStream is not available.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Intel Core Ultra NPU</div>
+        <p class="hw-spec">48 TOPS | OpenVINO</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">x86 edge robotics and industrial x86_64 IPC architectures.</p>
+      </div>
+
+      <div class="hw-card">
+        <div class="hw-name">Qualcomm RB5</div>
+        <p class="hw-spec">15 TOPS | SNPE</p>
+        <p class="bento-text text-muted" style="margin-top: var(--space-md);">Optimized for power-constrained micro-drones and compact robotics.</p>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <h2 style="margin-top: var(--space-3xl);">Sensors &amp; Perception</h2>
+      <table class="spec-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Supported Devices</th>
+            <th>Protocol / Interface</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="text-mono">RGB Camera</span></td>
+            <td>IMX219, IMX477, USB UVC webcams</td>
+            <td>CSI-2 / V4L2</td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">Stereo / Depth</span></td>
+            <td>Intel RealSense D435i / D455, OAK-D</td>
+            <td>USB 3.0 / ROS2 Wrapper</td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">LIDAR (2D)</span></td>
+            <td>RPLIDAR A1/A2/S1, Sick</td>
+            <td>UART / Serial</td>
+          </tr>
+          <tr>
+            <td><span class="text-mono">IMU / Gyro</span></td>
+            <td>BNO085, MPU6050</td>
+            <td>I2C / SPI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</BaseLayout>

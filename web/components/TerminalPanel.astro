@@ -1,0 +1,19 @@
+---
+interface Props {
+  title?: string;
+  compact?: boolean;
+  className?: string;
+}
+
+const { title = "bash", compact = false, className = "" } = Astro.props;
+---
+
+<div class={`terminal ${className}`}>
+  <div class="terminal-header">
+    <div class="terminal-dots"><span></span><span></span><span></span></div>
+    <div class="terminal-title">{title}</div>
+  </div>
+  <div class:list={["terminal-body", compact && "terminal-body-compact"]}>
+    <slot />
+  </div>
+</div>

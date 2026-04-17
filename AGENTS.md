@@ -1,85 +1,54 @@
-# OpenEyes Agent Instructions
+# OpenEyes Agent Notes
 
-## Entry Point
+## Repo shape
+- This repo has two deliverables: Python runtime in `src/` and website output at root (`index.html`, `docs.html`, `hardware.html`, `demos.html`, `community.html`).
+- Website source-of-truth is now Astro in `web/` (components/pages/styles), then built to root HTML.
+- Treat executable code as source of truth. Many prose docs are aspirational or stale.
 
+## Source of truth files
+- CLI flags/modes: `src/cli/argparse.py`
+- Runtime entry flow: `src/main.py`
+- Core processing loop: `src/core/vision_system.py` and `src/core/frame_processor.py`
+- DeepStream path (`--deepstream`): `src/deepstream/pipeline.py`
+- Config and env overrides: `src/utils/config.py` + `config.yaml`
+
+## Commands that are reliable
 ```bash
-# MUST use -m flag (not python src/main.py)
-python -m src.main --camera 0 --debug
+pip install -r requirements.txt
+python -m src.main --debug
+python -m src.main --deepstream --camera 0
+python -m src.main --api --api-port 8000 --api-host 127.0.0.1
+python -m src.main --video input.mp4 --output output.mp4
+sudo bash scripts/jetson_perf.sh
+python -m benchmarks.run_benchmarks --all
 ```
 
-## Key Commands
+## Testing
+- Full suite: `pytest tests -q`
+- Focused run: `pytest tests/test_config.py -q`
+- Current baseline (verified): `pytest tests -q` has 1 failure:
+  - `tests/test_deepstream_pipeline.py::TestDeepStreamPipeline::test_initialization_defaults`
+  - Test expects default width `640`; `DeepStreamPipeline` default is `1280`.
 
-```bash
-# Video processing
-python -m src.main --video path/to/video.mp4 --output output.mp4
+## Runtime quirks that save time
+- Prefer `python -m src.main` for local runs; docs and launch files mix invocation styles.
+- DeepStream currently forces `yolov10n` config in `DeepStreamPipeline._get_config_path()` even if another model is requested.
+- `src/main.py` injects ROS2 Python paths and sets `DISPLAY=:0` when unset.
+- Keep the ROS2 init delay in mind: `VisionSystem._init_ros2()` intentionally sleeps `0.5s` after startup.
+- `Config` env overrides are limited to `CAMERA_INDEX`, `MODEL_PATH`, `CONFIDENCE_THRESHOLD`, `OUTPUT_HOST`, `OUTPUT_PORT`, `DEBUG`.
+- `.gitignore` excludes model artifacts (`*.onnx`, `*.engine`, `models/*.pt`), so model binaries will not appear in git status unless unignored.
+- `launch/openeyes.launch.py` hardcodes `python3 src/main.py ...` values and does not wire declared launch args into the command.
+- `scripts/deploy-docs.sh` is destructive (`git checkout -B gh-pages` + `git push --force`); do not run casually.
 
-# World model + person following
-python -m src.main --world-model lewm --follow --turbo
+## Website editing gotchas
+- Edit `web/` files, not root HTML output.
+- Build website with `npm run build` (or Dockerized Node if Node is not installed locally), then promote `dist/` output to root files.
+- Preferred links use clean routes (`/docs`, `/hardware`, `/demos`, `/community`) that redirect to `.html` pages.
+- Use `npm run publish:root` to build + sync root pages in one command.
+- `demos` page uses local GIFs in `demo/`.
 
-# REST API server
-python -m src.main --api --api-port 8000 --api-host 0.0.0.0
-
-# Testing
-pytest tests/ -v
-pytest tests/test_camera.py -x  # Stop on first failure
-
-# ROS2 launch
-ros2 launch openeyes openeyes.launch.py device:=cuda ros2:=true
-```
-
-## Architecture
-
-```
-src/
-├── main.py           # Entry point
-├── cli/argparse.py  # All CLI flags
-├── camera/          # CameraHandler
-├── core/           # VisionSystem, frame_processor
-├── models/         # ObjectDetector, depth_estimator
-├── ros2/           # VisionPublisher
-├── utils/          # config, logger, tracker, safety_controller
-└── world_model/   # LeWorldModel, planner, safety_evaluator
-```
-
-## Hard-Earned Discoveries
-
-- **CSI camera not available**: Check `/dev/video0`, add queue to GStreamer pipeline, reboot
-- **ROS2 topics not publishing**: Use MultiThreadedExecutor in separate thread, add `time.sleep(0.5)` after init
-- **MediaPipe empty results**: Lower confidence to 0.3 for face/pose, 0.1 for hands, resize to 640x480
-- **Person following distance**: Use bounding box HEIGHT RATIO (% of frame): forward <60%, stop 60-95%, backward >95%
-
-## DeepStream Pipeline
-
-- **Entry**: Always use `python -m src.main` (not python src/main.py)
-- **Resolution**: 1280x720 default for clear display
-- **appsink**: For Python models (face/gesture/pose) - extracts frames after OSD
-- **Gesture types**: open_palm, fist, thumbs_up, point, peace, three, four, ok
-- **Pose**: 33 body keypoints if full body visible
-- **Performance**: 60 FPS with YOLO only, 20-40 FPS with all models
-- **RGBA to BGR**: Must convert: `cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)` for MediaPipe
-
-## Style
-
-- Python 3.10+, type hints required
-- Custom exceptions: `src/exceptions.py`
-- Logging: `from src.utils.logger import get_logger`
-
-## ROS2 Topics (10 Publishers)
-
-| Topic | Type |
-|:------|:----|
-| `/vision/detections` | JSON |
-| `/vision/depth` | JSON |
-| `/vision/faces` | JSON |
-| `/vision/gestures` | JSON |
-| `/vision/pose` | JSON |
-| `/vision/status` | JSON |
-| `/vision/image/debug` | JSON |
-| `/vision/predictions` | JSON |
-| `/vision/plan` | JSON |
-| `/vision/safety` | JSON |
-
-## Known Issues
-
-- Motor control not integrated (commands print to console only)
-- Target: 30-50 FPS (currently 10-12 without INT8/DLA)
+## Known docs drift
+- Version strings are inconsistent across code/docs (`README.md` v3.0.1, `src/main.py` and API v2.6.0, `src/__init__.py` v0.0.1).
+- Some documented commands are not implemented in current CLI (for example, `openeyes fleet ...` subcommands and `scripts/optimize_jetson.py`).
+- When unsure, validate against `src/cli/argparse.py` and runnable tests, not markdown docs.
+- There is no checked-in CI workflow, pre-commit config, or formatter config at repo root.

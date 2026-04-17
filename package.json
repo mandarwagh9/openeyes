@@ -1,0 +1,17 @@
+{
+  "name": "openeyes-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "publish:root": "bash scripts/publish_site.sh"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "astro": "^5.7.0",
+    "typescript": "^5.9.3"
+  }
+}

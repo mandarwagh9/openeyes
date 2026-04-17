@@ -1,0 +1,85 @@
+---
+import Footer from "../components/Footer.astro";
+import NavDock from "../components/NavDock.astro";
+import logo from "../../assets/images/logo.svg";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+  activePage?: "home" | "docs" | "hardware" | "demos" | "community";
+}
+
+const { title, description, activePage = "home" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={logo.src} />
+  </head>
+  <body data-page={activePage}>
+    <NavDock activePage={activePage} />
+    <main class="container">
+      <slot />
+      <Footer />
+    </main>
+
+    <script>
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      const revealItems = document.querySelectorAll(".reveal");
+      if (prefersReducedMotion) {
+        revealItems.forEach((item) => item.classList.add("active"));
+      } else if (revealItems.length > 0) {
+        const revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("active");
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.15,
+            rootMargin: "0px 0px -40px 0px"
+          }
+        );
+
+        revealItems.forEach((item) => revealObserver.observe(item));
+      }
+
+      const docsSections = document.querySelectorAll(".docs-section");
+      const docsLinks = document.querySelectorAll(".sidebar .sidebar-link");
+
+      if (docsSections.length > 0 && docsLinks.length > 0) {
+        const docsObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+
+              const sectionId = entry.target.getAttribute("id");
+              docsLinks.forEach((link) => link.classList.remove("active"));
+
+              const active = document.querySelector(`.sidebar .sidebar-link[href="#${sectionId}"]`);
+              if (active) {
+                active.classList.add("active");
+              }
+            });
+          },
+          {
+            rootMargin: "-20% 0px -68% 0px",
+            threshold: 0
+          }
+        );
+
+        docsSections.forEach((section) => docsObserver.observe(section));
+      }
+    </script>
+  </body>
+</html>

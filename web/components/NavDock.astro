@@ -1,0 +1,35 @@
+---
+import logo from "../../assets/images/logo.svg";
+
+interface Props {
+  activePage?: "home" | "docs" | "hardware" | "demos" | "community";
+}
+
+const { activePage = "home" } = Astro.props;
+
+const links = [
+  { key: "docs", href: "/docs", label: "Docs" },
+  { key: "hardware", href: "/hardware", label: "Hardware" },
+  { key: "demos", href: "/demos", label: "Demos" },
+  { key: "community", href: "/community", label: "Community" }
+];
+---
+
+<nav class="nav-dock" aria-label="Primary">
+  <a href="/" class="nav-brand">
+    <img src={logo.src} alt="OpenEyes" />
+    OpenEyes
+  </a>
+  <div class="nav-links">
+    {
+      links.map((link) => (
+        <a href={link.href} class={activePage === link.key ? "active" : undefined}>
+          {link.label}
+        </a>
+      ))
+    }
+    <a href="https://github.com/mandarwagh9/openeyes" target="_blank" rel="noreferrer" class="text-accent">
+      GitHub
+    </a>
+  </div>
+</nav>

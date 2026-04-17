@@ -1,0 +1,73 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BentoCard from "../components/BentoCard.astro";
+import healthIcon from "../../assets/images/health-monitor.svg";
+import safetyIcon from "../../assets/images/safety-shield.svg";
+import TerminalPanel from "../components/TerminalPanel.astro";
+---
+
+<BaseLayout
+  title="OpenEyes | Community & Contributing"
+  description="Join the OpenEyes robotics community and contribute to the framework."
+  activePage="community"
+>
+  <section class="section">
+    <h1 class="reveal">Community</h1>
+    <p class="hero-desc reveal">Build the future of edge robotics with us.</p>
+
+    <div class="content-wrapper">
+      <aside class="sidebar reveal">
+        <a href="#contributing" class="sidebar-link text-mono">01. Contributing</a>
+        <a href="#standards" class="sidebar-link text-mono">02. Standards</a>
+        <a href="#links" class="sidebar-link text-mono">03. Links</a>
+      </aside>
+
+      <article class="doc-content">
+        <section id="contributing" class="docs-section reveal">
+          <h2>01. How to Contribute</h2>
+          <p>OpenEyes is an Apache 2.0 open-source framework. We welcome pull requests for bug fixes, new model integrations, and performance optimizations.</p>
+          <TerminalPanel title="git" compact={true}>
+            <div class="term-line"><span class="term-dim"># Fork and clone</span></div>
+            <div class="term-line"><span class="term-cmd">git clone https://github.com/mandarwagh9/openeyes</span></div>
+            <div class="term-line"><span class="term-cmd">cd openeyes</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-dim"># Create feature branch</span></div>
+            <div class="term-line"><span class="term-cmd">git checkout -b feature/model-optimization</span></div>
+            <div class="term-line"> </div>
+            <div class="term-line"><span class="term-dim"># Validate tests</span></div>
+            <div class="term-line"><span class="term-cmd">pytest tests -q</span></div>
+          </TerminalPanel>
+        </section>
+
+        <section id="standards" class="docs-section reveal">
+          <h2>02. Code Standards</h2>
+          <ul>
+            <li><strong>Python 3.10+ required.</strong> Keep type hints in public interfaces.</li>
+            <li><strong>Use repo logging utilities.</strong> Prefer structured logs over ad-hoc prints.</li>
+            <li><strong>Respect real entrypoints.</strong> Validate CLI behavior against `src/cli/argparse.py`.</li>
+            <li><strong>Test before merge.</strong> Run targeted tests for touched areas, then broader suite.</li>
+          </ul>
+        </section>
+
+        <section id="links" class="docs-section reveal">
+          <h2>03. Connect</h2>
+          <div class="bento-grid" style="grid-template-columns: repeat(2, 1fr); margin-top: var(--space-md);">
+            <BentoCard title="GitHub Issues" iconSrc={healthIcon.src} iconAlt="Issues icon" className="col-span-1">
+              <p class="bento-text text-muted">Report bugs or request features. Include hardware info and logs when possible.</p>
+              <p class="bento-text" style="margin-top: var(--space-sm);"><a href="https://github.com/mandarwagh9/openeyes" target="_blank" rel="noreferrer">Open repository</a></p>
+            </BentoCard>
+
+            <BentoCard title="Community Chat" iconSrc={safetyIcon.src} iconAlt="Community icon" className="col-span-1">
+              <p class="bento-text text-muted">Coordinate on architecture, ROS2 integration, and field deployments.</p>
+              <p class="bento-text" style="margin-top: var(--space-sm);"><a href="https://discord.gg/openeyes" target="_blank" rel="noreferrer">Join discussion</a></p>
+            </BentoCard>
+          </div>
+
+          <p class="text-muted" style="margin-top: var(--space-md); font-size: 0.9rem;">
+            Need help getting started? Open an issue with your hardware details and command output.
+          </p>
+        </section>
+      </article>
+    </div>
+  </section>
+</BaseLayout>

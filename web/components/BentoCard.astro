@@ -1,0 +1,23 @@
+---
+interface Props {
+  title: string;
+  iconSrc?: string;
+  iconAlt?: string;
+  className?: string;
+}
+
+const {
+  title,
+  iconSrc = "/assets/images/sensor-fusion.svg",
+  iconAlt = "Feature icon",
+  className = ""
+} = Astro.props;
+---
+
+<article class={`bento-card reveal ${className}`}>
+  <div>
+    <img src={iconSrc} alt={iconAlt} class="bento-icon-image" width="28" height="28" loading="lazy" />
+    <h3 class="bento-title">{title}</h3>
+    <slot />
+  </div>
+</article>
