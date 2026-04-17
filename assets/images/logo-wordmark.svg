@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" role="img" aria-label="OpenEyes wordmark logo">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="50" cy="50" r="45" stroke="#ffffff" stroke-width="4" />
+    <circle cx="50" cy="50" r="30" stroke="#808080" stroke-width="3" />
+    <circle cx="50" cy="50" r="16" stroke="#ffffff" stroke-width="2.5" />
+  </g>
+  <text
+    x="112"
+    y="61"
+    fill="#ffffff"
+    font-family="IBM Plex Sans, Arial, sans-serif"
+    font-size="40"
+    font-weight="600"
+    letter-spacing="1"
+  >
+    OpenEyes
+  </text>
+</svg>
