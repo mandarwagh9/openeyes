@@ -1,5 +1,5 @@
 ---
-import logoWordmark from "../../assets/images/logo-wordmark.svg";
+import logo from "../../assets/images/logo.svg";
 
 interface Props {
   activePage?: "home" | "docs" | "hardware" | "demos" | "community";
@@ -17,7 +17,8 @@ const links = [
 
 <nav class="nav-dock" aria-label="Primary">
   <a href="/" class="nav-brand">
-    <img src={logoWordmark.src} alt="OpenEyes" />
+    <img src={logo.src} alt="OpenEyes" />
+    OpenEyes
   </a>
   <div class="nav-links">
     {

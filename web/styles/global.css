@@ -184,6 +184,8 @@ a:hover {
 .nav-brand {
   font-family: var(--font-display);
   font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
   color: var(--text-hi-res);
   display: flex;
   align-items: center;
@@ -191,8 +193,9 @@ a:hover {
 }
 
 .nav-brand img {
-  height: 22px;
+  height: 30px;
   width: auto;
+  flex-shrink: 0;
 }
 
 .nav-links {
@@ -786,7 +789,7 @@ a:hover {
   }
 
   .nav-brand img {
-    height: 24px;
+    height: 30px;
   }
 
   .nav-links {
