@@ -2,10 +2,10 @@
 @import url("https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap");
 
 :root {
-  --bg-base: #06080b;
-  --bg-surface: #0c1016;
-  --bg-panel: #141b24;
-  --bg-elevated: #1c2531;
+  --bg-base: #07090d;
+  --bg-surface: #0d1218;
+  --bg-panel: #131a23;
+  --bg-elevated: #1a2430;
   --accent-primary: #00e5ff;
   --accent-primary-dim: rgba(0, 229, 255, 0.15);
   --accent-secondary: #ff5a36;
@@ -51,9 +51,9 @@ body {
   overflow-x: hidden;
   position: relative;
   background:
-    radial-gradient(1200px 700px at 82% -6%, rgba(0, 229, 255, 0.1), transparent 62%),
-    radial-gradient(900px 620px at -8% 92%, rgba(255, 90, 54, 0.07), transparent 65%),
-    linear-gradient(160deg, #06080b 0%, #0b1017 42%, #090d13 100%);
+    radial-gradient(1400px 720px at 88% -10%, rgba(56, 189, 248, 0.08), transparent 62%),
+    radial-gradient(1000px 680px at -10% 105%, rgba(14, 165, 233, 0.06), transparent 66%),
+    linear-gradient(160deg, #07090d 0%, #0a1119 46%, #0a0f15 100%);
 }
 
 body::before {
@@ -63,12 +63,11 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(rgba(176, 205, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(176, 205, 255, 0.05) 1px, transparent 1px),
-    radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.08) 0, transparent 52%);
-  background-size: 56px 56px, 56px 56px, auto;
-  background-position: 0 0, 0 0, 0 0;
-  opacity: 0.18;
+    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+    linear-gradient(120deg, rgba(56, 189, 248, 0.08) 0%, rgba(56, 189, 248, 0) 38%);
+  background-size: 64px 64px, 64px 64px, 100% 100%;
+  opacity: 0.16;
 }
 
 body::after {
@@ -78,10 +77,8 @@ body::after {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(900px 480px at 76% 15%, rgba(0, 229, 255, 0.08), transparent 68%),
-    radial-gradient(720px 420px at 14% 86%, rgba(0, 120, 255, 0.06), transparent 72%),
-    radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.45) 100%);
-  animation: ambient-drift 24s var(--ease-smooth) infinite alternate;
+    radial-gradient(900px 440px at 74% 14%, rgba(56, 189, 248, 0.07), transparent 70%),
+    radial-gradient(circle at center, transparent 28%, rgba(2, 6, 12, 0.5) 100%);
 }
 
 main.container {
@@ -228,27 +225,17 @@ a:hover {
 .hero::before {
   content: "";
   position: absolute;
-  inset: -80px -60px -60px -80px;
+  inset: -60px -40px -30px 38%;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(900px 420px at 78% 24%, rgba(0, 229, 255, 0.13), transparent 68%),
-    repeating-radial-gradient(circle at 78% 24%, rgba(0, 229, 255, 0.12) 0 1px, transparent 1px 34px);
-  opacity: 0.36;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 18% 12% auto auto;
-  width: clamp(260px, 34vw, 520px);
-  height: clamp(260px, 32vw, 460px);
-  border-radius: 50%;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(circle at 50% 50%, rgba(117, 233, 255, 0.15) 0%, rgba(117, 233, 255, 0.05) 36%, transparent 72%);
-  filter: blur(4px);
-  animation: ambient-drift 20s var(--ease-smooth) infinite alternate;
+    radial-gradient(680px 360px at 66% 30%, rgba(56, 189, 248, 0.13), transparent 72%),
+    linear-gradient(120deg, rgba(56, 189, 248, 0.12), rgba(56, 189, 248, 0) 42%),
+    linear-gradient(rgba(125, 211, 252, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px);
+  background-size: auto, auto, 26px 26px, 26px 26px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+  opacity: 0.22;
 }
 
 .hero-content {
@@ -419,15 +406,6 @@ a:hover {
   50%,
   100% {
     border-right-color: transparent;
-  }
-}
-
-@keyframes ambient-drift {
-  from {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  to {
-    transform: translate3d(0, -8px, 0) scale(1.03);
   }
 }
 
@@ -825,17 +803,14 @@ a:hover {
   }
 
   .hero::before {
-    inset: -40px -20px -20px -20px;
+    inset: -30px -18px -12px 28%;
     background:
-      radial-gradient(540px 260px at 68% 22%, rgba(0, 229, 255, 0.13), transparent 72%),
-      repeating-radial-gradient(circle at 68% 22%, rgba(0, 229, 255, 0.1) 0 1px, transparent 1px 30px);
-    opacity: 0.24;
-  }
-
-  .hero::after {
-    width: 280px;
-    height: 280px;
-    inset: 24% -50px auto auto;
+      radial-gradient(420px 220px at 72% 24%, rgba(56, 189, 248, 0.12), transparent 76%),
+      linear-gradient(rgba(125, 211, 252, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px);
+    background-size: auto, 22px 22px, 22px 22px;
+    border-left: none;
+    opacity: 0.18;
   }
 
   h1 {
@@ -884,10 +859,5 @@ a:hover {
   .reveal {
     opacity: 1;
     transform: none;
-  }
-
-  body::after,
-  .hero::after {
-    animation: none !important;
   }
 }
