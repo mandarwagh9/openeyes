@@ -549,6 +549,20 @@ a:hover {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+  }
+  
+  html { font-size: 15px; }
+  
+  .container {
+    padding: 0 var(--space-md);
+  }
+
   .bento-grid {
     grid-template-columns: 1fr;
   }
@@ -556,14 +570,55 @@ a:hover {
   .row-span-2 { grid-row: span 1; }
   
   .nav-dock {
-    width: 90%;
+    width: calc(100% - 32px);
+    top: 16px;
+    padding: 12px 20px;
     justify-content: space-between;
+    gap: var(--space-sm);
+    border-radius: 12px;
+    flex-wrap: wrap;
   }
   
+  .nav-brand {
+    font-size: 0;
+  }
+  .nav-brand img {
+    height: 24px;
+  }
+
+  .nav-links {
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  
+  .hero {
+    min-height: auto;
+    padding-top: 120px;
+    padding-bottom: var(--space-2xl);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+  
+  .terminal-body {
+    height: 280px;
+    font-size: 0.75rem;
+    padding: var(--space-sm);
+  }
+
+  .term-line {
+    word-break: break-all;
+  }
+
   .footer {
     flex-direction: column;
     gap: var(--space-md);
     text-align: center;
+    padding: var(--space-2xl) 0;
   }
 }
 
