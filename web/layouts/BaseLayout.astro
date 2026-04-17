@@ -123,6 +123,60 @@ const { title, description, activePage = "home" } = Astro.props;
           typeNext();
         }
       }
+
+      const sectionNavLinks = Array.from(document.querySelectorAll(".home-section-link"));
+      if (sectionNavLinks.length > 0) {
+        const targets = sectionNavLinks
+          .map((link) => {
+            const hash = link.getAttribute("href");
+            if (!hash || !hash.startsWith("#")) return null;
+            const section = document.querySelector(hash);
+            if (!(section instanceof HTMLElement)) return null;
+            return { link, section };
+          })
+          .filter((item) => item !== null);
+
+        if (targets.length > 0) {
+          const setActive = (activeId: string) => {
+            sectionNavLinks.forEach((link) => {
+              const isActive = link.getAttribute("href") === `#${activeId}`;
+              link.classList.toggle("active", isActive);
+              link.setAttribute("aria-current", isActive ? "true" : "false");
+            });
+          };
+
+          const navObserver = new IntersectionObserver(
+            (entries) => {
+              let visible = null;
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  visible = entry.target;
+                }
+              });
+              if (visible instanceof HTMLElement) {
+                setActive(visible.id);
+              }
+            },
+            {
+              rootMargin: "-35% 0px -45% 0px",
+              threshold: 0.01
+            }
+          );
+
+          targets.forEach(({ section }) => navObserver.observe(section));
+
+          sectionNavLinks.forEach((link) => {
+            link.addEventListener("click", (event) => {
+              const href = link.getAttribute("href");
+              if (!href || !href.startsWith("#")) return;
+              const section = document.querySelector(href);
+              if (!(section instanceof HTMLElement)) return;
+              event.preventDefault();
+              section.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+            });
+          });
+        }
+      }
     </script>
   </body>
 </html>
