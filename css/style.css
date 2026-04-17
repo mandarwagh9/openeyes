@@ -149,7 +149,7 @@ a:hover {
 /* ===== Minimal Navigation ===== */
 .nav-dock {
   position: fixed;
-  bottom: var(--space-lg);
+  top: var(--space-md);
   left: 50%;
   transform: translateX(-50%);
   background: rgba(11, 11, 15, 0.8);
@@ -240,7 +240,7 @@ a:hover {
   grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: var(--space-2xl);
-  padding-top: var(--space-3xl);
+  padding-top: var(--space-2xl);
 }
 
 .hero-content {
