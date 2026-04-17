@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "/docs.html",
+      "permanent": false
+    },
+    {
+      "source": "/docs/",
+      "destination": "/docs.html",
+      "permanent": false
+    },
+    {
+      "source": "/hardware",
+      "destination": "/hardware.html",
+      "permanent": false
+    },
+    {
+      "source": "/hardware/",
+      "destination": "/hardware.html",
+      "permanent": false
+    },
+    {
+      "source": "/demos",
+      "destination": "/demos.html",
+      "permanent": false
+    },
+    {
+      "source": "/demos/",
+      "destination": "/demos.html",
+      "permanent": false
+    },
+    {
+      "source": "/community",
+      "destination": "/community.html",
+      "permanent": false
+    },
+    {
+      "source": "/community/",
+      "destination": "/community.html",
+      "permanent": false
+    }
+  ]
+}
