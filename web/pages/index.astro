@@ -26,19 +26,19 @@ import TerminalPanel from "../components/TerminalPanel.astro";
       </div>
     </div>
 
-    <TerminalPanel title="openeyes-engine - bash" className="reveal">
-      <div class="term-line"><span class="term-dim">$</span> <span class="term-cmd">python -m src.main --camera 0 --enable-face --enable-gesture --enable-pose</span></div>
-      <div class="term-line"><span class="term-accent">[INFO]</span> Initializing OpenEyes Vision Engine v2.6.0</div>
-      <div class="term-line"><span class="term-dim">[SYSTEM]</span> Hardware detected: Jetson Orin Nano (8GB)</div>
-      <div class="term-line"><span class="term-dim">[SYSTEM]</span> CUDA Available: True | TensorRT: True</div>
-      <div class="term-line"><span class="term-accent">[INFO]</span> Loading YOLO TensorRT engine... <span class="term-success">DONE</span></div>
-      <div class="term-line"><span class="term-accent">[INFO]</span> Initializing MediaPipe FaceMesh... <span class="term-success">DONE</span></div>
-      <div class="term-line"><span class="term-accent">[INFO]</span> Initializing MediaPipe Hands... <span class="term-success">DONE</span></div>
-      <div class="term-line"><span class="term-accent">[INFO]</span> Starting DeepStream pipeline via appsink...</div>
-      <div class="term-line"> </div>
-      <div class="term-line"><span class="term-success">FPS: 60 | Obj: 3 | Face: 1 | Hand: thumbs_up | Pose: 1</span></div>
-      <div class="term-line"><span class="term-success">FPS: 60 | Obj: 4 | Face: 1 | Hand: open_palm | Pose: 1</span></div>
-      <div class="term-line"><span class="term-success">FPS: 59 | Obj: 4 | Face: 1 | Hand: open_palm | Pose: 1</span></div>
+    <TerminalPanel title="openeyes-engine - bash" className="reveal js-terminal-boot">
+      <div class="term-line"><span class="term-dim">$</span> <span class="term-cmd js-type-command" data-text="python -m src.main --camera 0 --enable-face --enable-gesture --enable-pose"></span></div>
+      <div class="term-line js-stream-line"><span class="term-accent">[INFO]</span> Initializing OpenEyes Vision Engine v2.6.0</div>
+      <div class="term-line js-stream-line"><span class="term-dim">[SYSTEM]</span> Hardware detected: Jetson Orin Nano (8GB)</div>
+      <div class="term-line js-stream-line"><span class="term-dim">[SYSTEM]</span> CUDA Available: True | TensorRT: True</div>
+      <div class="term-line js-stream-line"><span class="term-accent">[INFO]</span> Loading YOLO TensorRT engine... <span class="term-success">DONE</span></div>
+      <div class="term-line js-stream-line"><span class="term-accent">[INFO]</span> Initializing MediaPipe FaceMesh... <span class="term-success">DONE</span></div>
+      <div class="term-line js-stream-line"><span class="term-accent">[INFO]</span> Initializing MediaPipe Hands... <span class="term-success">DONE</span></div>
+      <div class="term-line js-stream-line"><span class="term-accent">[INFO]</span> Starting DeepStream pipeline via appsink...</div>
+      <div class="term-line js-stream-line"> </div>
+      <div class="term-line js-stream-line"><span class="term-success">FPS: 60 | Obj: 3 | Face: 1 | Hand: thumbs_up | Pose: 1</span></div>
+      <div class="term-line js-stream-line"><span class="term-success">FPS: 60 | Obj: 4 | Face: 1 | Hand: open_palm | Pose: 1</span></div>
+      <div class="term-line js-stream-line"><span class="term-success">FPS: 59 | Obj: 4 | Face: 1 | Hand: open_palm | Pose: 1</span></div>
     </TerminalPanel>
   </section>
 

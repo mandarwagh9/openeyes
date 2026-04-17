@@ -334,6 +334,33 @@ a:hover {
   word-break: break-word;
 }
 
+.js-type-command {
+  border-right: 1px solid currentColor;
+  animation: term-caret 0.9s steps(1) infinite;
+}
+
+.js-stream-line {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.2s var(--ease-smooth), transform 0.2s var(--ease-smooth);
+}
+
+.js-stream-line.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes term-caret {
+  0%,
+  49% {
+    border-right-color: currentColor;
+  }
+  50%,
+  100% {
+    border-right-color: transparent;
+  }
+}
+
 .term-cmd {
   color: var(--text-hi-res);
 }

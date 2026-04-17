@@ -80,6 +80,49 @@ const { title, description, activePage = "home" } = Astro.props;
 
         docsSections.forEach((section) => docsObserver.observe(section));
       }
+
+      const terminalBoot = document.querySelector(".js-terminal-boot");
+      if (terminalBoot) {
+        const commandTarget = terminalBoot.querySelector(".js-type-command");
+        const streamLines = Array.from(terminalBoot.querySelectorAll(".js-stream-line"));
+
+        if (prefersReducedMotion) {
+          if (commandTarget instanceof HTMLElement) {
+            commandTarget.textContent = commandTarget.dataset.text || "";
+          }
+          streamLines.forEach((line) => {
+            if (line instanceof HTMLElement) line.classList.add("show");
+          });
+        } else if (commandTarget instanceof HTMLElement) {
+          const fullCommand = commandTarget.dataset.text || "";
+          let index = 0;
+          const typeDelayMs = 22;
+          const lineDelayMs = 140;
+
+          streamLines.forEach((line) => {
+            if (line instanceof HTMLElement) line.classList.remove("show");
+          });
+
+          const typeNext = () => {
+            if (index < fullCommand.length) {
+              index += 1;
+              commandTarget.textContent = fullCommand.slice(0, index);
+              window.setTimeout(typeNext, typeDelayMs);
+              return;
+            }
+
+            streamLines.forEach((line, lineIndex) => {
+              if (line instanceof HTMLElement) {
+                window.setTimeout(() => {
+                  line.classList.add("show");
+                }, lineDelayMs * lineIndex);
+              }
+            });
+          };
+
+          typeNext();
+        }
+      }
     </script>
   </body>
 </html>
