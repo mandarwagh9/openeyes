@@ -572,31 +572,32 @@ a:hover {
   .nav-dock {
     width: calc(100% - 32px);
     top: 16px;
-    padding: 12px 20px;
-    justify-content: space-between;
-    gap: var(--space-sm);
-    border-radius: 12px;
-    flex-wrap: wrap;
+    padding: 16px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    border-radius: 16px;
   }
   
   .nav-brand {
-    font-size: 0;
+    font-size: 1.2rem;
   }
   .nav-brand img {
     height: 24px;
   }
 
   .nav-links {
-    gap: 12px;
+    gap: 16px 20px;
     justify-content: center;
     flex-wrap: wrap;
     width: 100%;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
   }
   
   .hero {
     min-height: auto;
-    padding-top: 120px;
+    padding-top: 160px;
     padding-bottom: var(--space-2xl);
   }
 
@@ -611,7 +612,8 @@ a:hover {
   }
 
   .term-line {
-    word-break: break-all;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   .footer {

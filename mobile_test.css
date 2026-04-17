@@ -1,0 +1,25 @@
+  .nav-dock {
+    width: calc(100% - 32px);
+    top: 16px;
+    padding: 16px;
+    flex-direction: column;
+    gap: 16px;
+    border-radius: 16px;
+  }
+  
+  .nav-brand {
+    font-size: 1.2rem;
+    width: 100%;
+    justify-content: center;
+  }
+  .nav-brand img {
+    height: 24px;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    font-size: 0.9rem;
+  }
