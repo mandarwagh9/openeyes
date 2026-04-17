@@ -259,8 +259,14 @@ a:hover {
 
 .btn-primary:hover {
   background: var(--accent-primary);
+  color: var(--bg-base);
   transform: translateY(-1px);
   box-shadow: 0 8px 16px var(--accent-primary-dim);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  color: var(--bg-base);
 }
 
 .btn-secondary {
@@ -419,7 +425,8 @@ a:hover {
 .bento-icon-image {
   display: inline-block;
   margin-bottom: var(--space-md);
-  opacity: 0.9;
+  opacity: 0.95;
+  filter: brightness(0) invert(1);
 }
 
 .bento-title {
