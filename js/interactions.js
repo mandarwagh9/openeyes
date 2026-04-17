@@ -52,26 +52,29 @@ document.addEventListener('DOMContentLoaded', () => {
       line.style.display = 'block';
       line.style.opacity = '1';
       
-      // If the line is a command prompt, reveal it instantly
-      if (line.textContent.includes('openeyes@v3')) {
-         setTimeout(() => typeLine(index + 1), 300);
-      } else {
+      const text = line.textContent.trim();
+      
+      // If the line is a command prompt (starts with $), type it character by character
+      if (text.startsWith('$')) {
          const originalHTML = line.innerHTML;
-         const text = line.textContent; // pure text
+         const pureText = line.textContent; // pure text
          line.innerHTML = '';
          
          let charIndex = 0;
          const typeChar = () => {
-             if (charIndex < text.length) {
-                 line.innerHTML += text.charAt(charIndex);
+             if (charIndex < pureText.length) {
+                 line.innerHTML = pureText.substring(0, charIndex + 1);
                  charIndex++;
-                 setTimeout(typeChar, 10 + Math.random() * 15); // Fast typing speed
+                 setTimeout(typeChar, 20 + Math.random() * 30); // Fast typing speed
              } else {
-                 line.innerHTML = originalHTML; // Restore spans (like [OK])
-                 setTimeout(() => typeLine(index + 1), 150 + Math.random() * 100);
+                 line.innerHTML = originalHTML; // Restore spans (like dim $)
+                 setTimeout(() => typeLine(index + 1), 300); // Wait before outputting logs
              }
          };
          typeChar();
+      } else {
+         // Output logs reveal instantly, line by line
+         setTimeout(() => typeLine(index + 1), 80 + Math.random() * 70);
       }
     };
     
