@@ -566,3 +566,85 @@ a:hover {
     text-align: center;
   }
 }
+
+/* ==========================================================================
+   INTERACTIONS & EFFECTS (Added for v3.0.1)
+   ========================================================================== */
+
+/* 1. Film Grain Overlay */
+.film-grain {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* 2. Global Spotlight (follows mouse on body) */
+body {
+  position: relative;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(255, 255, 255, 0.03),
+    transparent 40%
+  );
+  transition: opacity 0.5s var(--ease-smooth);
+}
+
+/* 3. Bento Card Spotlight */
+.bento-card {
+  position: relative;
+  overflow: hidden; /* For spotlight to stay inside */
+}
+
+.bento-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(
+    400px circle at var(--card-mouse-x, -500px) var(--card-mouse-y, -500px),
+    rgba(0, 229, 255, 0.08), /* Cyan tint spotlight */
+    transparent 40%
+  );
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.3s;
+  opacity: 0;
+}
+.bento-card:hover::before {
+  opacity: 1;
+}
+
+/* Make sure bento content stays above the card spotlight */
+.bento-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* 4. Scroll Reveals */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s var(--ease-smooth), transform 0.8s var(--ease-smooth);
+  will-change: opacity, transform;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 5. Docs ScrollSpy active state */
+.sidebar-link.active {
+  color: var(--accent-primary);
+  border-left: 2px solid var(--accent-primary);
+  padding-left: calc(var(--space-sm) - 2px);
+  background: var(--accent-primary-dim);
+}
