@@ -13,7 +13,7 @@ import TerminalPanel from "../components/TerminalPanel.astro";
   description="Hardware-agnostic edge robot vision framework. YOLO, MediaPipe, TensorRT at 60 FPS."
   activePage="home"
 >
-  <section class="hero section" id="hero-top">
+  <section class="hero section home-snap-section" id="hero-top">
     <div class="hero-content reveal">
       <div class="hero-tag">v3.0.1 Stable Release</div>
       <h1>We Give Robots<br /><span class="text-accent">Vision</span></h1>
@@ -42,7 +42,7 @@ import TerminalPanel from "../components/TerminalPanel.astro";
     </TerminalPanel>
   </section>
 
-  <section class="section reveal" id="core-architecture">
+  <section class="section reveal home-snap-section" id="core-architecture">
     <h2>Core Architecture</h2>
     <div class="bento-grid">
       <BentoCard title="DeepStream Pipeline" iconSrc={sensorFusionIcon.src} iconAlt="DeepStream icon" className="col-span-2">
@@ -63,7 +63,7 @@ import TerminalPanel from "../components/TerminalPanel.astro";
     </div>
   </section>
 
-  <section class="section reveal" id="performance-benchmarks">
+  <section class="section reveal home-snap-section" id="performance-benchmarks">
     <h2>Performance Benchmarks</h2>
     <p>Tested on NVIDIA Jetson Orin Nano (8GB) in MAXN mode.</p>
 
@@ -105,9 +105,4 @@ import TerminalPanel from "../components/TerminalPanel.astro";
     </table>
   </section>
 
-  <nav class="home-section-nav" aria-label="Landing sections">
-    <a href="#hero-top" class="home-section-link active" data-label="Hero"></a>
-    <a href="#core-architecture" class="home-section-link" data-label="Architecture"></a>
-    <a href="#performance-benchmarks" class="home-section-link" data-label="Benchmarks"></a>
-  </nav>
 </BaseLayout>

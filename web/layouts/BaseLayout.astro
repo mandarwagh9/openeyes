@@ -124,58 +124,95 @@ const { title, description, activePage = "home" } = Astro.props;
         }
       }
 
-      const sectionNavLinks = Array.from(document.querySelectorAll(".home-section-link"));
-      if (sectionNavLinks.length > 0) {
-        const targets = sectionNavLinks
-          .map((link) => {
-            const hash = link.getAttribute("href");
-            if (!hash || !hash.startsWith("#")) return null;
-            const section = document.querySelector(hash);
-            if (!(section instanceof HTMLElement)) return null;
-            return { link, section };
-          })
-          .filter((item) => item !== null);
+      const homeSections = Array.from(document.querySelectorAll(".home-snap-section"));
+      const isHomePage = document.body.dataset.page === "home";
+      const shouldUseSnap = isHomePage && homeSections.length > 1 && window.matchMedia("(min-width: 1025px)").matches;
 
-        if (targets.length > 0) {
-          const setActive = (activeId: string) => {
-            sectionNavLinks.forEach((link) => {
-              const isActive = link.getAttribute("href") === `#${activeId}`;
-              link.classList.toggle("active", isActive);
-              link.setAttribute("aria-current", isActive ? "true" : "false");
-            });
-          };
+      if (shouldUseSnap) {
+        let snapLocked = false;
+        let snapReleaseTimer = null;
 
-          const navObserver = new IntersectionObserver(
-            (entries) => {
-              let visible = null;
-              entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                  visible = entry.target;
-                }
-              });
-              if (visible instanceof HTMLElement) {
-                setActive(visible.id);
-              }
-            },
-            {
-              rootMargin: "-35% 0px -45% 0px",
-              threshold: 0.01
+        const lockSnap = () => {
+          snapLocked = true;
+          if (snapReleaseTimer) {
+            window.clearTimeout(snapReleaseTimer);
+          }
+          snapReleaseTimer = window.setTimeout(() => {
+            snapLocked = false;
+          }, 520);
+        };
+
+        const getCurrentIndex = () => {
+          const viewportAnchor = window.innerHeight * 0.34;
+          let closestIndex = 0;
+          let closestDistance = Number.POSITIVE_INFINITY;
+
+          homeSections.forEach((section, idx) => {
+            if (!(section instanceof HTMLElement)) return;
+            const distance = Math.abs(section.getBoundingClientRect().top - viewportAnchor);
+            if (distance < closestDistance) {
+              closestDistance = distance;
+              closestIndex = idx;
             }
-          );
-
-          targets.forEach(({ section }) => navObserver.observe(section));
-
-          sectionNavLinks.forEach((link) => {
-            link.addEventListener("click", (event) => {
-              const href = link.getAttribute("href");
-              if (!href || !href.startsWith("#")) return;
-              const section = document.querySelector(href);
-              if (!(section instanceof HTMLElement)) return;
-              event.preventDefault();
-              section.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
-            });
           });
-        }
+
+          return closestIndex;
+        };
+
+        const scrollToIndex = (index: number) => {
+          const clamped = Math.max(0, Math.min(homeSections.length - 1, index));
+          const target = homeSections[clamped];
+          if (!(target instanceof HTMLElement)) return;
+          lockSnap();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        };
+
+        window.addEventListener(
+          "wheel",
+          (event) => {
+            if (prefersReducedMotion || snapLocked) return;
+            const delta = event.deltaY;
+            if (Math.abs(delta) < 18) return;
+
+            const active = document.activeElement;
+            if (active instanceof HTMLElement) {
+              const tag = active.tagName;
+              if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active.isContentEditable) {
+                return;
+              }
+            }
+
+            event.preventDefault();
+            const current = getCurrentIndex();
+            const next = delta > 0 ? current + 1 : current - 1;
+            scrollToIndex(next);
+          },
+          { passive: false }
+        );
+
+        window.addEventListener("keydown", (event) => {
+          if (prefersReducedMotion || snapLocked) return;
+          if (!["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Space"].includes(event.key)) return;
+
+          const active = document.activeElement;
+          if (active instanceof HTMLElement) {
+            const tag = active.tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || active.isContentEditable) {
+              return;
+            }
+          }
+
+          event.preventDefault();
+          const current = getCurrentIndex();
+          let direction = 0;
+          if (event.key === "ArrowDown" || event.key === "PageDown" || event.key === "Space") {
+            direction = 1;
+          }
+          if (event.key === "ArrowUp" || event.key === "PageUp") {
+            direction = -1;
+          }
+          scrollToIndex(current + direction);
+        });
       }
     </script>
   </body>

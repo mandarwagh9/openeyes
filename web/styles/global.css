@@ -211,69 +211,6 @@ a:hover {
   color: var(--text-hi-res);
 }
 
-.home-section-nav {
-  position: fixed;
-  right: clamp(16px, 2.8vw, 42px);
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 950;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 14px 10px;
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  border-radius: 999px;
-  background: rgba(8, 12, 18, 0.72);
-  backdrop-filter: blur(8px);
-}
-
-.home-section-link {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: transparent;
-  display: inline-block;
-  position: relative;
-  transition: background-color 0.18s var(--ease-snappy), transform 0.18s var(--ease-snappy), border-color 0.18s var(--ease-snappy);
-}
-
-.home-section-link::after {
-  content: attr(data-label);
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 14px);
-  transform: translateY(-50%) translateX(4px);
-  opacity: 0;
-  pointer-events: none;
-  white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--text-medium);
-  transition: opacity 0.18s var(--ease-snappy), transform 0.18s var(--ease-snappy);
-}
-
-.home-section-link:hover,
-.home-section-link:focus-visible,
-.home-section-link.active {
-  border-color: rgba(186, 230, 253, 0.95);
-  background: var(--accent-primary);
-}
-
-.home-section-link:hover::after,
-.home-section-link:focus-visible::after,
-.home-section-link.active::after {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-}
-
-.home-section-link.active {
-  transform: scale(1.16);
-  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.18);
-}
-
 .hero {
   min-height: 90vh;
   display: grid;
@@ -860,10 +797,6 @@ a:hover {
     font-size: 0.95rem;
   }
 
-  .home-section-nav {
-    display: none;
-  }
-
   .hero {
     padding-top: 160px;
     padding-bottom: var(--space-2xl);
@@ -928,8 +861,4 @@ a:hover {
     transform: none;
   }
 
-  .home-section-link,
-  .home-section-link::after {
-    transition: none !important;
-  }
 }
