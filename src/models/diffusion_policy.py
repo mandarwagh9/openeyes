@@ -195,7 +195,7 @@ class DiffusionPolicy:
             True if successful
         """
         try:
-            state_dict = torch.load(path, map_location=self._device)
+            state_dict = torch.load(path, map_location=self._device, weights_only=True)
             self._model.load_state_dict(state_dict)
             self._is_loaded = True
             return True
